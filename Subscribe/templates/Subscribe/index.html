@@ -77,6 +77,9 @@ var mobile_number = $('#inputMobileNumber').val();
       else if(json.status == 2){
         alert('Enter a valid phone number.');
     }
+      else if(json.status == 3){
+        alert('Enter a valid email address.');
+    }
     else{
       alert('Email already registered');
     }

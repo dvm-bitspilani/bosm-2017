@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from models import Subscriber
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
+import re
 
 @csrf_exempt
 def index(request):
@@ -24,21 +25,33 @@ def index(request):
 			data = {'status':0}
 			return JsonResponse(data)
 
+		
+
 		if len(mobile_number) == 10:
 			try:
 
 				number = int(mobile_number)
-				subscriber = Subscriber()
-				subscriber.email_address = email
-				subscriber.name = name
-				subscriber.mobile_number = '+91' + mobile_number
-				subscriber.save()
-				data = {'status':1,'email':email, 'name':name, 'mobile_number':mobile_number}
-				return JsonResponse(data)
+
+				if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+
+					subscriber = Subscriber()
+					subscriber.email_address = email
+					subscriber.name = name
+					subscriber.mobile_number = '+91' + mobile_number
+					subscriber.save()
+					data = {'status':1,'email':email, 'name':name, 'mobile_number':mobile_number}
+					return JsonResponse(data)
+
+				else:
+
+					data = {'status':3}
+					return JsonResponse(data)
 
 			except ValueError:
 				data = {'status':2}
 				return JsonResponse(data)
+
+
 
 		else:
 			data = {'status':2}
