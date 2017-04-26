@@ -6,5 +6,5 @@ app_name = 'Subscribe'
 urlpatterns = [
     #url(r'^subscribe$', views.subscribe, name='subscribe'),
     url(r'^$', views.index, name='index'),
-    url(r'^download$', views.get_list, name='prc list'),
+    url(r'^2017/download$', views.get_list, name='prc list'),
 ]

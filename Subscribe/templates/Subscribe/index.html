@@ -15,12 +15,14 @@
       <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
       <label for="inputName" class="sr-only">Name</label>
       <input type="text" id="inputName" class="form-control" placeholder="Name" required>
+      <label for="inputMobileNumber" class="sr-only">Name</label>
+      <input type="text" id="inputMobileNumber" class="form-control" placeholder="Mobile No.(+91-)" required>
       <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
  </form>
 
  </div>
 
- <a href='/download'>Download Excel Sheet</a>
+ <a href='/2017/download'>Download Excel Sheet</a>
 
  <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
  <script>
@@ -54,6 +56,7 @@ function getCookie(name) {
 
  var name = $('#inputName').val();
 
+var mobile_number = $('#inputMobileNumber').val();
 //This is the Ajax post.Observe carefully. It is nothing but details of where_to_post,what_to_post
 
  $.ajax({
@@ -61,7 +64,8 @@ function getCookie(name) {
          type : "POST", // http method
          data : { csrfmiddlewaretoken : csrftoken,
          email : email,
-         name : name
+         name : name, 
+         mobile_number:mobile_number
  }, // data sent with the post request
 
  // handle a successful response
@@ -70,7 +74,10 @@ function getCookie(name) {
       if(json.status == 1){
       alert('Hi '+json['email'] +'!.' + ' You have entered name:'+      json['name']);
     }
-    else {
+      else if(json.status == 2){
+        alert('Enter a valid phone number.');
+    }
+    else{
       alert('Email already registered');
     }
  },

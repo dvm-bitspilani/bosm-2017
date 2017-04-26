@@ -11,7 +11,8 @@ def index(request):
 
 		email = request.POST['email']
 		name = request.POST['name']
-
+		mobile_number = request.POST["mobile_number"]
+		
 		try:
 			Subscriber.objects.get(email_address = email)
 			user_exists = True
@@ -23,13 +24,24 @@ def index(request):
 			data = {'status':0}
 			return JsonResponse(data)
 
-		else:
+		if len(mobile_number) == 10:
+			try:
 
-			subscriber = Subscriber()
-			subscriber.email_address = email
-			subscriber.name = name
-			subscriber.save()
-			data = {'status':1,'email':email, 'name':name}
+				number = int(mobile_number)
+				subscriber = Subscriber()
+				subscriber.email_address = email
+				subscriber.name = name
+				subscriber.mobile_number = '+91' + mobile_number
+				subscriber.save()
+				data = {'status':1,'email':email, 'name':name, 'mobile_number':mobile_number}
+				return JsonResponse(data)
+
+			except ValueError:
+				data = {'status':2}
+				return JsonResponse(data)
+
+		else:
+			data = {'status':2}
 			return JsonResponse(data)
 
 	return render(request, 'Subscribe/index.html')
@@ -64,6 +76,8 @@ def get_list(request):
 	worksheet.write(1, 0, "ID")
 	worksheet.write(1, 1, "Name")
 	worksheet.write(1, 2, "Email ID")
+	worksheet.write(1, 3, "Mobile No.")
+
 	
 
 	for i, row in enumerate(data):
@@ -75,6 +89,7 @@ def get_list(request):
 		worksheet.write(i+2, 0, deepgetattr(row['obj'], 'id', 'NA'))
 		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'name', 'NA'))
 		worksheet.write(i+2, 2, deepgetattr(row['obj'], 'email_address', 'NA'))
+		worksheet.write(i+2, 3, deepgetattr(row['obj'], 'mobile_number', 'NA'))
 		
 
 	workbook.close()
