@@ -34,7 +34,7 @@ def index(request):
 
 	return render(request, 'Subscribe/index.html')
 
-
+@staff_member_required
 def get_list(request):
 	from django.http import HttpResponse, HttpResponseRedirect
 	import xlsxwriter
