@@ -18,7 +18,7 @@ ul.cards-list li > * {
 }
 ul.cards-list li .proPic {
 	background-position: center;
-	background-size: contain;
+	background-size: cover;
 	background-repeat: no-repeat;
 }
 ul.cards-list li .info {
@@ -243,7 +243,7 @@ label[for="mail"] {
 	.cards-list{
 		width: 75%;
 		height: 60%;
-		margin-top: 15%;
+		margin-top: 0px !important;
 	}
 	.cards-list li{
 		min-width: 170px;
@@ -396,7 +396,7 @@ label[for="mail"] {
 }
 
 .cards-list::-webkit-scrollbar-thumb
-{
+{	width: 6px;
 	background-color: : #000000;
 }
 .cossac li{
@@ -411,4 +411,10 @@ label[for="mail"] {
 }
 nav ul{
 	z-index: 10;
+}
+label.mail{
+	font-size: 12px !important;
+}
+.cards-list li{
+	height: 95%;
 }
