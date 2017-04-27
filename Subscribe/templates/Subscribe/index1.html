@@ -1,0 +1,98 @@
+<html>
+ <head>
+ <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+ <link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
+ </head>
+
+ <body>
+
+ <div class="container">
+
+ <form class="form-signin" method="POST">
+      {% csrf_token %}
+      <h2 class="form-signin-heading">Enter Details</h2>
+      <label for="inputEmail" class="sr-only">Email address</label>
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+      <label for="inputName" class="sr-only">Name</label>
+      <input type="text" id="inputName" class="form-control" placeholder="Name" required>
+      <label for="inputMobileNumber" class="sr-only">Name</label>
+      <input type="text" id="inputMobileNumber" class="form-control" placeholder="Mobile No.(+91-)" required>
+      <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+ </form>
+
+ </div>
+
+ <a href='/2017/download'>Download Excel Sheet</a>
+
+ <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+ <script>
+
+//For getting CSRF token
+function getCookie(name) {
+       var cookieValue = null;
+       if (document.cookie && document.cookie != '') {
+         var cookies = document.cookie.split(';');
+         for (var i = 0; i < cookies.length; i++) {
+         var cookie = jQuery.trim(cookies[i]);
+         // Does this cookie string begin with the name we want?
+         if (cookie.substring(0, name.length + 1) == (name + '=')) {
+             cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+             break;
+          }
+     }
+   }
+ return cookieValue;
+}
+
+
+//For doing AJAX post
+ $("#submit").click(function(e) {
+
+ e.preventDefault();
+
+ var csrftoken = getCookie('csrftoken');
+
+ var email = $('#inputEmail').val();
+
+ var name = $('#inputName').val();
+
+var mobile_number = $('#inputMobileNumber').val();
+//This is the Ajax post.Observe carefully. It is nothing but details of where_to_post,what_to_post
+
+ $.ajax({
+         url : window.location.href, // the endpoint,commonly same url
+         type : "POST", // http method
+         data : { csrfmiddlewaretoken : csrftoken,
+         email : email,
+         name : name, 
+         mobile_number:mobile_number
+ }, // data sent with the post request
+
+ // handle a successful response
+ success : function(json) {
+      console.log(json);
+      if(json.status == 1){
+      alert('Hi '+json['email'] +'!.' + ' You have entered name:'+      json['name']);
+    }
+      else if(json.status == 2){
+        alert('Enter a valid phone number.');
+    }
+      else if(json.status == 3){
+        alert('Enter a valid email address.');
+    }
+    else{
+      alert('Email already registered');
+    }
+ },
+
+ // handle a non-successful response
+ error : function(xhr,errmsg,err) {
+ console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+ }
+ });
+});
+
+</script>
+
+</body>
+</html>

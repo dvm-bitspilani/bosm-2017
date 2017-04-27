@@ -1,31 +1,207 @@
-<html>
- <head>
- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
- <link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
- </head>
+<!DOCTYPE html>
+{% load static %}
+<html lang="en-US">
+	<head>
 
- <body>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>BOSM Intro</title>
+		<link rel="stylesheet" href="{% static 'stylesheet/resets.css' %}">
+		<link rel="stylesheet" href="{% static 'stylesheet/ui.css' %}">
+		<link rel="stylesheet" href="{% static 'stylesheet/image-trans.css' %}">
+		<link rel="stylesheet" href="{% static 'stylesheet/timer.css' %}">
+		<link rel="stylesheet" href="{% static 'stylesheet/popup.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'stylesheet/animate.css' %}">
+		<style media="screen">
+			@font-face {
+				font-family: Bebas;
+				src: url({% static 'fonts/Bebas.ttf' %});
+			}
+			@font-face {
+				font-family: Roboto;
+				src: url({% static 'fonts/Roboto.ttf' %});
+			}
+			* {
+				font-family: Bebas !important;
+				font-weight: 100;
+			}
+		</style>
+		<script src="{% static 'javascript/jquery.min.js' %}" charset="utf-8"></script>
+		<script type="text/javascript" src="{% static 'javascript/lettering.js' %}"></script>
+		<script type="text/javascript" src="{% static 'javascript/textillate.js' %}"></script>
+		<script type="text/javascript" src="{% static 'javascript/prefixfree.min.js' %}"></script>
+	</head>
+	<body>
+		<div class="layer" id="one">
+			<div id="slider">
+			<figure class="active">
+				<div class="imgwrap" style="background-image: url({% static 'images/01.jpg' %});"></div>
+				<div class="imgwrap" style="background-image: url({% static 'images/02.jpg' %});"></div>
+				<div class="imgwrap" style="background-image: url({% static 'images/03.jpg' %});"></div>
+				<div class="imgwrap" style="background-image: url({% static 'images/01.jpg' %});"></div>
+			</figure>
+			</div>
+		</div>
 
- <div class="container">
 
- <form class="form-signin" method="POST">
-      {% csrf_token %}
-      <h2 class="form-signin-heading">Enter Details</h2>
-      <label for="inputEmail" class="sr-only">Email address</label>
-      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-      <label for="inputName" class="sr-only">Name</label>
-      <input type="text" id="inputName" class="form-control" placeholder="Name" required>
-      <label for="inputMobileNumber" class="sr-only">Name</label>
-      <input type="text" id="inputMobileNumber" class="form-control" placeholder="Mobile No.(+91-)" required>
-      <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
- </form>
+		<div class="layer" id="two">
+			<header>
+				<div class="heading"><p>BOSM'17</p></div>
+					<input type="checkbox" id="toggle1">
+					<label for="toggle1">&#9776;</label>
+				<nav>
+					<ul>
+						<li><a class="about-link">About Us</a></li>
+						<li><a class="contact-link">Contacts</a></li>
+						<li><a class="sponsors-link">Sponsors</a></li>
+						<li><a class="travel-link">Travel Partner</a></li>
+						<li><a class="subscribe-link">Subscribe</a></li>
+					</ul>
+				</nav>
 
- </div>
+			</header>
+			<section>
+				<div class="shade">
+				</div>
+				<div class="main-content">
+					<div class="container">
+						<div class="text-container">
+							<div class="text active">
+								<ul class="texts active">
+									<li>GRIT</li><li>GUTS</li><li>GLORY</li>
+								</ul>
+							</div>
+							<span class="bosm-17">
+								BOSM'17
+							</span>
+						</div>
+						<div class="box"></div>
+					</div>
+				</div>
+			</section>
+			<div id="timer-wrapper">
+				<div id="timer">
+				</div>
+			</div>
+			<footer>
+			<div class="footer-inwrap">
+				<div class="buttons">
+					<div class="button" list="1">
+						<span>
+							<img src="{% static 'images/play-icon.png' %}">
+						</span>
+					Teaser
+					</div>
+				</div>
+				<div class="social_media_icons">
+					<div class="icon">
+						<span>
+							<a href = "https://www.facebook.com/bosmbitspilani/?hc_ref=SEARCH&fref=nf"><img src="{% static 'images/facebook-icon.png' %}"></a>
+						</span>
+					</div>
+					<div class="icon">
+						<span>
+							<a href = "https://www.youtube.com/user/bitsbosm"><img src="{% static 'images/youtube-icon.png' %}"></a>
+						</span>
+					</div>
+					<div class="icon">
+						<span>
+							<a href = "https://twitter.com/bosm_bitspilani"><img src="{% static 'images/twitter-icon.png' %}"></a>
+						</span>
+					</div>
+				</div>
+			</div>
+			</footer>
+		</div>
+		<!-- youtube video -->
+		<div class="backdrop">
+			<div class="youtube-video-container">
+				<div id="player"></div>
+			</div>
+		</div>
+		<!-- Popups -->
+		<div class="popup-wrapper">
+			<div class="popup green about">
+				<div class="up-ribbon ribbon">
+					<p>ABOUT US</p>
+				</div>
+				<div class="content">
+					<div class="">
+						<p>
+							<b>BOSM</b> is one of the most celebrated sporting fest across the country. It is a blend of coordination, enthusiasm, talent and most importantly, the spirit of sportsmanship.
+						</p>
+						<p> The 31st edition of BOSM, which was organized from 15th September, 2016 to 19th September, 2016, witnessed the most majestic and splendid concept of <b>BOSM Torch</b> and its mascot the <b>Baxter</b>- "the Desert Eagle".The lightening of the BOSM
+							torch and the performance by the band of Birla Balika Vidyapeeth, Pilani marked the beginning of this season of sports.
+						</p>
+						<p> Then started the awaited events which impartially judged the hard work, skills and perseverance of the players. Most of the outdoor events were organized in the newly renovated Gym Grounds of BITS Pilani, whose improved tracks, grounds and courts
+							especially bragged the attention and appreciation of all the players from within and outside the college.
+						</p>
+						<p>The food and accommodation facilities were praised by the outside players and spectators. Also, BOSM 2016 witnessed the presence of great sportspersons like <b>Babita Kumari Phogat</b>, the 2014 Commonweath Gold medalist wrestler and <b>Sanjeev Rajput</b>,
+							the renowned Arjuna Awardee shooter.
+						</p>
+						<center>
+							<p>So, this year we are back with much more competition, adventure and fun. Do you have the guts to take up the challenge and show your skills to the world?</p>
+							<p>Then pull up your socks as we are coming to judge you to the fullest of your talents and bring out the best in you.</p>
+							<p><b>The game begins NOW!!!</b>
+							</p>
+						</center>
 
- <a href='/2017/download'>Download Excel Sheet</a>
+					</div>
+				</div>
+				<div class="down-ribbon ribbon"></div>
+			</div>
+			<div class="popup green travel">
+				<div class="up-ribbon ribbon">
+					<p>TRAVEL</p>
+				</div>
 
- <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
- <script>
+				<div class="content">
+					<div class="">
+						<p>
+							Looking for a site to book your travel tickets on for your PS stations or your summer vacations? Worried by the various prices all over the internet? Wondering if you're missing out on the best deals at the cheapest price?
+						</p>
+						<p>
+							Look no further! Musafir is a trusted travel website providing the cheapest fares on all flights, local and international. Get the best deals, current offers and affordable flight options. Book customized holiday packages to top tourist destinations,
+							or avail the best discounts on frequent domestic flights.
+						</p>
+						<p>
+							Visit <a href="https://clk.omgt5.com/?AID=1049250&PID=16669">Musafir</a> and avail free coupons, such as 15% off on all flights booked between 12 to 2 PM. Witness the smoothest booking and flying experience with Musafir.
+						</p>
+					</div>
+				</div>
+				<div class="down-ribbon ribbon">
+					<p>MUSAFIR</p>
+				</div>
+			</div>
+			<div class="popup green subscribe">
+				<div class="up-ribbon ribbon">
+					<p>SUBSCRIBE</p>
+				</div>
+
+				<div class="content">
+					<div class="">
+						<form action="index.html" method="post" class="subscribe-form">
+							<h2 class="form-signin-heading">Enter Details</h2>
+							<div class="">
+								<div>
+									<label for="inputEmail" class="sr-only">Email</label>
+									<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+								</div>
+								<div>
+									<label for="inputName" class="sr-only">Name</label>
+									<input type="text" id="inputName" class="form-control" placeholder="Name" required>
+								</div>
+								<div>
+									<label for="inputMobileNumber" class="sr-only">Phone</label>
+									<input type="text" id="inputMobileNumber" class="form-control" placeholder="Mobile No.(+91-)" required>
+								</div>
+
+							</div>
+							<button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+						</form>
+					</div>
+				</div>
+				<script>
 
 //For getting CSRF token
 function getCookie(name) {
@@ -64,7 +240,7 @@ var mobile_number = $('#inputMobileNumber').val();
          type : "POST", // http method
          data : { csrfmiddlewaretoken : csrftoken,
          email : email,
-         name : name, 
+         name : name,
          mobile_number:mobile_number
  }, // data sent with the post request
 
@@ -93,6 +269,36 @@ var mobile_number = $('#inputMobileNumber').val();
 });
 
 </script>
-
-</body>
+				<div class="down-ribbon ribbon"></div>
+			</div>
+			<div class="popup red contact">
+				<svg class="triangle" height="210" width="500">
+		 <polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
+		</svg>
+				<div class="up-ribbon ribbon">
+					<p>CONTACT US</p>
+				</div>
+				<div class="content">
+					<ul class="cards-list cossac">
+					</ul>
+				</div>
+				<div class="down-ribbon ribbon"></div>
+			</div>
+			<div class="popup green sponsors">
+				<div class="up-ribbon ribbon">
+					<p>SPONSORS</p>
+				</div>
+				<div class="content">
+					<ul class="cards-list spons">
+					</ul>
+				</div>
+				<div class="down-ribbon ribbon"></div>
+			</div>
+		</div>
+		<script src="{% static 'javascript/youtube.js' %}" ></script>
+		<script src="{% static 'javascript/main.js' %}"  charset="utf-8"></script>
+		<script src="{% static 'javascript/popup.js' %}"  charset="utf-8"></script>
+		<script src="{% static 'javascript/timer.js' %}" charset="utf-8"></script>
+		<script src="{% static 'javascript/ui.js' %}"></script>
+	</body>
 </html>
