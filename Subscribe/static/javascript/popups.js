@@ -77,7 +77,7 @@ for (var i in cossac) {
 	cossacul = $('ul.cards-list.cossac');
 	cossacul.append('\
 		<li>\
-			<div class="proPic" style="background-image: url(/2017/static/images/cossac'+cossacn.img+')"></div>\
+			<div class="proPic" style="background-image: url(/2017/static/images/cossac/'+cossacn.img+')"></div>\
 			<div class="info">\
 				<label for="name">'+cossacn.name+'</label>\
 				<label for="dept">'+cossacn.dept+'</label>\
@@ -91,7 +91,7 @@ for (var i in spons) {
 	sponsor = spons[i];
 	sponsul.append('\
 		<li>\
-			<div class="proPic" style="background-image: url(/2017/static/images/sponsors'+sponsor.logo+')"></div>\
+			<div class="proPic" style="background-image: url(/2017/static/images/sponsors/'+sponsor.logo+')"></div>\
 			<div class="info">\
 				<label for="name">'+sponsor.name+'</label>\
 			</div>\
