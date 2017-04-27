@@ -24,6 +24,7 @@ ul.cards-list li .proPic {
 ul.cards-list li .info {
 	max-height: 75px;
 	background: #fff;
+	font-size: 60%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -90,6 +91,8 @@ label[for="mail"] {
 	z-index: 2;
 	height: 70vh;
 	width: 70vw;
+	margin: auto;
+	margin-top: 15vh;
 	min-width: 400px;
 	position: relative;
 }
@@ -322,4 +325,90 @@ label[for="mail"] {
 }
 .subscribe-form > div > div > label {
 	margin: 5px;
+}
+/*check*/
+.form_1 form{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+#submit{
+	width: 50%;
+	text-align: center;
+	justify-content: center;
+	margin:auto;
+	background-color: white;
+	border-radius: 3px;
+	border: 1px solid white;
+	transition: background-color 0.5s linear;
+	transition: color 0.4s linear;
+}
+#submit:hover{
+	color: white;
+	background-color: black;
+}
+.form-control{
+	height: 1em;
+	margin: auto;
+	overflow-y: hidden;
+}
+.form-signin-heading{
+	margin:auto;
+	padding: 10px;
+	border-bottom: 3px solid black;
+}
+.form_1 div{
+	padding: 2px 0px;
+	border-radius: 2px;
+
+}
+.cards-list::scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.cards-list::scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.cards-list::scrollbar-thumb
+{
+	background-color: : #000000;
+}
+.cossac li{
+	height: 90%;
+}
+
+
+.cards-list::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.cards-list::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+.cards-list::-webkit-scrollbar-thumb
+{
+	background-color: : #000000;
+}
+.cossac li{
+	height: 90%;
+}
+.popup-wrapper{
+	z-index: 0;
+}
+
+#one{
+	z-index: -1;
+}
+nav ul{
+	z-index: 10;
 }
