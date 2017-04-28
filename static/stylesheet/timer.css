@@ -1,0 +1,76 @@
+div#timer-wrapper {
+  height: 100%;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top:0;
+}
+@media screen and (max-width: 900px) {
+  div#timer-wrapper {
+    display: none;
+  }
+}
+div#timer-wrapper * {
+  backface-visibility: hidden;
+}
+div#timer {
+  transform-style: preserve-3d;
+  position: relative;
+  top:0;
+  right:0;
+  width:100px;
+  height: 100%;
+  perspective: 600px;
+  perspective-origin: center;
+
+}
+.threedee {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50% 50%;
+  backface-visibility: hidden;
+}
+.assembly {
+  position: absolute;
+  left: 0%;
+  top: 50%;
+  transform: rotateZ(90deg) rotateY(0deg);
+}
+.assembly {
+  animation: spin 2s cubic-bezier(.65,.29,.65,1.25);
+}
+.assembly .face {
+  /*outline: 1px solid #000;*/
+  background: transparent !important;
+  backface-visibility: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.assembly .face span {
+  display: block !important;
+  transform: rotate(-90deg) scale(0.25);
+  transform-origin: center;
+  width: calc(4 * 2px);
+  height: calc(4 * 90px);
+  background: #FFF;
+}
+.assembly .face label {
+  display: block !important;
+  transform: rotate(-90deg) scale(0.25);
+  transform-origin: center;
+  color: #FFF;
+  font-size: calc(2.5 * 1.8rem);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-family: "Bebas Neue";
+}
+@keyframes spin {
+  to {
+    transform: rotateZ(90deg) rotateY(360deg);
+  }
+}

@@ -30,8 +30,63 @@
 		<script type="text/javascript" src="{% static 'javascript/lettering.js' %}"></script>
 		<script type="text/javascript" src="{% static 'javascript/textillate.js' %}"></script>
 		<script type="text/javascript" src="{% static 'javascript/prefixfree.min.js' %}"></script>
+
+		<script type="text/javascript">
+		$(window).load(function() {
+			// Animate loader off screen
+			$(".loader-wrapper").fadeOut("slow");
+		});
+	</script>
 	</head>
 	<body>
+		<div class="loader-wrapper">
+			<div class="loader">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 257.5 257.5">
+				  <defs>
+				    <style>
+				      .\36 461ed6f-f43c-4f84-81d7-4f231c3adacd {
+				        font-size: 36px;
+				        fill: #e2fcef;
+				        font-family: Bebas, Bebas;
+				      }
+
+				      .\33 b286878-dddc-4be0-9835-7205ac2a8632 {
+				        letter-spacing: 0.02em;
+				      }
+
+				      .d74be699-0b01-4406-be98-b6715a0d624a {
+				        letter-spacing: 0.02em;
+				      }
+
+				      .ce003358-51b5-4747-a82a-3e50ae1d0021 {
+				        letter-spacing: 0.02em;
+				      }
+
+				      .\33 fa24b36-c2c2-4ef4-98b9-28e1f794f7d0, .\34 86c41df-a2bd-4c88-9fbc-83b4a4ed696a {
+				        fill: none;
+				        stroke: #e2fcef;
+				        stroke-miterlimit: 10;
+				      }
+
+				      .\34 86c41df-a2bd-4c88-9fbc-83b4a4ed696a {
+				        stroke-dasharray: 9.09 9.09;
+				      }
+				    </style>
+				  </defs>
+				  <title>Loader</title>
+				  <g id="b4c66f6d-ce94-434a-8933-37fcd3c86610" data-name="Layer 2">
+				    <g id="1f8f9ef2-93c0-4218-b067-4b15af0b6f04" data-name="Layer 2">
+				      <rect x="55" y="104" width="147.5" height="47.95"/>
+				      <text class="6461ed6f-f43c-4f84-81d7-4f231c3adacd" id ="text" transform="translate(65.5 145)"><tspan class="3b286878-dddc-4be0-9835-7205ac2a8632">B</tspan><tspan class="d74be699-0b01-4406-be98-b6715a0d624a" x="20.4" y="0">O</tspan><tspan class="ce003358-51b5-4747-a82a-3e50ae1d0021" x="39.68" y="0">S</tspan><tspan x="59.67" y="0">M &apos;17</tspan></text>
+				      <g id="square">
+				      <rect class="3fa24b36-c2c2-4ef4-98b9-28e1f794f7d0" x="0.5" y="0.5" width="256.5" height="256.5"/></rect></g>
+				      <g id="circle">
+				      <circle class="486c41df-a2bd-4c88-9fbc-83b4a4ed696a" cx="128.75" cy="128.75" r="115.75"/></circle></g>
+				    </g>
+				  </g>
+				</svg>
+			</div>
+		</div>
 		<div class="layer" id="one">
 			<div id="slider">
 			<figure class="active">
@@ -86,11 +141,19 @@
 			<footer>
 			<div class="footer-inwrap">
 				<div class="buttons">
+					<a href="http://bits-bosm.org/2016main" style="text-decoration: none; color: #fff;">
+					<div class="button" list="1">
+						<span>
+							<img src="{% static 'images/play-icon.png' %}" style="visibility: hidden">
+						</span>
+					BOSM '16
+					</div>
+					</a>
 					<div class="button" list="1">
 						<span>
 							<img src="{% static 'images/play-icon.png' %}">
 						</span>
-					Teaser
+					BOSM '17&nbsp;Teaser
 					</div>
 				</div>
 				<div class="social_media_icons">
@@ -112,7 +175,12 @@
 				</div>
 			</div>
 			</footer>
+				<div id="DVM">
+					MADE WITH <span>&hearts;</span> AT DVM
+				</div>
+
 		</div>
+
 		<!-- youtube video -->
 		<div class="backdrop">
 			<div class="youtube-video-container">
@@ -189,16 +257,16 @@
 							<h2 class="form-signin-heading">Enter Details</h2>
 							<div class="">
 								<div>
-									<label for="inputEmail" class="sr-only">Email</label>
+									<label for="inputEmail" class="sr-only"></label>
 									<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
 								</div>
 								<div>
-									<label for="inputName" class="sr-only">Name</label>
+									<label for="inputName" class="sr-only"></label>
 									<input type="text" id="inputName" class="form-control" placeholder="Name" required>
 								</div>
 								<div>
-									<label for="inputMobileNumber" class="sr-only">Phone</label>
-									<input type="text" id="inputMobileNumber" class="form-control" placeholder="Mobile No.(+91-)" required>
+									<label for="inputMobileNumber" class="sr-only"></label>
+									<input type="number" id="inputMobileNumber" min="1000000000" max="9999999999" class="form-control" placeholder="Mobile No.(+91-)" style="width:100%" required>
 								</div>
 
 							</div>
@@ -253,7 +321,7 @@ var mobile_number = $('#inputMobileNumber').val();
  success : function(json) {
       console.log(json);
       if(json.status == 1){
-      alert('Hi '+json['email'] +'!.' + ' You have entered name:'+      json['name']);
+      alert('Hi '+json['name'] +'!.' + ' Your email :'+      json['name'] + ' has been registered.');
     }
       else if(json.status == 2){
         alert('Enter a valid phone number.');
