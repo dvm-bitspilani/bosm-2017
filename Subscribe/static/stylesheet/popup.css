@@ -231,7 +231,11 @@ label[for="mail"] {
 	background-color: transparent !important;
 	color: #222 !important;
 }
-
+ul.cards-list li .proPic {
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
 
 @media screen and (max-width : 1200px) {
 	.popup .ribbon{
