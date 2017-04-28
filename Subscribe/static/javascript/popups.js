@@ -36,17 +36,18 @@ var cossac = [
 		dept: "For Correspondence and Publicity",
 		email: "pcr@bits-bosm.org"
 	},
-	{
-		name: "vihang",
-		img: "Vihang.jpg",
-		dept: "Core Website",
-		email: "webmaster@bits-bosm.org"
-	},
+	
 	{
 		name: "Gautham",
 		img: "Gautham.jpg",
 		dept: "For Reception and Accomodation",
 		email: "recnacc@bits-bosm.org"
+	},
+	{
+		name: "vihang",
+		img: "Vihang.jpg",
+		dept: "Core Website",
+		email: "webmaster@bits-bosm.org"
 	}
 	
 ];
@@ -88,7 +89,7 @@ for (var i in cossac) {
 			<div class="proPic" style="background-image: url(/2017/static/images/cossac/'+cossacn.img+');background-size: cover;"></div>\
 			<div class="info">\
 				<label for="name" style="font-size:17px;">'+cossacn.name+'</label>\
-				<label for="dept" class="dept" style="font-size:15px;padding:3px;">'+cossacn.dept+'</label>\
+				<label for="dept" class="dept" style="font-size:15px;padding:3px;text-align:center;">'+cossacn.dept+'</label>\
 				<a href="mailto:'+cossacn.email+'"><label for="mail" style="font-size: 12px !important;">'+cossacn.email+'</label></a>\
 			</div>\
 		</li>\

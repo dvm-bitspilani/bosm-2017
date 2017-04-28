@@ -89,8 +89,8 @@ function threedeestripes() {
   var ct19 = faces[29].style.transform;
   var nt19 = ct19.replace(/Y\([^\)]*rad\)/,"Y(-0.93rad)");
   var nt19 = nt19.replace(/X\([^\)]*rad\)/,"X(+0.02rad)");
-  nt1 += " scale(1.5)";
-  nt19 += " scale(1.5)";
+  nt1 += " scale(1.25)";
+  nt19 += " scale(1.25)";
   faces[1].style.transform = nt1;
   faces[0].querySelector('label').style.fontSize = "calc(3 * 1.8rem)";
   faces[1].querySelector('span').style.transform = "rotateZ(-90deg) rotateX(0deg) scaleX(0.5) scaleY(0.25)";
