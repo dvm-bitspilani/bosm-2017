@@ -25,6 +25,9 @@ background-position: center;
 background-repeat: no-repeat;
 background-size: cover;
 height: 100vh;}
+div#slider figure > div:first-of-type, div#slider figure > div:last-of-type {
+	background-position-x: 20%;
+}
 div#slider figure {
   position: relative;
   width: 400%;

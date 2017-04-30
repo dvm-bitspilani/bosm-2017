@@ -3,13 +3,13 @@
 	left: 0%; }
 30% {
 	left: 0%; }
-35% {
+33.33% {
 	left: -100vw; }
-60% {
+63.33% {
 	left: -100vw; }
-65% {
+66.66% {
 	left: -200vw; }
-95% {
+96.66% {
 	left: -200vw; }
 100%{
 	left:-300vw;
@@ -25,6 +25,9 @@ background-position: center;
 background-repeat: no-repeat;
 background-size: cover;
 height: 100vh;}
+div#slider figure > div:first-of-type, div#slider figure > div:last-of-type {
+	background-position-x: 20%;
+}
 div#slider figure {
   position: relative;
   width: 400%;

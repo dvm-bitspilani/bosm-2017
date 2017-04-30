@@ -35,6 +35,7 @@
 		$(window).load(function() {
 			// Animate loader off screen
 			$(".loader-wrapper").fadeOut("slow");
+			startAnimations();
 		});
 	</script>
 	</head>
@@ -73,7 +74,6 @@
 				      }
 				    </style>
 				  </defs>
-				  <title>Loader</title>
 				  <g id="b4c66f6d-ce94-434a-8933-37fcd3c86610" data-name="Layer 2">
 				    <g id="1f8f9ef2-93c0-4218-b067-4b15af0b6f04" data-name="Layer 2">
 				      <rect id="rectangle" x="55" y="104" width="147.5" height="47.95"/>
@@ -89,7 +89,7 @@
 		</div>
 		<div class="layer" id="one">
 			<div id="slider">
-			<figure class="active">
+			<figure>
 				<div class="imgwrap" style="background-image: url({% static 'images/01.jpg' %});"></div>
 				<div class="imgwrap" style="background-image: url({% static 'images/02.jpg' %});"></div>
 				<div class="imgwrap" style="background-image: url({% static 'images/03.jpg' %});"></div>
@@ -104,7 +104,7 @@
 				<div class="heading"><p>BOSM'17</p></div>
 					<input type="checkbox" id="toggle1">
 					<label for="toggle1">&#9776;</label>
-				<nav style="z-index: 10;">
+				<nav>
 					<ul>
 						<li><a class="about-link">About Us</a></li>
 						<li><a class="contact-link">Contacts</a></li>
@@ -222,7 +222,7 @@
 			</div>
 			<div class="popup green travel">
 				<div class="up-ribbon ribbon">
-					<p>TRAVEL</p>
+					<p>TRAVEL PARTNER</p>
 				</div>
 
 				<div class="content">
@@ -346,7 +346,7 @@ var mobile_number = $('#inputMobileNumber').val();
 		 <polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
 		</svg>
 				<div class="up-ribbon ribbon">
-					<p>CONTACT US</p>
+					<p>CONTACTS</p>
 				</div>
 				<div class="content">
 					<ul class="cards-list cossac" style="margin-top: 0px !important;">
@@ -364,7 +364,7 @@ var mobile_number = $('#inputMobileNumber').val();
 				</div>
 				<div class="down-ribbon ribbon"></div>
 			</div>
-		
+
 		<script src="{% static 'javascript/youtube.js' %}" ></script>
 		<script src="{% static 'javascript/main.js' %}"  charset="utf-8"></script>
 		<script src="{% static 'javascript/popups.js' %}"  charset="utf-8"></script>

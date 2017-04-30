@@ -1,10 +1,4 @@
 $(document).ready(function(){
-
-
-
-
-
-
 	$("#two footer .button").click(function(){
 			$(".backdrop").fadeIn(1000);
 				$(".backdrop").css('display','flex');
@@ -12,8 +6,6 @@ $(document).ready(function(){
 		curr_id = $(this).attr("list");
 
 		player.loadVideoById({videoId:youtube_video_ids[curr_id],startSeconds:10,suggestedQuality:'large'});
-
-
 	});
 
 	$(".backdrop").click(function(){

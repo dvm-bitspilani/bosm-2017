@@ -61,25 +61,25 @@ Loader
 }
 @keyframes back{
 	0%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
 	30%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
-	33%{
+	33.33%{
 		background-color: #60c9b1;
 	}
-	63%{
+	63.33%{
 		background-color: #60c9b1;
 	}
-	66%{
+	66.66%{
 		background-color: #D68FD6;
 	}
-	96%{
+	96.99%{
 		background-color: #D68FD6;
 	}
 	100%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
 }
 .loader-wrapper{
@@ -90,7 +90,7 @@ Loader
 	width: 100vw;
 	height: 100vh;
 	z-index: 100;
-	animation: back 10s infinite;
+	animation: back 15s infinite;
 }
 .loader{
 	width: 250px;
@@ -117,7 +117,7 @@ Loader
 	100%{
 		transform: rotate(-360deg);
 	}
-} 
+}
 #square{
 	transform-origin: 50% 50%;
 	animation: anims 5s infinite;
@@ -127,7 +127,7 @@ Loader
 	animation: animc 5s linear infinite;
 }
 #text{
-	animation: breathing 3s linear infinite;
+	animation: breathing 1s ease-in-out infinite;
 	fill: #000;
 	stroke : #000;
 }
@@ -179,6 +179,7 @@ timer's aside
 	margin-bottom: 10px;
 	position: absolute;
 	bottom: 20px;
+	margin-left: 20px;
 }
 
 .footer-inwrap * {
@@ -222,7 +223,7 @@ layer 2
 
 #two header {
 	height: 23vh;
-
+	position: relative;
 }
 
 #two footer {
@@ -262,11 +263,14 @@ header
 
 #two nav {
 	height: 100%;
-	width: 70vw;
+	width: calc(100vw - 250px);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-
+	position: absolute;
+	top: 0;
+	left: 50px;
+	z-index: 8;
 }
 
 #two input,
@@ -274,15 +278,18 @@ header
 	display: none;
 }
 
+#two nav ul {
+	display: flex;
+	justify-content: space-around;
+}
+
 #two nav li {
 	display: inline-block;
 	height: 100%;
 	font-size: 20pt;
-	padding: 30px 10px;
+	padding: 0px 10px;
 	text-transform: uppercase;
-	margin-left: 40px;
 	cursor: pointer;
-	padding: 10px;
 	text-align: center;
 	border-bottom: 1px solid transparent;
 	transition: all .3s linear;
@@ -353,14 +360,13 @@ main content
 }
 
 #two .box{
-	//border: 1px solid white;
 	background: url(../images/box.png) no-repeat;
 	background-position: center bottom;
 	background-size: contain;
 	width: 250px;
 	height: 245px;
 	position: absolute;
-	left: 50%;
+	left: calc(50% - 26px);
 	animation: frame-moved 1s linear forwards;
 }
 
@@ -505,12 +511,12 @@ footer
 	***************************/
 
 	#two label {
-		display: block;
 		position: relative;
-		top: 10px;
-		left: 10px;
-		width: 20px;
-		padding: 10px;
+		top: 20px;
+		left: 20px;
+		width: 40px;
+		height: 35px;
+		padding: 0;
 		text-align: center;
 		transition: all .3s linear;
 		border-radius: 3px;
@@ -520,45 +526,54 @@ footer
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		font-family: Roboto !important;
+		font-size: 1.2rem;
+		border: 1px solid transparent;
+		z-index: 8;
 	}
 
 	#two label:hover {
-		background: rgba(255,255,255,.4);
-		color: #ddd;
+		background: rgba(255,255,255,0.4);
 		border: 1px solid #ddd;
 	}
 
 
-
-
 	#two nav{
 		max-height:0;
-
+		width: 100vw;
 		display: block;
 		position: relative;
-
-
-		top: 10px;
+		top: 30px;
+		left: 0;
+		z-index: 8;
 		transition: all 1s linear;
-
 	}
 
 	#two header{
 		height: fixed;
 	}
 
+	#two nav ul {
+		display: block;
+	}
 
 	#two nav li{
 		font-size: 16px;
-		padding: 2px 0;
-		width: 120px;
+		padding: 8px 0;
+		width: 100%;
 		text-align: left;
-		display: block;
-
-		margin-left:10px;
 		position: relative;
-		transform: translateX(-120px);
-		/*border: 1px solid black;*/
+		transform: translateX(-100%);
+		margin-left: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: rgba(0,0,0,0.3);
+	}
+
+	#two nav li a {
+		padding-bottom: 0;
+		border-bottom-width: 0;
 	}
 
 	#two nav li:hover{
@@ -569,19 +584,16 @@ footer
 		transform: translateX(0);
 	}
 
-	#two nav li:first-of-type{
-		transition: transform .3s ease-in;
-
+	#two nav li {
+		transition: all 0.5s cubic-bezier(.68,-0.55,.27,1.55);
 	}
 
-	#two nav li:nth-of-type(2){
-		transition: transform .6s ease-in;
-
+	#two nav li:nth-of-type(2n){
+		transition: all 0.5s ease-out;
 	}
 
-	#two nav li:last-of-type{
-		transition: transform .9s ease-in;
-
+	#two nav li:nth-of-type(3n){
+		transition: all 0.5s ease-in;
 	}
 
 	#two header{
@@ -602,9 +614,8 @@ footer
 	}
 
 	#two p{
-		font-size: 22px;
+		font-size: 2rem;
 		display: block;
-
 	}
 
 	#two input:checked + label{
@@ -612,6 +623,7 @@ footer
 		background: rgba(255,255,255,.1);
 		color: #ddd;
 		border: 1px solid #ddd;
+		padding: 7px 0;
 	}
 
 	#two input:checked ~ nav{
@@ -645,11 +657,24 @@ footer
 
 }
 
+@media only screen and (max-height: 550px) {
+	#two .box {
+		display: none;
+	}
+	#two .bosm-17 {
+		display: none;
+	}
+}
+
+@media only screen and (max-height: 420px) {
+	.footer-inwrap {
+		display: none;
+	}
+}
 
 @media only screen and (max-width: 400px){
 	#two .text{
 		width: 250px;
-		font-size: 4em;
 		animation: appear-phone .8s linear;
 	}
 

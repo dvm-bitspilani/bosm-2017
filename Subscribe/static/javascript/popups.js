@@ -35,14 +35,14 @@
 		dept: "For Scheduling and Events",
 		email: "controls@bits-bosm.org"
 	},
-	
+
 	{
 		name: "Ashay",
 		img: "Ashay.jpg",
 		dept: "For Correspondence and Publicity",
 		email: "pcr@bits-bosm.org"
 	},
-	
+
 	{
 		name: "Gautham",
 		img: "Gautham.jpg",
@@ -55,36 +55,43 @@
 		dept: "Core Website",
 		email: "webmaster@bits-bosm.org"
 	}
-	
+
 ];
 var spons = [
 	{
 		logo: "epson.png",
-		name: "Title Sponsor",
+		name: "EPSON",
+		title: "Title Sponsor",
 	},
 	{
 		logo: "pepsi.png",
-		name: "Beverage Partner",
+		name: "PEPSI",
+		title: "Beverage Partner",
 	},
 	{
 		logo: "manya.png",
-		name: "Education Partner",
+		name: "Manya",
+		title: "Education Partner",
 	},
 	{
 		logo: "saavn.png",
-		name: "Music Streaming",
+		name: "Saavn",
+		title: "Music Streaming",
 	},
 	{
 		logo: "adda.png",
-		name: "Online Gaming",
+		name: "Adda52.com",
+		title: "Online Gaming",
 	},
 	{
 		logo: "9xm.png",
-		name: "Music Channel",
+		name: "9XM",
+		title: "Music Channel",
 	},
 	{
 		logo: "du.png",
-		name: "Online Media",
+		name: "DU Beat",
+		title: "Online Media",
 	}
 ];
 for (var i in cossac) {
@@ -108,7 +115,8 @@ for (var i in spons) {
 		<li>\
 			<div class="proPic" style="background-image: url(/2017/static/images/sponsors/'+sponsor.logo+')"></div>\
 			<div class="info">\
-				<label for="name">'+sponsor.name+'</label>\
+			<label for="spons">'+sponsor.name+'</label>\
+			<label for="dept">'+sponsor.title+'</label>\
 			</div>\
 		</li>\
 	');
@@ -141,6 +149,8 @@ for (var i in spons) {
 				var color = colorchange();
 				$('.about').addClass(color);
 				$('section').hide();
+				$('footer .buttons').fadeOut('fast');
+				$('#toggle1:checked').click();
 				$('.popup-wrapper').show();
 				$('.popup').fadeOut('fast',function(){
 					setTimeout(function(){$('.about').fadeIn()},500);
@@ -150,6 +160,8 @@ for (var i in spons) {
 				var color = colorchange();
 				$('.contact').addClass(color);
 				$('section').hide();
+				$('footer .buttons').fadeOut('fast');
+				$('#toggle1:checked').click();
 				$('.popup-wrapper').show();
 				$('.popup').fadeOut('fast',function(){
 					setTimeout(function(){$('.contact').fadeIn()},500);
@@ -160,6 +172,8 @@ for (var i in spons) {
 				console.log(color);
 				$('.sponsors').addClass(color);
 				$('section').hide();
+				$('footer .buttons').fadeOut('fast');
+				$('#toggle1:checked').click();
 				$('.popup-wrapper').show();
 				$('.popup').fadeOut('fast',function(){
 					setTimeout(function(){$('.sponsors').fadeIn()},500);
@@ -170,6 +184,8 @@ for (var i in spons) {
 				console.log(color);
 				$('.travel').addClass(color);
 				$('section').hide();
+				$('footer .buttons').fadeOut('fast');
+				$('#toggle1:checked').click();
 				$('.popup-wrapper').show();
 				$('.popup').fadeOut('fast',function(){
 					setTimeout(function(){$('.travel').fadeIn()},500);
@@ -192,6 +208,8 @@ for (var i in spons) {
 				$("#submit").css("background-color",col);
 				$('.form_1 form').css("color",col);
 				$('section').hide();
+				$('footer .buttons').fadeOut('fast');
+				$('#toggle1:checked').click();
 				$('.popup-wrapper').show();
 				$('.popup').fadeOut('fast',function(){
 					setTimeout(function(){$('.subscribe').fadeIn()},500);
@@ -203,9 +221,9 @@ for (var i in spons) {
 					$('section').show();
 				});
 				$('.popup-wrapper').hide();
+				$('footer .buttons').fadeIn('fast');
 				$('#slider figure').css('animation-play-state','running');
 				$('div.text span *').css('animation-play-state','running');
 			}
 			});
 		});
-	
