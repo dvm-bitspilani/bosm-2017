@@ -39,12 +39,12 @@ Loader
 ***************************/
 @keyframes breathing{
 	0%{
-		fill: #f9f9f9;
-		stroke: #f9f9f9;
+		fill: #000;
+		stroke: #000;
 	}
 	30%{
-		fill: #f9f9f9;
-		stroke: #f9f9f9;
+		fill: #000;
+		stroke: #000;
 	}
 	50%{
 		fill: #605e5e;
@@ -55,25 +55,31 @@ Loader
 		stroke: #605e5e;
 	}
 	100%{
-		fill: #f9f9f9;
-		stroke: #f9f9f9;
+		fill: #000;
+		stroke: #000;
 	}
 }
 @keyframes back{
 	0%{
-		background-color: #ff0000;
+		background-color: #ef515c;
 	}
-	45%{
-		background-color: #ff0000;
+	30%{
+		background-color: #ef515c;
 	}
-	50%{
+	33%{
 		background-color: #60c9b1;
 	}
-	95%{
+	63%{
 		background-color: #60c9b1;
+	}
+	66%{
+		background-color: #D68FD6;
+	}
+	96%{
+		background-color: #D68FD6;
 	}
 	100%{
-		background-color: #ff0000;
+		background-color: #ef515c;
 	}
 }
 .loader-wrapper{
@@ -121,8 +127,18 @@ Loader
 	animation: animc 5s linear infinite;
 }
 #text{
-	animation: breathing 4s linear infinite;
+	animation: breathing 3s linear infinite;
+	fill: #000;
+	stroke : #000;
 }
+
+
+
+#rectangle{
+	fill: #fff;
+	stroke: #fff;
+}
+
 /***************************
 ============================
 
