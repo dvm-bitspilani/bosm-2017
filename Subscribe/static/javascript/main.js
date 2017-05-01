@@ -1,29 +1,29 @@
-var youtube_video_ids = ['7lkhrw-Mj8g','-RcTmH_vdTw'];
-var curr_id = 0;
-var youtube_width = '640';
-var youtube_height = '390';
-if($(window).width()<700){
-  youtube_width = '300';
-  youtube_height = '150'
-}
-var player;
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-      height: youtube_height,
-      width: youtube_width,
-      videoId: youtube_video_ids[curr_id],
-      events: {
-        'onReady': onPlayerReady,
-      }
-    });
-  }
-  function onPlayerReady(event) {
-     // event.target.playVideo();
-}
-
-   function stopVideo() {
-      player.stopVideo();
-    }
+// var youtube_video_ids = ['7lkhrw-Mj8g','-RcTmH_vdTw'];
+// var curr_id = 0;
+// var youtube_width = '640';
+// var youtube_height = '390';
+// if($(window).width()<700){
+//   youtube_width = '300';
+//   youtube_height = '150'
+// }
+// var player;
+//   function onYouTubeIframeAPIReady() {
+//     player = new YT.Player('player', {
+//       height: youtube_height,
+//       width: youtube_width,
+//       videoId: youtube_video_ids[curr_id],
+//       events: {
+//         'onReady': onPlayerReady,
+//       }
+//     });
+//   }
+//   function onPlayerReady(event) {
+//      // event.target.playVideo();
+// }
+//
+//    function stopVideo() {
+//       player.stopVideo();
+//     }
     function startAnimations() {
       $('div.text').textillate({
         selector: '.texts.active',
