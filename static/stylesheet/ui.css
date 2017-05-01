@@ -61,25 +61,25 @@ Loader
 }
 @keyframes back{
 	0%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
 	30%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
-	33%{
+	33.33%{
 		background-color: #60c9b1;
 	}
-	63%{
+	63.33%{
 		background-color: #60c9b1;
 	}
-	66%{
+	66.66%{
 		background-color: #D68FD6;
 	}
-	96%{
+	96.99%{
 		background-color: #D68FD6;
 	}
 	100%{
-		background-color: #ef515c;
+		background-color: #EF3340;
 	}
 }
 .loader-wrapper{
@@ -90,7 +90,7 @@ Loader
 	width: 100vw;
 	height: 100vh;
 	z-index: 100;
-	animation: back 10s infinite;
+	animation: back 15s infinite;
 }
 .loader{
 	width: 250px;
@@ -173,12 +173,19 @@ timer's aside
 ============================
 ***************************/
 
+	footer {
+		position: absolute;
+		width: 100%;
+		bottom:0;
+		left:0;
+	}
+
 .footer-inwrap {
 	display: flex;
 	flex-direction: column;
-	margin-bottom: 10px;
-	position: absolute;
-	bottom: 20px;
+	margin-bottom: 30px;
+	position: relative;
+	/*bottom: 20px;*/
 	margin-left: 20px;
 }
 
@@ -270,6 +277,7 @@ header
 	position: absolute;
 	top: 0;
 	left: 50px;
+	z-index: 8;
 }
 
 #two input,
@@ -528,6 +536,7 @@ footer
 		font-family: Roboto !important;
 		font-size: 1.2rem;
 		border: 1px solid transparent;
+		z-index: 8;
 	}
 
 	#two label:hover {
@@ -535,6 +544,9 @@ footer
 		border: 1px solid #ddd;
 	}
 
+	.youtube-video-container{
+		width: 100vw !important;
+	}
 
 	#two nav{
 		max-height:0;
@@ -543,6 +555,7 @@ footer
 		position: relative;
 		top: 30px;
 		left: 0;
+		z-index: 8;
 		transition: all 1s linear;
 	}
 
@@ -566,6 +579,7 @@ footer
 		justify-content: center;
 		align-items: center;
 		background: rgba(0,0,0,0.3);
+		z-index: 8;
 	}
 
 	#two nav li a {
@@ -610,6 +624,10 @@ footer
 
 	}
 
+	.bosm-17 {
+		display: none;
+	}
+
 	#two p{
 		font-size: 2rem;
 		display: block;
@@ -642,6 +660,8 @@ footer
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
 	}
 
 	#two footer .button{

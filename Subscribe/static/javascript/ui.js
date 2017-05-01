@@ -1,15 +1,16 @@
 $(document).ready(function(){
 	$("#two footer .button").click(function(){
 			$(".backdrop").fadeIn(1000);
-				$(".backdrop").css('display','flex');
+			$(".backdrop").css('display','flex');
+			$(".backdrop div").html('<iframe width="560" height="315" src="https://www.youtube.com/embed/-RcTmH_vdTw?ecver=1" frameborder="0" allowfullscreen></iframe>');
 
 		curr_id = $(this).attr("list");
 
-		player.loadVideoById({videoId:youtube_video_ids[curr_id],startSeconds:0,suggestedQuality:'large'});
+		//player.loadVideoById({videoId:youtube_video_ids[curr_id],startSeconds:0,suggestedQuality:'large'});
 	});
 
 	$(".backdrop").click(function(){
-      	stopVideo();
+      	$(".backdrop iframe").remove();
       	$(".backdrop").fadeOut();
 	});
 

@@ -7,10 +7,8 @@ scroll-snap-type: mandatory;
 scroll-snap-destination: 20% 0%;*/
 }
 ul.cards-list li {
-	display: flex;
-	flex-direction: column;
 	padding: 0;
-	/*box-shadow: 0 0 5px #999;*/
+	position: relative;
 }
 ul.cards-list li > * {
 	flex: 1;
@@ -20,19 +18,33 @@ ul.cards-list li .proPic {
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
+	height: 100%;
 }
 ul.cards-list li .info {
-	max-height: 75px;
-	background: #fff;
+	height: auto;
+	background: rgba(0,0,0,0.5);
 	font-size: 60%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 5px;
+	padding: 10px;
 	box-sizing: border-box;
-	color: rgb(152,155,157);
+	color: #fff;
 	font-family: Roboto !important;
+	position: absolute;
+	bottom: 0;
+}
+.msg {
+	font-family: Roboto !important;
+	font-size: 1.5rem !important;
+	justify-content: center !important;
+}
+.msg.success {
+	color: green;
+}
+.msg.error {
+	color: red;
 }
 ul.cards-list li .info > a {
 	text-decoration: underline;
@@ -44,16 +56,29 @@ ul.cards-list li .info * {
 	line-height: 1;
 }
 label[for="name"] {
-	font-size: 1rem;
+	font-size: 1.2rem;
 	margin: 2px;
 }
 label[for="dept"] {
-	font-size: 0.9rem;
+	font-size: 1.1rem;
+	font-family: Roboto !important;
 }
 label[for="mail"] {
-	font-size: 0.7rem !important;
+	font-size: 1rem !important;
 	white-space: nowrap;
 	cursor: pointer;
+	color: #fff;
+	font-family: Roboto !important;
+}
+label[for="phone"] {
+	font-size: 1rem !important;
+	white-space: nowrap;
+	cursor: pointer;
+	color: #fff;
+	font-family: Roboto !important;
+}
+label[for="spons-name"] {
+	font-size: 1rem !important;
 }
 .popup-wrapper{
 	height: 100vh;
@@ -285,6 +310,10 @@ ul.cards-list li .proPic {
 	body,html{
 		font-size: 13px;
 	}
+	.content .info {
+		width: 100%;
+		height: 100% !important;
+	}
 	.content > div {
 		transform: skew(0deg);
 	}
@@ -306,11 +335,14 @@ ul.cards-list li .proPic {
 		height: 70%;
 		margin-top: 10%;
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		flex-wrap: wrap;
 	}
 	.cards-list li {
 		margin:0 !important;
 		width:100%;
+		height: 100px !important;
+		background: transparent !important;
 	}
 	.cards-list li .proPic {
 		display: none;
@@ -322,14 +354,24 @@ ul.cards-list li .proPic {
 		display: block;
 		font-size: 1.7rem !important;
 	}
+	.cards-list label[for="spons-name"] {
+		font-size: 1.2rem !important;
+		font-family: Roboto !important;
+	}
 	.cards-list label[for="name"] {
 		font-size: 1.5rem !important;
 	}
 	.cards-list label[for="dept"] {
 		font-size: 1.1rem !important;
 	}
+	.cards-list label[for="phone"] {
+		font-size: 1.1rem !important;
+	}
 	.popup .ribbon p,.popup .content p,.popup .content,.cards-list li,.cards-list{
 			transform: skewX(0deg);
+	}
+	#inputMobileNumber {
+		width: 100%;
 	}
 
 }
@@ -383,15 +425,21 @@ ul.cards-list li .proPic {
 .form-control{
 	margin: auto;
 	overflow-y: hidden;
+	font-family: Roboto !important;
 }
 .form-signin-heading{
 	margin:auto;
 	color: #555;
+	margin-bottom: 20px;
+	font-size: 2rem;
 }
 .form_1 div{
 	padding: 2px 0px;
 	border-radius: 2px;
 
+}
+#inputMobileNumber {
+	width: 91.5%;
 }
 .cards-list::scrollbar-track,.content > div::scrollbar-track
 {

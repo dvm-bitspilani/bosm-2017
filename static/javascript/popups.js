@@ -3,7 +3,8 @@
 		name: "Jayshil",
 		img: "Jayshil.jpg",
 		dept: "Sports Secretary",
-		email: "sportssecretary@bits-bosm.org"
+		email: "sportssecretary@bits-bosm.org",
+		phone: "+91-9828623535"
 	},
 	{
 		name: "Siddharth",
@@ -15,7 +16,7 @@
 		name: "Aman",
 		img: "Untitled.jpg",
 		dept: "Joint Sports Secretary",
-		email: "91-9714540571"
+		email: "+91-9714540571"
 	},
 	{
 		name: "Shreshtha",
@@ -26,34 +27,39 @@
 	{
 		name: "Jayesh",
 		img: "Jayesh.jpg",
-		dept: "For Sponsorship and Marketing",
-		email: "sponsorship@bits-bosm.org"
+		dept: "Sponsorship and Marketing",
+		email: "sponsorship@bits-bosm.org",
+		phone: "+91-8897716880"
 	},
 	{
 		name: "Pavan",
 		img: "Pavan.jpg",
-		dept: "For Scheduling and Events",
-		email: "controls@bits-bosm.org"
+		dept: "BOSM Controls",
+		email: "controls@bits-bosm.org",
+		phone: "+91-9828629266"
 	},
 
 	{
 		name: "Ashay",
 		img: "Ashay.jpg",
-		dept: "For Correspondence and Publicity",
-		email: "pcr@bits-bosm.org"
+		dept: "For Registration and Correspondence",
+		email: "pcr@bits-bosm.org",
+		phone: "9929022741"
 	},
 
 	{
 		name: "Gautham",
 		img: "Gautham.jpg",
-		dept: "For Reception and Accomodation",
-		email: "recnacc@bits-bosm.org"
+		dept: "Reception and Accomodation",
+		email: "recnacc@bits-bosm.org",
+		phone: "+91-9444637124"
 	},
 	{
 		name: "vihang",
 		img: "Vihang.jpg",
 		dept: "Core Website",
-		email: "webmaster@bits-bosm.org"
+		email: "webmaster@bits-bosm.org",
+		phone: "+91-9828630490"
 	}
 
 ];
@@ -61,42 +67,48 @@ var spons = [
 	{
 		logo: "epson.png",
 		name: "EPSON",
-		title: "Title Sponsor",
+		title: "Title Sponsor"
 	},
 	{
 		logo: "pepsi.png",
 		name: "PEPSI",
-		title: "Beverage Partner",
+		title: "Beverage Partner"
 	},
 	{
 		logo: "manya.png",
 		name: "Manya",
-		title: "Education Partner",
+		title: "Education Partner"
 	},
 	{
 		logo: "saavn.png",
 		name: "Saavn",
-		title: "Music Streaming",
+		title: "Music Streaming"
 	},
 	{
 		logo: "adda.png",
 		name: "Adda52.com",
-		title: "Online Gaming",
+		title: "Online Gaming"
 	},
 	{
 		logo: "9xm.png",
 		name: "9XM",
-		title: "Music Channel",
+		title: "Music Channel"
 	},
 	{
 		logo: "du.png",
 		name: "DU Beat",
-		title: "Online Media",
+		title: "Online Media"
 	}
 ];
 for (var i in cossac) {
-	cossacn = cossac[i];
-	cossacul = $('ul.cards-list.cossac');
+	var cossacn = cossac[i];
+	var cossacul = $('ul.cards-list.cossac');
+	var phone;
+	if(cossacn.phone)
+		phone = '				<a href="tel:'+cossacn.phone+'"><label for="phone">'+cossacn.phone+'</label></a>\
+		';
+	else
+		phone = "";
 	cossacul.append('\
 		<li>\
 			<div class="proPic" style="background-image: url(/2017/static/images/cossac/'+cossacn.img+');background-size: cover;"></div>\
@@ -104,6 +116,7 @@ for (var i in cossac) {
 				<label for="name">'+cossacn.name+'</label>\
 				<label for="dept" class="dept" style="padding:3px;text-align:center;">'+cossacn.dept+'</label>\
 				<a href="mailto:'+cossacn.email+'"><label for="mail">'+cossacn.email+'</label></a>\
+				'+phone+'\
 			</div>\
 		</li>\
 	');
@@ -116,7 +129,7 @@ for (var i in spons) {
 			<div class="proPic" style="background-image: url(/2017/static/images/sponsors/'+sponsor.logo+')"></div>\
 			<div class="info">\
 			<label for="spons">'+sponsor.name+'</label>\
-			<label for="dept">'+sponsor.title+'</label>\
+			<label for="spons-name">'+sponsor.title+'</label>\
 			</div>\
 		</li>\
 	');
