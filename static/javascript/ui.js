@@ -5,7 +5,7 @@ $(document).ready(function(){
 
 		curr_id = $(this).attr("list");
 
-		player.loadVideoById({videoId:youtube_video_ids[curr_id],startSeconds:10,suggestedQuality:'large'});
+		player.loadVideoById({videoId:youtube_video_ids[curr_id],startSeconds:0,suggestedQuality:'large'});
 	});
 
 	$(".backdrop").click(function(){

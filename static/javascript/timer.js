@@ -48,7 +48,7 @@ function createBarrel() {
 
 function initTimer() {
 document.querySelector('.assembly').style.width = 1.25*parseInt(document.querySelector('.assembly .face').style.width)+"px";
-var times = ["3 Months","2 Months","1 Month","25 Days","20 Days","15 Days","2 Weeks","10 Days","1 Week","5 Days","4 Days","3 Days","2 Days","1 Day","0 Days"];
+var times = ["3 Months","2 Months","1 Month","25 Days","20 Days","15 Days","2 Weeks","10 Days","1 Week","5 Days","4 Days","3 Days","2 Days","1 Day","BOSM '17"];
 var labels = document.querySelectorAll("#timer label");
 var today = new Date();
 var bosm = new Date("08/27/2017");

@@ -24,23 +24,27 @@ var player;
    function stopVideo() {
       player.stopVideo();
     }
+    function startAnimations() {
       $('div.text').textillate({
         selector: '.texts.active',
         loop: true,
-        minDisplayTime: 3500,
+        minDisplayTime: 3400,
         initialDelay: 0,
         autoStart: true,
         inEffects: [],
         outEffects: [],
         in: {
           effect: 'fadeIn',
+          delayScale: 1.5
         },
         out: {
           effect: 'fadeOut',
+          delayScale: 1.5
         },
         type: 'char'
       });
       $('div#slider figure').addClass('active');
+    }
       $('nav > ul > li').on('click',function(){
           var flag = 0;
           var a = $('div#slider figure.active').css("left");
