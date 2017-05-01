@@ -544,6 +544,9 @@ footer
 		border: 1px solid #ddd;
 	}
 
+	.youtube-video-container{
+		width: 100vw !important;
+	}
 
 	#two nav{
 		max-height:0;

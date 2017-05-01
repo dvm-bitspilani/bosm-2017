@@ -253,17 +253,15 @@
 						<form action="index.html" method="post" class="subscribe-form">
 							<h2 class="form-signin-heading">Enter Details</h2>
 							<div class="">
+								<div class="msg"></div>
 								<div>
-									<label for="inputEmail" class="sr-only"></label>
 									<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
 								</div>
 								<div>
-									<label for="inputName" class="sr-only"></label>
 									<input type="text" id="inputName" class="form-control" placeholder="Name" required>
 								</div>
 								<div>
-									<label for="inputMobileNumber" class="sr-only"></label>
-									<input type="number" id="inputMobileNumber" min="1000000000" max="9999999999" class="form-control" placeholder="Mobile No.(+91-)" style="width:100%" required>
+									<input type="number" id="inputMobileNumber" min="1000000000" max="9999999999" class="form-control" placeholder="Mobile No.(+91-)" required>
 								</div>
 
 							</div>
@@ -314,20 +312,25 @@ var mobile_number = $('#inputMobileNumber').val();
          mobile_number:mobile_number
  }, // data sent with the post request
 
+	function respond(status,msg) {
+		var msgholder = document.querySelector('.msg');
+		msgholder.innerHTML = msg;
+		msgholder.className = "msg "+status;
+	}
+
  // handle a successful response
  success : function(json) {
-      console.log(json);
       if(json.status == 1){
-      alert('Hi '+json['name'] +'!.' + ' Your email :'+      json['name'] + ' has been registered.');
+      respond('success','Hi '+json['name'] +'!.' + ' Your email :'+      json['name'] + ' has been registered.');
     }
       else if(json.status == 2){
-        alert('Enter a valid phone number.');
+        respond('error','Enter a valid phone number.');
     }
       else if(json.status == 3){
-        alert('Enter a valid email address.');
+        respond('error','Enter a valid email address.');
     }
     else{
-      alert('Email already registered');
+      respond('error','Email already registered');
     }
  },
 
