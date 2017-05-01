@@ -302,6 +302,12 @@ function getCookie(name) {
 
 var mobile_number = $('#inputMobileNumber').val();
 //This is the Ajax post.Observe carefully. It is nothing but details of where_to_post,what_to_post
+	function respond(status,msg) {
+		var msgholder = document.querySelector('.msg');
+		msgholder.innerHTML = msg;
+		msgholder.className = "msg "+status;
+	}
+
 
  $.ajax({
          url : window.location.href, // the endpoint,commonly same url
@@ -311,12 +317,6 @@ var mobile_number = $('#inputMobileNumber').val();
          name : name,
          mobile_number:mobile_number
  }, // data sent with the post request
-
-	function respond(status,msg) {
-		var msgholder = document.querySelector('.msg');
-		msgholder.innerHTML = msg;
-		msgholder.className = "msg "+status;
-	}
 
  // handle a successful response
  success : function(json) {
