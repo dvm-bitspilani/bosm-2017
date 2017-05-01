@@ -173,12 +173,19 @@ timer's aside
 ============================
 ***************************/
 
+	footer {
+		position: absolute;
+		width: 100%;
+		bottom:0;
+		left:0;
+	}
+
 .footer-inwrap {
 	display: flex;
 	flex-direction: column;
-	margin-bottom: 10px;
-	position: absolute;
-	bottom: 20px;
+	margin-bottom: 30px;
+	position: relative;
+	/*bottom: 20px;*/
 	margin-left: 20px;
 }
 
@@ -614,6 +621,10 @@ footer
 
 	}
 
+	.bosm-17 {
+		display: none;
+	}
+
 	#two p{
 		font-size: 2rem;
 		display: block;
@@ -646,6 +657,8 @@ footer
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
 	}
 
 	#two footer .button{
