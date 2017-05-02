@@ -1,5 +1,4 @@
 $(document).ready(function(){
-	$(".backdrop div").html('<iframe width="560" height="315" src="https://www.youtube.com/embed/-RcTmH_vdTw?ecver=1" frameborder="0" allowfullscreen></iframe>');
 	$("#two footer .button").click(function(){
 			$(".backdrop").fadeIn(1000);
 			$(".backdrop").css('display','flex');
