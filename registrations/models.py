@@ -21,7 +21,8 @@ class GroupLeader(models.Model):
 	email = models.EmailField(unique=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	gender = models.CharField(max_length=10, choices=GENDERS)
-	
+	events = models.ManyToManyField(Event, through=Participation, blank=True, null=True) #events.models
+
 	def __unicode__(self):
 
 		return self.name + ' ' + self.college
@@ -36,6 +37,7 @@ class TeamCaptain(models.Model):
 	name = models.CharField(max_length=200)
 	email = models.EmailField(blank=True, null=True)
 	email_verified = models.BooleanField(default=False)
+	phone = models.BigIntegerField(default=0)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE)
 	g_l = models.ForeignKey(GroupLeader, on_delete=models.CASCADE, default=None)
 	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
