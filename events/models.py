@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from registrations.models import *
 
 class Event(models.Model):
 
@@ -37,3 +38,13 @@ class ExtraEvent(models.Model):
 	def __unicode__(self):
 
 		return self.name
+
+class Participation(models.Model):
+
+	event = models.ForeignKey(Event, on_delete=models.CASCADE)
+	g_l = models.ForeignKey('registrations.GroupLeader', on_delete=models.CASCADE)
+	confirmed = models.BooleanField(default=False)
+
+	def __unicode__(self):
+
+		return str(self.event.name)+'-'+str(self.g_l.name)
