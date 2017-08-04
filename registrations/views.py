@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -92,3 +92,17 @@ def remove_sports(request):
 		#return JsonResponse({'status':0,'participations':participation_list})
 
 		return HttpResponseRedirect('/')
+
+@login_required
+def add_players(request, event_id):
+
+	event = get_object_or_404(Event, event_id)
+	user = request.user
+
+	g_l = GroupLeader.objects.get(user=user)
+
+	if Event.objects.get(event=event, g_l=g_l).exists():
+
+		if request.method == "POST":
+
+			
