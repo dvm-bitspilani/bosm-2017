@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^sportlimit/(?P<event_id>\d+)/$', views.sport_limit_change, name="sport_limit_change"),
     url(r'^email_select/$', views.email_select, name="email_select"),
     url(r'^email_compose/(?P<gl_id>\d+)/$', views.email_compose, name="email_compose"),
+    url(r'^status_change/$', views.status_change, name="status_change"),
 ]

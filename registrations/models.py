@@ -19,9 +19,11 @@ class GroupLeader(models.Model):
 	state = models.CharField(max_length=50)
 	phone = models.BigIntegerField()
 	email = models.EmailField(unique=True)
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, name='')
 	gender = models.CharField(max_length=10, choices=GENDERS)
 	events = models.ManyToManyField(Event, through=Participation, blank=True, null=True) #events.models
+	email_verified = models.BooleanField(default=False)
+	pcr_approved = models.BooleanField(default=False)
 
 	def __unicode__(self):
 
@@ -36,7 +38,6 @@ class TeamCaptain(models.Model):
 
 	name = models.CharField(max_length=200)
 	email = models.EmailField(blank=True, null=True)
-	email_verified = models.BooleanField(default=False)
 	phone = models.BigIntegerField(default=0)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE)
 	g_l = models.ForeignKey(GroupLeader, on_delete=models.CASCADE, default=None)
