@@ -65,3 +65,14 @@ class Participant(models.Model):
 	def __unicode__(self):
 
 		return self.name
+
+class Transport(models.Model):
+
+	g_l = models.ForeignKey('GroupLeader', on_delete=models.CASCADE)
+	no_of_passengers = models.IntegerField()
+	departure = models.CharField(max_length=50)
+	arrival = models.CharField(max_length=50)
+
+	def __unicode__(self):
+
+		return str(self.g_l.name)
