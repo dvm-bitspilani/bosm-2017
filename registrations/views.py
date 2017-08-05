@@ -8,6 +8,8 @@ from .models import *
 from events.models import *
 from .forms import *
 
+import random
+
 def index(request):
 
 	user = request.user
@@ -36,9 +38,60 @@ def index(request):
 				g_l_profile.user = user
 				g_l_profile.save()
 
+				send_to = request.POST["email_id"]
+				name = request.POST["name"]
+				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
+				<pre style="font-family:Roboto,sans-serif">
+Hello %s!
 
+Thank you for registering!
 
-				return HttpResponseRedirect('/')
+Greetings from BITS Pilani!
+
+It gives me immense pleasure in inviting your institute to the 32nd edition of BITS Open Sports Meet (BOSM), the annual national sports meet of Birla Institute of Technology & Science, Pilani, India. This year, BOSM will be held from September 15th to 19th.             
+
+Kindly go through the invite attached with this email and apply through our website www.bits-bosm.org. Applications close on 31st August 2016 at 1700 hrs.            
+
+Please apply as soon as possible to enable us to confirm your participation at the earliest.             
+
+We would be really happy to see your college represented at our sports festival.            
+
+We look forward to seeing you at BOSM 2016.
+
+<a href='%s'>Click Here</a> to verify your email.
+
+P.S: THIS EMAIL DOES NOT CONFIRM YOUR PRESENCE AT BOSM 2017. YOU WILL BE RECEIVING ANOTHER EMAIL FOR THE CONFIRMATION OF YOUR PARTICIPATION. 
+
+Regards,
+CoSSAcn (Head)
+Dept. of Publications & Correspondence, BOSM 2017
+BITS Pilani
++91-7240105158, +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778
+pcr@bits-bosm.org
+</pre>
+				'''%(name, str(request.build_absolute_uri(reverse("Index"))) + generate_email_token(GroupLeader.objects.get(email_id=send_to)) + '/')
+
+				email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("Index"))) + generate_email_token(GroupLeader.objects.get(email_id=send_to)) + '/' + ' to confirm.', 
+												'register@bits-bosm.org', [send_to.strip()]
+												)
+				email.attach_alternative(body, "text/html")
+
+				try:
+					email.send()
+				
+				except SMTPException:
+				
+					try:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
+						email.send()
+					except SMTPException:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+						email.send()
+
+				return render()
 
 			else:
 
@@ -50,6 +103,92 @@ def index(request):
 			pform = GroupLeaderForm()
 
 			return render(request, 'registrations/index.html', {'uform':uform, 'pform':pform}) 
+
+
+############# Helper functions for Django Email ##########
+
+def generate_email_token(gleader):
+
+	import uuid
+	token = uuid.uuid4().hex
+	registered_tokens = [profile.email_token for profile in GroupLeader.objects.all()]
+
+	while token in registered_tokens:
+		token = uuid.uuid4().hex
+
+	gleader.email_token = token
+	gleader.save()
+	
+	return token
+
+def authenticate_email_token(token):
+
+	try:
+		gleader = GroupLeader.objects.get(email_token=token)
+		gleader.email_verified = True
+		gleader.email_token = None
+		gleader.user.is_active = True
+		gleader.save()
+
+		return gleader
+
+	except ObjectDoesNotExist:
+
+		return False
+
+
+#################   End of helper functions  ####################
+
+def email_confirm(request, token):
+	
+	member = email_authenticate_token(token)
+	
+	if member:
+
+		context = {
+			'error_heading': 1,
+			'error_message': 'Your email has beeen verified. Your username and password can now be used to login at <a>bits-bosm.org.</a>',
+		}
+	else:
+		context = {
+			'status': 0,
+			'error_heading': "Invalid Token",
+			'error_message': "Sorry! This is an invalid token. Email couldn't be verified.",
+		}
+	return render()
+
+def user_login(request):
+
+	context = RequestContext(request)
+
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
+		if user is not None:
+			if user.is_active:
+				if user.is_staff:
+					login(request, user)
+					if user.username == 'pcradmin':
+						return HttpResponseRedirect(reverse('pcradmin:dashboard'))
+					else:
+						return HttpResponseRedirect(reverse('regsoft:home'))
+				else:
+					login(request, user)
+					return HttpResponseRedirect('/')
+			else:
+				context = {'error_heading' : "Account Inactive", 'error_message' :  'Your account is currently INACTIVE. To activate it, call the following members of the Department of Publications and Correspondence. Karthik Maddipoti: +91-7240105158, Additional COntacts:- +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778 - pcr@bits-bosm.org .'}
+				return render()
+		else:
+			context = {'error_heading' : "Invalid Login Credentials", 'error_message' :  'Invalid Login Credentials. Please try again'}
+			return render()
+	else:
+		return render()
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect('/')
 
 def show_sports(request):
 

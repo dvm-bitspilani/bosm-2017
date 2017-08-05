@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'pcradmin.middleware.PCrAdminMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'pcradmin.middleware.PCrAdminMiddleware',
 ]
 
 ROOT_URLCONF = 'BOSM.urls'
@@ -139,12 +141,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 from django.core.mail.backends.smtp import EmailBackend
 
-
+'''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = email_host
 EMAIL_HOST_USER = email_host_user[0]
 EMAIL_HOST_PASSWORD = email_host_pass[0]
 EMAIL_PORT = email_port
 EMAIL_USE_TLS = True
+'''
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)

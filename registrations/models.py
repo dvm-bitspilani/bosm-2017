@@ -23,6 +23,7 @@ class GroupLeader(models.Model):
 	gender = models.CharField(max_length=10, choices=GENDERS)
 	events = models.ManyToManyField(Event, through=Participation, blank=True, null=True) #events.models
 	email_verified = models.BooleanField(default=False)
+	email_token = models.CharField(max_length=32, null=True, blank=True)
 	pcr_approved = models.BooleanField(default=False)
 
 	def __unicode__(self):
