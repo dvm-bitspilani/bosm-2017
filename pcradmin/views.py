@@ -215,5 +215,5 @@ def search_tc(request):
 			Q(email__icontains=search))
 		return request(request, 'pcradmin/search_tc.html', {'teamcaptains':teamcaptains})
 	except:
-		return redirect(request.META..get('HTTP_REFERER'))
+		return redirect(request.META.get('HTTP_REFERER'))
 
