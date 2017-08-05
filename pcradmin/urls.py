@@ -10,4 +10,7 @@ urlpatterns = [
     url(r'^email_select/$', views.email_select, name="email_select"),
     url(r'^email_compose/(?P<gl_id>\d+)/$', views.email_compose, name="email_compose"),
     url(r'^status_change/$', views.status_change, name="status_change"),
+    url(r'^confirm_events/(?P<gl_id>\d+)/$',views.confirm_events, name = "confirm_events"),
+    url(r'^list_team_captains/$', views.list_tc, name="list_tc"),
+    url(r'^search_team_captain/$', views.search_tc, name="search_tc"),
 ]

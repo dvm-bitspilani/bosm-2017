@@ -9,7 +9,7 @@ from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth import login, logout
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_http_methods
-
+from django.db.models import Q
 
 @staff_member_required
 def index(request):
@@ -103,17 +103,17 @@ def status_change(request):
 
 				for gl_id in group_leaders:
 					gl = GroupLeader.objects.get(id=gl_id)
-					gl.is_active = False
+					gl.pcr_approved = False
 					gl.save()
-					send_status_email(gl.email, "inactive")
+					send_status_email(gl.email, "Frozen")
 			elif "activate" == data['submit']:
 				for gl_id in group_leaders:
 					gl = GroupLeader.objects.get(id=gl_id)
 					if gl.email_verified:
 
-						gl.is_active = True
+						gl.pcr_approved = True
 						gl.save()
-						send_status_email(gl.email, "active")
+						send_status_email(gl.email, "Approved")
 					else:
 						context = {
 						'email':gl.email,
@@ -134,10 +134,11 @@ def status_change(request):
 		return render(request, 'pcradmin/status_select.html', {'active':gl_active, 'inactive':gl_inactive})
 
 
+### helper function ###
 def send_status_email(send_to, status):
-	if status == 'active':
-		subject = "Account Activated"
-	elif status == 'inactive':
+	if status == 'Approved':
+		subject = "Account Approved"
+	elif status == 'Frozen':
 		subject = "Account Frozen"
 	body = "Dear User, Your account status has been changed, and is now "+status+"."
 	email = EmailMessage(sub, body,'register@bits-bosm.org', [send_to])
@@ -161,4 +162,58 @@ def send_status_email(send_to, status):
 				return
 
 	return
+
+@staff_member_required
+def confirm_events(request, gl_id):
+	gl = get_object_or_404(GroupLeader, id=gl_id, pcr_approved=True)
+
+	if request.method == 'POST':
+		confirmed=True
+		unconfirmed=True
+		try:
+			confirm = data['confirm']
+			for i in confirm:
+				p = Participation.objects.get(id=i)
+				p.confirmed = True
+				p.save()
+		except:
+			confirmed=False
+		
+		try:
+			unconfirm = data['unconfirm']
+			for i in unconfirm:
+				p = Participation.objects.get(id=i)
+				p.confirmed = False
+				p.save()
+		except:
+			unconfirmed = False
+		if not(confirmed or unconfirmed):
+			return redirect(request.META.get('HTTP_REFERER'))
+		context = {}
+		return render(request, 'pcradmin/success.html', context)
+
+
+	else:
+		events = list(set([{'event':p.event, 'status':p.confirmed, 'part_id':p.id} for p in Participation.objects.filter(g_l=gl).order_by('confirmed')]))
+		return render(request, 'pcradmin/confirm_events.html', {'events':events})
+
+
+@staff_member_required
+def list_tc(request):
+
+	teamcaptains = TeamCaptain.objects.all()
+	return render(request, 'pcradmin/list_tc.html', {'teamcaptains':teamcaptains})
+
+@staff_member_required
+def search_tc(request):
+
+	try:
+		search = request.GET['search']
+		teamcaptains = TeamCaptain.objects.filter(Q(name__icontains=search) | 
+			Q(g_l__college__icontains=search) | 
+			Q(g_l__email__icontains=search) |
+			Q(email__icontains=search))
+		return request(request, 'pcradmin/search_tc.html', {'teamcaptains':teamcaptains})
+	except:
+		return redirect(request.META..get('HTTP_REFERER'))
 
