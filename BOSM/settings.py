@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'registrations',
     'regsoft',
     'events',
+    'pcradmin',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,15 @@ USE_TZ = True
 
 STATIC_URL = '/2017/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+from django.core.mail.backends.smtp import EmailBackend
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config.email_host
+EMAIL_HOST_USER = config.email_host_user[0]
+EMAIL_HOST_PASSWORD = config.email_host_pass[0]
+EMAIL_PORT = config.email_port
+EMAIL_USE_TLS = True
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
