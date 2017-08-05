@@ -66,18 +66,18 @@ def email_compose(request, gl_id):
 		except SMTPException:
 
 			try:
-				bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
-				bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
+				BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
+				BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
 				email.send()
 			except SMTPException:
 
 				try :
-					bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
-					bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
 					email.send()	
 				except:
 					return render(request, 'pcradmin/email_not_sent.html')
-					
+
 		return render(request, "pcradmin/email_sent.html", {'email':send_to})
 
 	else:
@@ -88,3 +88,4 @@ def email_compose(request, gl_id):
 		"body" : '',
 		}
 		return render(request, 'pcradmin/email_compose.html', context)
+
