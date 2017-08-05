@@ -9,6 +9,7 @@ from Subscribe import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('Subscribe.urls')),
+    url(r'^pcradmin/', include('pcradmin.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
