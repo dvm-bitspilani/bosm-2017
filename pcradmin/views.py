@@ -10,6 +10,7 @@ from django.contrib.auth import login, logout
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
+from registrations.urls import *
 
 @staff_member_required
 def index(request):
@@ -173,12 +174,50 @@ def confirm_events(request, gl_id):
 		try:
 			confirm = data['confirm']
 			for i in confirm:
-				p = Participation.objects.get(id=i)
+				p = Participation.objects.get(id=int(i))
 				p.confirmed = True
 				p.save()
+
+				event = Participation.event
+				teamcaptain = event.teamcaptain_set.filter.get(g_l=g_l)
+				send_to = teamcaptain.email
+				name = teamcaptain.name
+				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+					<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
+					<pre style="font-family:Roboto,sans-serif">
+					
+					Hello %s!
+					Your team registration for %s has been confirmed.
+					<a href='%s'>Click Here</a> to pay %d for the same.
+					
+					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:Index"))) + generate_payment_token(TeamCaptain.objects.get(email_id=send_to)) + '/', event.price)
+
+				email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("Index"))) + generate_payment_token(TeamCaptain.objects.get(email_id=send_to)) + '/' + ' to confirm.', 
+												'register@bits-bosm.org', [send_to.strip()]
+												)
+				email.attach_alternative(body, "text/html")
+
+				try:
+					email.send()
+					
+				except SMTPException:
+				
+					try:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
+						email.send()
+					
+					except SMTPException:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+						email.send()
+		
+
 		except:
 			confirmed=False
 		
+		### Probably not necessary###
+		'''
 		try:
 			unconfirm = data['unconfirm']
 			for i in unconfirm:
@@ -187,7 +226,9 @@ def confirm_events(request, gl_id):
 				p.save()
 		except:
 			unconfirmed = False
-		if not(confirmed or unconfirmed):
+
+			'''
+		if not confirmed:
 			return redirect(request.META.get('HTTP_REFERER'))
 		context = {}
 		return render(request, 'pcradmin/success.html', context)
@@ -197,6 +238,24 @@ def confirm_events(request, gl_id):
 		events = list(set([{'event':p.event, 'status':p.confirmed, 'part_id':p.id} for p in Participation.objects.filter(g_l=gl).order_by('confirmed')]))
 		return render(request, 'pcradmin/confirm_events.html', {'events':events})
 
+
+####### Helper function for payment token #######
+
+def generate_payment_token(teamcaptain):
+
+	import uuid
+	token = uuid.uuid4().hex
+	registered_tokens = [profile.payment_token for profile in TeamCaptain.objects.all()]
+
+	while token in registered_tokens:
+		token = uuid.uuid4().hex
+
+	teamcaptain.payment_token = token
+	teamcaptain.save()
+	
+	return token
+
+###############################  END of Helper functions  ################
 
 @staff_member_required
 def list_tc(request):
