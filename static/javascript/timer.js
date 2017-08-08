@@ -51,7 +51,7 @@ document.querySelector('.assembly').style.width = 1.25*parseInt(document.querySe
 var times = ["3 Months","2 Months","1 Month","25 Days","20 Days","15 Days","2 Weeks","10 Days","1 Week","5 Days","4 Days","3 Days","2 Days","1 Day","BOSM '17"];
 var labels = document.querySelectorAll("#timer label");
 var today = new Date();
-var bosm = new Date("08/27/2017");
+var bosm = new Date("09/27/2017");
 var timeDiff = Math.abs(bosm.getTime() - today.getTime());
 var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 if (diffDays >= 90) {var initial = 0;}

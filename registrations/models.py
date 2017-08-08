@@ -51,11 +51,13 @@ class TeamCaptain(models.Model):
 	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
 	acco = models.NullBooleanField('passed recnacc', null=True, blank=True)
 	room = models.ForeignKey(Room, null=True, blank=True)
-	controlz_paid = models.BooleanField(default=False)
+	paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
 	total_players = models.IntegerField(default=1)
-	gender = models.CharField(max_length=10, choices=GENDERS)
-	
+	gender = models.CharField(max_length=10, choices=GENDERS)	
+	payment_token = models.CharField(max_length=32, null=True, blank=True)
+	order_id = models.CharField(max_length=10, null=True, blank=True)
+
 	def __unicode__(self):
 
 		return self.name + '-' + str(self.g_l.college)

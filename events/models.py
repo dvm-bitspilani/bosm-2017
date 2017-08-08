@@ -12,6 +12,7 @@ class Event(models.Model):
 	start_date = models.CharField(max_length=10,default='TBA')
 	end_date = models.CharField(max_length=10,default='TBA')
 	venue = models.CharField(max_length=40, default='TBA')
+	price = models.IntegerField(default=0)
 
 	def __unicode__(self):
 
