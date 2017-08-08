@@ -19,7 +19,7 @@ colleges = (
 	('Bits','Bits')
 	)
 
-genders = (
+gender = (
 
 			('M', 'MALE'),
 			('F', 'FEMALE'),
@@ -30,7 +30,7 @@ class UserForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ('username', 'password')
-		 widgets = {
+		widgets = {
             'username':forms.TextInput(attrs={'placeholder':'Username'}),
             'password': forms.PasswordInput(attrs={'placeholder':'Password'}), 
         }
@@ -47,12 +47,12 @@ class GroupLeaderForm(forms.ModelForm):
 		'email':forms.TextInput(attrs={'placeholder':'Email'}),
 		'city':forms.Select(choices = cities),
 		'state':forms.Select(choices = states),
-		'college':forms.Select(choices = college),
+		#'college':forms.Select(choices = college),
 		'gender':forms.Select(choices = gender),
-		'name':forms.TextInput(attrs='placeholder':'FullName')
+		'name':forms.TextInput(attrs={'placeholder':'FullName'})
 		}
 
-class TeamCaptainForm(models.ModelForm):
+class TeamCaptainForm(forms.ModelForm):
 	phone = forms.RegexField(regex=r'^\d{10}$')
 
 	class Meta:
@@ -61,5 +61,5 @@ class TeamCaptainForm(models.ModelForm):
 
 		widgets = {
 		'email':forms.TextInput(attrs={'placeholder':'Email'}),
-		'name':forms.TextInput(attrs='placeholder':'FullName')
+		'name':forms.TextInput(attrs={'placeholder':'FullName'})
 		}

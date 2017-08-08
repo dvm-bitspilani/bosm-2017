@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 from events.models import *
@@ -19,7 +20,13 @@ def index(request):
 		g_leader = GroupLeader.objects.get(user=user)
 		participation_list = Participation.objects.filter(g_l=g_leader)
 
-		return render(request, 'registrations/index.html', {'user':user, 'participation_list':participation_list, 'g_leader':g_leader})
+		if participation_list:
+
+			return render(request, 'registrations/index.html', {'user':user, 'participation_list':participation_list, 'g_leader':g_leader})
+
+		else:
+
+			return render(request, 'registrations/index.html', {'user':user, 'message':True})
 
 	else:
 
@@ -205,13 +212,15 @@ def add_sports(request):
 		id_list = request.POST.getlist('id_list[]')
 		g_leader = GroupLeader.objects.get(user=request.user)
 
-		for id in id_list:
+		if id_list:
 
-			participation = Participation()
-			participation.g_l = g_leader
-			participation.event = Event.objects.get(pk=id)
+			for id in id_list:
 
-			participation.save()
+				participation = Participation()
+				participation.g_l = g_leader
+				participation.event = Event.objects.get(pk=id)
+
+				participation.save()
 
 		#participation_list = Participation.objects.filter(g_l=g_leader)
 		#return JsonResponse({'status':0,'participations':participation_list})
@@ -408,15 +417,16 @@ def paytm_request(request, token):
 	import Checksum
 
 	MERCHANT_KEY = settings.PAYTM_MERCHANT_KEY
-    MERCHANT_ID = settings.PAYTM_MERCHANT_ID
-    CALLBACK_URL = settings.HOST_URL + settings.PAYTM_CALLBACK_URL
-    # Generating unique temporary ids
-    order_id = Checksum.__id_generator__()
-    teamcaptain.order_id = order_id
-    bill_amount = teamcaptain.event.price
-    name = teamcaptain.name + ' ' + teamcaptain.event.name
-    if bill_amount:
-        data_dict = {
+	MERCHANT_ID = settings.PAYTM_MERCHANT_ID
+	CALLBACK_URL = settings.HOST_URL + settings.PAYTM_CALLBACK_URL
+	# Generating unique temporary ids
+	order_id = Checksum.__id_generator__()
+	teamcaptain.order_id = order_id
+	bill_amount = teamcaptain.event.price
+	name = teamcaptain.name + ' ' + teamcaptain.event.name
+	if bill_amount:
+
+		data_dict = {
                     'MID':MERCHANT_ID,
                     'ORDER_ID':order_id,
                     'TXN_AMOUNT': bill_amount,
@@ -426,10 +436,10 @@ def paytm_request(request, token):
                     'CHANNEL_ID':'WEB',
                     'CALLBACK_URL':CALLBACK_URL,
                 }
-        param_dict = data_dict
-        param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(data_dict, MERCHANT_KEY)
-        return render(request,"payment.html",{'paytmdict':param_dict})
-    return HttpResponse("Bill Amount Error.")
+		param_dict = data_dict
+		param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(data_dict, MERCHANT_KEY)
+		return render(request,"payment.html",{'paytmdict':param_dict})
+	return HttpResponse("Bill Amount Error.")
 
 @login_required
 @csrf_exempt
