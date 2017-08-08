@@ -262,7 +262,8 @@ def register_captain(request, event_id):
 						for part in participants:
 							if part:
 								Participant.objects.create(captain=teamCaptain, name = part)
-					
+						teamCaptain.total_players = len(participants) + 1
+						teamCaptain.save()
 						return render
 				
 				else:

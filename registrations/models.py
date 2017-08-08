@@ -37,6 +37,12 @@ class GroupLeader(models.Model):
 
 class TeamCaptain(models.Model):
 
+	GENDERS = (
+
+			('M', 'MALE'),
+			('F', 'FEMALE'),
+	)
+
 	name = models.CharField(max_length=200)
 	email = models.EmailField(blank=True, null=True)
 	phone = models.BigIntegerField(default=0)
@@ -47,7 +53,9 @@ class TeamCaptain(models.Model):
 	room = models.ForeignKey(Room, null=True, blank=True)
 	controlz_paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
-
+	total_players = models.IntegerField(default=1)
+	gender = models.CharField(max_length=10, choices=GENDERS)
+	
 	def __unicode__(self):
 
 		return self.name + '-' + str(self.g_l.college)
