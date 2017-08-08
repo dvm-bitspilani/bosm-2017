@@ -57,7 +57,8 @@ class TeamCaptainForm(forms.ModelForm):
 
 	class Meta:
 		model = TeamCaptain
-		fields = ('email', 'name', 'phone', 'gender',)
+
+		fields = ('email', 'name', 'phone', 'gender')
 
 		widgets = {
 		'email':forms.TextInput(attrs={'placeholder':'Email'}),
