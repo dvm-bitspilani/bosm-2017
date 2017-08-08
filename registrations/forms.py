@@ -44,7 +44,7 @@ class GroupLeaderForm(forms.ModelForm):
 		fields = ('email', 'city', 'name', 'college', 'state', 'phone', 'gender',)
 
 		widgets = {
-		'email':forms.TextInput(attrs={'placeholder':'Email'}),
+		'email':forms.TextInput(attrs={'placeholder':'Email',}),
 		'city':forms.Select(choices = cities),
 		'state':forms.Select(choices = states),
 		#'college':forms.Select(choices = college),
@@ -57,7 +57,7 @@ class TeamCaptainForm(forms.ModelForm):
 
 	class Meta:
 		model = TeamCaptain
-		fields = ('email', 'name', 'phone', )
+		fields = ('email', 'name', 'phone', 'gender',)
 
 		widgets = {
 		'email':forms.TextInput(attrs={'placeholder':'Email'}),
