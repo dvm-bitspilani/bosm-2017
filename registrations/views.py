@@ -19,7 +19,13 @@ def index(request):
 		g_leader = GroupLeader.objects.get(user=user)
 		participation_list = Participation.objects.filter(g_l=g_leader)
 
-		return render(request, 'registrations/index.html', {'user':user, 'participation_list':participation_list, 'g_leader':g_leader})
+		if participation_list:
+
+			return render(request, 'registrations/index.html', {'user':user, 'participation_list':participation_list, 'g_leader':g_leader})
+
+		else:
+
+			return render(request, 'registrations/index.html', {'user':user, 'message':True})
 
 	else:
 
@@ -205,13 +211,15 @@ def add_sports(request):
 		id_list = request.POST.getlist('id_list[]')
 		g_leader = GroupLeader.objects.get(user=request.user)
 
-		for id in id_list:
+		if id_list:
 
-			participation = Participation()
-			participation.g_l = g_leader
-			participation.event = Event.objects.get(pk=id)
+			for id in id_list:
 
-			participation.save()
+				participation = Participation()
+				participation.g_l = g_leader
+				participation.event = Event.objects.get(pk=id)
+
+				participation.save()
 
 		#participation_list = Participation.objects.filter(g_l=g_leader)
 		#return JsonResponse({'status':0,'participations':participation_list})
