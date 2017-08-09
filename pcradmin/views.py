@@ -10,6 +10,7 @@ from django.contrib.auth import login, logout
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
+from functools import reduce
 from registrations.urls import *
 
 @staff_member_required
@@ -288,7 +289,96 @@ def team_detail(request, tc_id):
 
 	return redirect(request, 'pcradmin/details.html', {'teamcaptain':teamcaptain})
 
+@staff_member_required
+def stats(request):
+
+	if order == 'collegewise':
+
+		g_ls = GroupLeader.objects.filter(email_verified=True, approved=True)
+		collegewise = []
+		for g_l in g_ls:
+
+			entry = {}
+			entry['name'] = g_l.college
+			teamcaptains = TeamCaptain.objects.filter(g_l=g_l)
+			entry['total'] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
+			teamcaptains_m = teamcaptains.filter(gender='M')
+			entry['male'] = str(reduce(count_players.confirmed, teamcaptains_m)) + ' | ' + str(reduce(count_players, teamcaptains_m))
+			teamcaptains_f = teamcaptains.filter(gender='F')
+			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f)) + ' | ' + str(reduce(count_players, teamcaptains_f))
+			
+			for i in ['total', 'male', 'female']:
+				if entry[i] == '0 | 0': entry[i] = '- -'
+
+			collegewise.append(entry)
+		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise})
+
+
+	if order == 'Sportwise':
+		events = Events.objects.all()
+		sportwise = []
+		for event in events:
+			entry = {}
+			entry['name'] = event.name
+			teamcaptains = TeamCaptain.objects.filter(event=event)
+			entry['total'] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
+			teamcaptains_m = teamcaptains.filter(gender='M')
+			entry['male'] = str(reduce(count_players.confirmed, teamcaptains_m)) + ' | ' + str(reduce(count_players, teamcaptains_m))
+			teamcaptains_f = teamcaptains.filter(gender='F')
+			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f)) + ' | ' + str(reduce(count_players, teamcaptains_f))
+			
+			for i in ['total', 'male', 'female']:
+				if entry[i] == '0 | 0': entry[i] = '- -'
+
+			sportwise.append(entry)
+		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise})
+
+	if order == 'both':
+		g_ls = GroupLeader.objects.filter(email_verified=True, approved=True)
+		colleges = [g_l.college for g_l in g_ls]
+		events = Events.objects.all()
+		events_name = [event.name  for event in events]
+		both = {}
+		for g_l in g_ls:
+			entry = {}
+			for event in events:
+				teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+				entry[event.name] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
+				if entry[event.name] == '0 | 0':
+					entry[i] = '- -'
+			both[g_l.college] = entry
+		return render(request, 'pcradmin/stats_both.html', {'colleges':colleges, 'events':events_name, 'list':both})
+
+
+########################## HELPER function ################################
+
+def count_players(x,y):
+	try:
+		return x.total_players + y.total_players
+	except :
+		return x + y.total_players
+
+def count_players_confirmed(x,y):
+	
+	g_l_y = y.g_l
+	event_y = y.event
+	try:
+		event_x = x.event
+		g_l_x = x.g_l
+		z=0
+		if Participation.objects.get(g_l=g_l_y, event=event_y).confirmed:
+			z+=y.total_players
+		if Participation.objects.get(g_l=g_l_x, event=event_x).confirmed:
+			z+=x.total_players
+		return z
+	except :
+		if Participation.objects.get(g_l=g_l_y, event=event_y).confirmed:
+			return x + y.total_players
+		else:
+			return x
+
 ######################### Custom Error Handlers  #####################
+
 @staff_member_required
 def custom_page_not_found(request):
 

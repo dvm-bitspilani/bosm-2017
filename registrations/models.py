@@ -37,6 +37,12 @@ class GroupLeader(models.Model):
 
 class TeamCaptain(models.Model):
 
+	GENDERS = (
+
+			('M', 'MALE'),
+			('F', 'FEMALE'),
+	)
+
 	name = models.CharField(max_length=200)
 	email = models.EmailField(blank=True, null=True)
 	phone = models.BigIntegerField(default=0)
@@ -47,6 +53,8 @@ class TeamCaptain(models.Model):
 	room = models.ForeignKey(Room, null=True, blank=True)
 	paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
+	total_players = models.IntegerField(default=1)
+	gender = models.CharField(max_length=10, choices=GENDERS)	
 	payment_token = models.CharField(max_length=32, null=True, blank=True)
 	order_id = models.CharField(max_length=10, null=True, blank=True)
 
