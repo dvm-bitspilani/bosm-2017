@@ -268,11 +268,38 @@ def search_tc(request):
 
 	try:
 		search = request.GET['search']
+		attr = request.GET['attr']
+		'''
 		teamcaptains = TeamCaptain.objects.filter(Q(name__icontains=search) | 
 			Q(g_l__college__icontains=search) | 
 			Q(g_l__email__icontains=search) |
 			Q(email__icontains=search))
+		'''
+		attribute = getattr(TeamCaptain,  attr)
+		teamcaptains = TeamCaptain.objects.filter(attribute__icontains=search)
 		return request(request, 'pcradmin/search_tc.html', {'teamcaptains':teamcaptains})
 	except:
 		return redirect(request.META.get('HTTP_REFERER'))
 
+@staff_member_required
+def team_detail(request, tc_id):
+
+	teamcaptain = get_object_or_404(TeamCaptain, tc_id)
+
+	return redirect(request, 'pcradmin/details.html', {'teamcaptain':teamcaptain})
+
+######################### Custom Error Handlers  #####################
+@staff_member_required
+def custom_page_not_found(request):
+
+	return render(request, 'pcradmin/404page.html')
+
+@staff_member_required
+def custom_permission_denied(request):
+
+	return render(request, 'pcradmin/403page.html')
+
+@staff_member_required
+def custom_bad_request(request):
+
+	return render(request, 'pcradmin/400page.html')	

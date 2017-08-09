@@ -3,6 +3,10 @@ from pcradmin import views
 
 app_name = 'pcradmin'
 
+handler404 = 'views.custom_page_not_found'
+handler403 = 'views.custom_permission_denied'
+handler400 = 'views.custom_bad_request'
+
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^sportlimit/$',views.sport_limit, name='sport_limit'),
