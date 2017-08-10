@@ -92,7 +92,6 @@ def email_compose(request, gl_id):
 		}
 		return render(request, 'pcradmin/email_compose.html', context)
 
-
 @staff_member_required
 def status_change(request):
 	
@@ -101,14 +100,14 @@ def status_change(request):
 		data = request.POST
 		group_leaders = data['gls']
 		if group_leaders:
-			if "deactivate" == data['submit']:
+			if "Deactivate" == data['submit']:
 
 				for gl_id in group_leaders:
 					gl = GroupLeader.objects.get(id=gl_id)
 					gl.pcr_approved = False
 					gl.save()
 					send_status_email(gl.email, "Frozen")
-			elif "activate" == data['submit']:
+			elif "Activate" == data['submit']:
 				for gl_id in group_leaders:
 					gl = GroupLeader.objects.get(id=gl_id)
 					if gl.email_verified:
@@ -259,9 +258,10 @@ def generate_payment_token(teamcaptain):
 ###############################  END of Helper functions  ################
 
 @staff_member_required
-def list_tc(request):
+def list_tc(request, gl_id):
 
-	teamcaptains = TeamCaptain.objects.all()
+	g_leader = GroupLeader.objects.get(pk=gl_id)
+	teamcaptains = TeamCaptain.objects.filter(g_l=g_leader)
 	return render(request, 'pcradmin/list_tc.html', {'teamcaptains':teamcaptains})
 
 @staff_member_required

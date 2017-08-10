@@ -1,0 +1,29 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="twelve columns textcenter">
+            <h1>Change Status</h1>
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for captain in teamcaptains %}
+                    <tr>
+                        <td>{{captain.name}}</td>
+                        <td>{{captain.g_l.college}}</td>
+                        <td><a class="button button-primary" href="{% url 'pcradmin:list_tc' gl.id %}">Show</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br><a class="button" href="../logout/">Logout</a>
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock body %}

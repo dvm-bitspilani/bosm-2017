@@ -15,11 +15,12 @@ urlpatterns = [
     url(r'^email_compose/(?P<gl_id>\d+)/$', views.email_compose, name="email_compose"),
     url(r'^status_change/$', views.status_change, name="status_change"),
     url(r'^confirm_events/(?P<gl_id>\d+)/$',views.confirm_events, name = "confirm_events"),
-    url(r'^list_team_captains/$', views.list_tc, name="list_tc"),
+    url(r'^list_team_captains/(?P<gl_id>\d+)/$', views.list_tc, name="list_tc"),
     url(r'^search_team_captain/$', views.search_tc, name="search_tc"),
     url(r'^stats/college/$', views.stats, name="stats_collegewise", kwargs={'order':'Collegewise'}),
     url(r'^stats/sport/$', views.stats, name="stats_sportwise", kwargs={'order':'Sportwise'}),
     url(r'^stats/sport_college/$', views.stats, name="stat_sport_college", kwargs={'order':'both'}),
-    url(r'^stats/sport_college/(?P<gl_id>)/$', views.stats)
+    url(r'^stats/sport_college/(?P<gl_id>)/$', views.stats),
+    #url(r'^logout/$', views.user_logout, name="logout"),
     # url(r'')
 ]

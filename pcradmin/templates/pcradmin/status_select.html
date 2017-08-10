@@ -1,0 +1,66 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="twelve columns textcenter">
+            <h1>Inactive GroupLeaders</h1>
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% for gl in inactive %}
+                    <tr>
+                        <td>{{gl.name}}</td>
+                        <td>{{gl.college}}</td>
+                        <td>
+                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><button type="submit" value="Activate" name="submit">Activate</td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+            <br>
+            <h1>Active GroupLeaders</h1>
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% for gl in active %}
+                    <tr>
+                        <td>{{gl.name}}</td>
+                        <td>{{gl.college}}</td>
+                        <td>
+                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><button type="submit" value="Deactivate" name="submit">Deactivate</td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

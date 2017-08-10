@@ -141,6 +141,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 from django.core.mail.backends.smtp import EmailBackend
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 '''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = email_host
