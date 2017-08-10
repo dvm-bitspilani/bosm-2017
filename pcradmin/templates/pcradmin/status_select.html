@@ -1,0 +1,72 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select the Group Leader to change status</h2>
+      <div class="row center">
+        <!--<h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5> -->
+      </div>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% csrf_token %}
+                    {% for gl in inactive %}
+                    <tr>
+                        <td>{{gl.name}}</td>
+                        <td>{{gl.college}}</td>
+                        <td>
+                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><button class="waves-effect waves-light btn pink" type="submit" value="Activate" name="submit">Activate</td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+            <br>
+            <h1>Active GroupLeaders</h1>
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% csrf_token %}
+                    {% for gl in active %}
+                    <tr>
+                        <td>{{gl.name}}</td>
+                        <td>{{gl.college}}</td>
+                        <td>
+                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><button class="waves-effect waves-light btn pink" type="submit" value="Deactivate" name="submit">Deactivate</td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

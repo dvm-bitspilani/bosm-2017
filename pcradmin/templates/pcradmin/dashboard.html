@@ -1,0 +1,52 @@
+{% extends 'pcradmin/base.html' %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select the required option to proceed</h2>
+      <div class="row center">
+        <!--<h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5> -->
+      </div>
+      <div class="center-align">
+        <table class="centered">
+        <thead>
+          <tr>
+              <th>Task</th>
+              <th>Execute</th>
+          </tr> 
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Activate or Freeze User Accounts</td>
+            <td class="right-align"><a href="{% url 'pcradmin:status_change' %}" id="download-button" class="btn-large waves-effect waves-light pink">Switch User Status</a></td>
+          </tr>
+          <tr>
+            <td>Send Mails to Group Leaders</td>
+            <td><a href="{% url 'pcradmin:email_select' %}" id="download-button" class="btn-large waves-effect waves-light pink">Send Mails</a></td>
+          </tr>
+          <tr>
+            <td>Change or View current limits for each sport</td>
+            <td><a href="{% url 'pcradmin:status_change' %}" id="download-button" class="btn-large waves-effect waves-light pink">Sport Limits</a></td>
+          </tr>
+          <tr>
+            <td>View Stats</td>
+            <td><a href="{% url 'pcradmin:status_change' %}" id="download-button" class="btn-large waves-effect waves-light pink">Stats</a></td>
+          </tr>
+          <tr>
+            <td>Group Leaders</td>
+            <td><a href="{% url 'pcradmin:status_change' %}" id="download-button" class="btn-large waves-effect waves-light pink">Confirm</a></td>
+          </tr>
+          <tr>
+            <td>View PDF</td>
+            <td><a href="{% url 'pcradmin:status_change' %}" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <br><br>
+
+    </div>
+  </div>
+
+{% endblock %}

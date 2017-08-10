@@ -1,0 +1,21 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Compose email for {{g_l.name}}</h2>
+            <form action="{% url 'pcradmin:email_compose' g_l.id %}" method="POST">
+                {% csrf_token %}
+                <div class="input-field col s12">
+                    <input value="{{to}}" id="email_id" type="text" class="validate" name="to">
+                    <label class="active" for="email_id">To:</label>
+                    <input value="{{subject}}" id="max_limit" type="text" class="validate" name="sub">
+                    <label class="active" for="max_limit">Subject</label>
+                    <textarea name="body" id="body">{{body}}</textarea> 
+                    <label class="active" for="max_limit">Body</label>
+                </div>
+            </form>
+            <br>
+    </div>
+</div>
+{% endblock body %}
