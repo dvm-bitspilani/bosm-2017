@@ -23,7 +23,7 @@ def index(request):
 def sport_limit(request):
 	
 	events = Event.objects.order_by('name')
-	return render(request, 'pcradmin/sport_limit.html')
+	return render(request, 'pcradmin/change_limits.html', {'events':events})
 
 
 @staff_member_required
@@ -38,7 +38,7 @@ def sport_limit_change(request, event_id):
 			event.max_limit = data['max_limit']
 			event.min_limit = data['min_limit']
 			event.save()
-			return render(request, 'pcradmin/sport_limit_saved.html', {'event':event})
+			return render(request, 'pcradmin/change_limits.html', {'event':event})
 		
 		except: 
 			print "invalid data"
@@ -79,13 +79,14 @@ def email_compose(request, gl_id):
 					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
 					email.send()	
 				except:
-					return render(request, 'pcradmin/email_not_sent.html')
+					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
-		return render(request, "pcradmin/email_sent.html", {'email':send_to})
+		return render(request, "pcradmin/message.html", {'email':send_to, 'message':'Email sent'})
 
 	else:
 
 		context = {
+		'g_l':g_l,
 		'to' : g_l.email,
 		'subject' : "BOSM 2017",
 		"body" : '',
@@ -258,11 +259,15 @@ def generate_payment_token(teamcaptain):
 ###############################  END of Helper functions  ################
 
 @staff_member_required
+def list_gl(request):
+	gls = GroupLeader.objectss.all()
+	return render(request, 'pcradmin/list_gls.html', {'gls':gls})
+@staff_member_required
 def list_tc(request, gl_id):
 
 	g_leader = GroupLeader.objects.get(pk=gl_id)
 	teamcaptains = TeamCaptain.objects.filter(g_l=g_leader)
-	return render(request, 'pcradmin/list_tc.html', {'teamcaptains':teamcaptains})
+	return render(request, 'pcradmin/list_tc.html', {'teamcaptains':teamcaptains, 'g_l':g_leader})
 
 @staff_member_required
 def search_tc(request):
@@ -376,6 +381,144 @@ def count_players_confirmed(x,y):
 			return x + y.total_players
 		else:
 			return x
+
+######################### PDF generators  #####################
+
+@staff_member_required
+def get_list_gleaders(request):
+
+	import xlsxwriter
+	try:
+		import cStringIO as StringIO
+	except ImportError:
+		import StringIO
+	a_list = []
+
+
+	gleaders = GroupLeader.objects.all()
+
+	for p in gleaders:
+		a_list.append({'obj': p})
+	data = sorted(a_list, key=lambda k: k['obj'].id)
+	output = StringIO.StringIO()
+	workbook = xlsxwriter.Workbook(output)
+	worksheet = workbook.add_worksheet('new-spreadsheet')
+	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
+	worksheet.write(0, 0, "Generated:")
+	from time import gmtime, strftime
+	generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
+	worksheet.write(0, 1, generated)
+
+	worksheet.write(1, 0, "ID")
+	worksheet.write(1, 1, "Name")
+	worksheet.write(1, 2, "Email ID")
+	worksheet.write(1, 3, "Mobile No.")
+	worksheet.write(1, 4, "College")
+	worksheet.write(1, 5, "Total teams")
+	worksheet.write(1, 6, "Total players")
+
+	for i, row in enumerate(data):
+		"""for each object in the date list, attribute1 & attribute2
+		are written to the first & second column respectively,
+		for the relevant row. The 3rd arg is a failure message if
+		there is no data available"""
+
+		worksheet.write(i+2, 0, deepgetattr(row['obj'], 'id', 'NA'))
+		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'name', 'NA'))
+		worksheet.write(i+2, 2, deepgetattr(row['obj'], 'email', 'NA'))
+		worksheet.write(i+2, 3, deepgetattr(row['obj'], 'phone', 'NA'))
+		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'college', 'NA'))
+		worksheet.write(i+2, 1, get_teams(row['obj']))
+		worksheet.write(i+2, 1, get_players(row['obj']))
+
+	workbook.close()
+	filename = 'ExcelReport.xlsx'
+	output.seek(0)
+	response = HttpResponse(output.read(), content_type="application/ms-excel")
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	return response
+
+@staff_member_required
+def get_list_captains(request, gl_id):
+
+	import xlsxwriter
+	try:
+		import cStringIO as StringIO
+	except ImportError:
+		import StringIO
+	a_list = []
+
+	g_leader = get_object_or_404(GroupLeader, pk=gl_id)
+	captains = TeamCaptain.objects.filter(g_l=g_leader)
+
+	for p in captains:
+		a_list.append({'obj': p})
+	data = sorted(a_list, key=lambda k: k['obj'].id)
+	output = StringIO.StringIO()
+	workbook = xlsxwriter.Workbook(output)
+	worksheet = workbook.add_worksheet('new-spreadsheet')
+	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
+	worksheet.write(0, 0, "Generated:")
+	from time import gmtime, strftime
+	generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
+	worksheet.write(0, 1, generated)
+
+	worksheet.write(1, 0, "ID")
+	worksheet.write(1, 1, "Name")
+	worksheet.write(1, 2, "Email ID")
+	worksheet.write(1, 3, "Mobile No.")
+	worksheet.write(1, 5, "Event")
+	worksheet.write(1, 6, "Total players")
+
+	for i, row in enumerate(data):
+		"""for each object in the date list, attribute1 & attribute2
+		are written to the first & second column respectively,
+		for the relevant row. The 3rd arg is a failure message if
+		there is no data available"""
+
+		worksheet.write(i+2, 0, deepgetattr(row['obj'], 'id', 'NA'))
+		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'name', 'NA'))
+		worksheet.write(i+2, 2, deepgetattr(row['obj'], 'email', 'NA'))
+		worksheet.write(i+2, 3, deepgetattr(row['obj'], 'phone', 'NA'))
+		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'event.name', 'NA'))
+		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'total_players', 'NA'))
+
+	workbook.close()
+	filename = 'ExcelReport.xlsx'
+	output.seek(0)
+	response = HttpResponse(output.read(), content_type="application/ms-excel")
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	return response
+
+def deepgetattr(obj, attr, default = None):
+
+	attributes = attr.split(".")
+	for i in attributes:
+		try:
+			obj = getattr(obj, i)
+
+		except AttributeError:
+			if default:
+				return default
+			else:
+				raise
+
+		return obj
+
+def get_teams(obj):
+
+	teams = Participation.objects.filter(g_l=obj).count()
+	return str(teams)
+
+def get_players(obj):
+
+	total_players = 0
+	for captain in obj.teamcaptain_set.all():
+
+		total_players += captain.total_players
+
+	return str(total_players)
+	return str(teams)
 
 ######################### Custom Error Handlers  #####################
 

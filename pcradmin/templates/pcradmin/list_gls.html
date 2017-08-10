@@ -1,0 +1,28 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">List of approved Group Leaders</h2>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>Group Leader Name</th>
+                        <th>College</th>
+                        <th>Display Teams</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g_l in gls %}
+                    <tr>
+                        <td>{{g_l.name}}</td>
+                        <td>{{g_l.college}}</td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:list_tc' gl.id %}">Show team list</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

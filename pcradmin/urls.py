@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^stats/sport/$', views.stats, name="stats_sportwise", kwargs={'order':'Sportwise'}),
     url(r'^stats/sport_college/$', views.stats, name="stat_sport_college", kwargs={'order':'both'}),
     url(r'^stats/sport_college/(?P<gl_id>)/$', views.stats),
+    url(r'^get_captain_list/(?P<gl_id>)/$', views.get_list_captains, name="get_list_captains"),
+    url(r'^get_gleaders_list/$', views.get_list_captains, name="get_list_gleaders"),
     #url(r'^logout/$', views.user_logout, name="logout"),
     # url(r'')
 ]

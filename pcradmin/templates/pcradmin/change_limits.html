@@ -1,0 +1,33 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select sport to change limits</h2>
+      <div class="row center">
+        <!--<h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5> -->
+      </div>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>Sport</th>
+                        <th>Minimum Participants</th>
+                        <th>Maximum Participants</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{event.name}}</td>
+                        <td>{{event.min_limit}}</td>
+                        <td>{{event.max_limit}}</td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:sport_limit_change' event.id %}">Change</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

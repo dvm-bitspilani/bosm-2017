@@ -1,0 +1,21 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Input new limit/limits for {{event.name}}</h2>
+            <form action="{% url 'pcradmin:sport_limit_change' event.id %}" method="POST">
+                {% csrf_token %}
+                <div class="input-field col s6">
+                    <input value="{{event.min_limit}}" id="min_limit" type="text" class="validate" name="min_limit">
+                    <label class="active" for="min_limit">First Name</label>
+                </div>
+                <div class="input-field col s6">
+                    <input value="{{event.max_limit}}" id="max_limit" type="text" class="validate" name="max_limit">
+                    <label class="active" for="max_limit">First Name</label>
+                </div>
+            </form>
+            <br>
+    </div>
+</div>
+{% endblock body %}

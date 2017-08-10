@@ -1,10 +1,14 @@
 {% extends "pcradmin/base.html" %}
 {% block body %}
-<div class="container">
-    <div class="row">
-        <div class="twelve columns textcenter">
-            <h1>Inactive GroupLeaders</h1>
-            <table class="u-full-width">
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select the Group Leader to change status</h2>
+      <div class="row center">
+        <!--<h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5> -->
+      </div>
+      <div class="center-align">
+        <table class="centered">
                 <thead>
                     <tr>
                         <th>Group Leader Name</th>
@@ -14,6 +18,7 @@
                 </thead>
                 <tbody>
                     <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% csrf_token %}
                     {% for gl in inactive %}
                     <tr>
                         <td>{{gl.name}}</td>
@@ -26,7 +31,7 @@
                     <tr>
                         <td></td>
                         <td></td>
-                        <td><button type="submit" value="Activate" name="submit">Activate</td>
+                        <td><button class="waves-effect waves-light btn pink" type="submit" value="Activate" name="submit">Activate</td>
                     </tr>
                     </form>
                 </tbody>
@@ -43,6 +48,7 @@
                 </thead>
                 <tbody>
                     <form action="{% url 'pcradmin:status_change' %}" method="POST">
+                    {% csrf_token %}
                     {% for gl in active %}
                     <tr>
                         <td>{{gl.name}}</td>
@@ -55,7 +61,7 @@
                     <tr>
                         <td></td>
                         <td></td>
-                        <td><button type="submit" value="Deactivate" name="submit">Deactivate</td>
+                        <td><button class="waves-effect waves-light btn pink" type="submit" value="Deactivate" name="submit">Deactivate</td>
                     </tr>
                     </form>
                 </tbody>

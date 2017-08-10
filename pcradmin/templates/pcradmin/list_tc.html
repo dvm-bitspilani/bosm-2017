@@ -1,28 +1,41 @@
 {% extends "pcradmin/base.html" %}
 {% block body %}
-<div class="container">
-    <div class="row">
-        <div class="twelve columns textcenter">
-            <h1>Change Status</h1>
-            <table class="u-full-width">
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Teams under {{g_l.name}} from {{g_l.college}}</h2>
+      <div class="center-align">
+        <table class="centered">
                 <thead>
                     <tr>
-                        <th>Group Leader Name</th>
+                        <th>Team Captain Name</th>
                         <th>College</th>
-                        <th>Display Teams</th>
+                        <th>Participants</th>
+                        <th>Sport</th>
+                        <th>Confirm Team</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <form action="{% url 'pcradmin:confirm_events' gl.id %}" method="POST">
                     {% for captain in teamcaptains %}
                     <tr>
                         <td>{{captain.name}}</td>
                         <td>{{captain.g_l.college}}</td>
-                        <td><a class="button button-primary" href="{% url 'pcradmin:list_tc' gl.id %}">Show</a></td>
+                        <td>{{captain.total_players}}</td>
+                        <td>{{captain.event.name}}</td>
+                        <td><input type="checkbox" id="{{captain.id}}" name="confirm" value="{{captain.id}}"/></td>
                     </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><button class="waves-effect waves-light btn pink" type="submit" value="Confirm" name="submit">Confirm</td>
+                    </tr>
+                </form>
                 </tbody>
             </table>
-            <br><a class="button" href="../logout/">Logout</a>
-            <br>
         </div>
     </div>
 </div>
