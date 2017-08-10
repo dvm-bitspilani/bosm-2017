@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('Subscribe.urls')),
     url(r'^pcradmin/', include('pcradmin.urls')),
+    url(r'^registrations/', include('registrations.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

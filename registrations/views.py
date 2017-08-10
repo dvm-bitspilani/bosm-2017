@@ -111,7 +111,7 @@ pcr@bits-bosm.org
 			uform = UserForm()
 			pform = GroupLeaderForm()
 
-			return render(request, 'registrations/index.html', {'uform':uform, 'pform':pform}) 
+			return render(request, 'registrations/index.html') 
 
 
 ############# Helper functions for Django Email ##########
