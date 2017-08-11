@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	{% load static %}
+<head>
+	<title>BOSM 2017 Registrations</title>
+	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css'  %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
+</head>
+<body>
+<!-- <nav>
+    <div class="nav-wrapper" style="background-color:#EDDEA4">
+      <a href="#" class="brand-logo" style="margin-left:2%;">BOSM'17</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+         <li><a href="sass.html">Sass</a></li>
+        <li><a href="badges.html">Components</a></li>
+        <li><a href="collapsible.html">JavaScript</a></li>
+      </ul>
+    </div>
+</nav> -->
+
+<div class="row">
+	<div class="col s12 m12 l6" style="color:#D9E5D6;background-color:#0FA3B1;height:110vh">
+		<div class="container">
+			<div class="row" style="margin-top:10%;">
+				<div class="col s12" style="text-align:center;font-size:300%;">
+					Login
+				</div>
+				<div class="col s12" style="padding-top:15%;">
+					<div class="row">
+				    <form class="col s12 form1" id="login" action="" method="post">
+				      {% csrf_token %}
+				      <div class="row">
+				        <div class="input-field col s12">
+				          <!-- <i class="material-icons prefix">account_circle</i> -->
+				          <input id="username" name="username" type="text">
+				          <label for="username">Username</label>
+				        </div>
+				        <div class="input-field col s12">
+				          <!-- <i class="material-icons prefix">security</i> -->
+				          <input id="password"  name="password" type="password">
+         				  <label for="password">Password</label>				       
+         			    </div>
+				      </div>
+				      <div class="col s12 m6 l6 offset-m3 offset-l3"  style="display:flex;justify-content:center">
+					 <button class="btn waves-effect waves-light login-button" type="submit" name="action" id="login-btn">Login</button>
+				</div>
+				    </form>
+				  </div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<style type="text/css">
+		#xyz{
+			background:url("{% static 'registrations/image/bg.jpeg' %}");
+			background-size:cover;
+			height:110vh;
+			background-position:50% 0%;
+		}
+	</style>
+	<div class="col s12 m12 l6" id="xyz">
+		<div class="container" style="margin-top:30vh">
+			<div class="row">
+ 				<div class="col s12" style="display:flex;justify-content:center">
+ 					<div style="background:url('../img/logo.jpg');height:200px;width:200px;"></div>
+ 				</div>
+ 				<div class="col s12" style="margin-top:10vh;display:flex;justify-content:center">
+ 					<a href="{% url 'registrations:signup' %}"><button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="signup-btn" style="white-space:nowrap">SIGN UP</button></a>
+ 				</div>
+ 			</div>
+		</div>
+	</div>
+</div> 
+<script type="text/javascript">
+ //  var sdata={};
+ //  var ldata={};
+
+ //  var 
+ //  $('#signup-btn').click(function(e){
+ //    e.preventDefault();
+ //    console.log("Sign Up Clicked")
+ //    var a = $('#signup').serializeArray();
+ //    $.each(a,function(i,key){
+ //      sdata[key.name]=key.value;
+ //    });
+ //    $.ajax({
+ //    	method:"GET",
+ //      	url:signupurl,
+ //      	data:sdata,
+ //      	success:function(res){
+ //      		console.log("Sign Up Successful");
+ //      	}
+ //    });
+ // });
+
+ // $('#login-btn').click(function(e){
+ // 	e.preventDefault();
+ // 	console.log("Login clicked");
+ //    var a = $('#login').serializeArray();
+ //    $.each(a,function(i,key){
+ //      ldata[key.name]=key.value;
+ //    });
+ //    $.ajax({
+ //    	method:"GET",
+ //      	url:loginurl,
+ //      	data:ldata,
+ //      	success:function(res){
+ //      		console.log("Login Successful");
+ //      	}
+ //    });
+ // })
+
+</script>    
+</body>
+</html>

@@ -1,0 +1,99 @@
+/*fonts*/
+@font-face{
+	font-family: 'Mosk';
+	src:url('../fonts/Mosk.ttf');
+}
+
+/*Styles*/
+body{
+	overflow-y: hidden;
+}
+*{
+	font-family: 'Mosk' !important;
+}
+.form1{
+	width: 100%;
+	height:auto;
+	padding:5% !important;
+	background-color: #D9E5D6;
+	border-radius: 10px;
+	color: #0fa3b1;
+}
+.form2{
+	width: 100%;
+	height:auto;
+	padding:3% !important;
+	padding-left: 5% !important;
+	padding-right: 5% !important;
+	background-color: #0fa3b1;
+	border-radius: 10px;
+	color: #D9E5D6;
+}
+.form2 label{
+	color:  #D9E5D6 !important;
+
+}
+.form2 input[type="radio"]:checked+label:after{
+	background-color: #D9E5D6 !important;
+}
+.form2 input{
+	border-bottom-color: #D9E5D6 !important;
+}
+.form2 .row{
+	margin-bottom: 4px !important;
+}
+.login-button{
+	background-color:#0FA3B1 !important;
+	color:#D9E5D6 !important;
+	font-size:200% !important;
+	border-radius:10px !important; 
+	padding-top:5%;
+	height: auto;
+	padding-bottom: 5%; 
+}
+.signup-button{
+	background-color:#D9E5D6 !important;
+	color:#0FA3B1 !important;
+	font-size:200% !important;
+	border-radius:10px !important; 
+	padding-top:15px;
+	height: auto;
+	padding-bottom: 15px; 
+}
+
+.box{
+	padding: 10px !important;
+	color: #D9E5D6;
+	border-radius: 20px;
+	border:20px solid #0FA3B1;
+	height: auto;
+	min-height:60vh !important;
+}
+.welcome{
+	display:flex;
+	justify-content:center;
+	font-size:350%;
+	font-weight:bold;
+	color:#0FA3B1;
+}
+.check{
+	padding-left: 30px !important;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+.check label{
+	font-size: 200% !important;
+}
+/*Responsive*/
+@media(max-width: 992px){
+	body{
+		overflow-y: scroll;
+		font-size: 150%;
+	}
+	.welcome{
+		font-size: 150%;
+	}
+	.signup-button{
+		font-size: 130% !important;
+	}
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+	<title>BOSM'17 SignUp</title>
+	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css'  %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css'  %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="{% static 'registrations/js/materialize.min.js'  %}"></script>
+</head>
+<body style="background-color:#D9E5D6;overflow-y:scroll">
+<div class="container" >
+
+	<div class="row" style="margin-top:5%;margin-bottom:50px;">
+				<div class="col s12" style="text-align:center;font-size:300%;">
+					Sign Up
+				</div>
+				<div class="col s12" style="padding-top:2%;">
+				 	 <div class="row" style="margin-bottom:7px;">
+					    <form class="col s12 form2" id="signup" action="" method="post">
+					    {% csrf_token %}
+					      <div class="row">
+					        
+					        <div class="input-field col s12">
+					          <input id="name" type="text" name="name">
+					          <label for="name">Name</label>
+					        </div>
+
+					      </div>
+					      
+					      <div class="row">
+					        <div class="input-field col s12">
+					          <input id="email" type="email" name="email">
+					          <label for="email">Email</label>
+					        </div>
+					      </div>
+
+					      <div class="row">
+					        <div class="input-field col s12 m6 l6">
+					          <input id="username" type="text" name="username">
+					          <label for="username">Username</label>
+					      </div>
+					     
+					      	<div class="input-field col s12 m6 l6">
+				          <!-- <i class="material-icons prefix">security</i> -->
+				          		<input id="password"  name="password" type="password">
+         				  		<label for="password">Password</label>				       
+         			    	</div>
+         			      </div>
+
+					      <div class="row">
+					        <div class="input-field col s12 m6 l6">
+					          <input id="city" type="text" name="city">
+					          <label for="city">City</label>
+					        </div>
+					      
+					        <div class="input-field col s12 m6 l6">
+					          <input id="state" type="text" name="state">
+					          <label for="state">State</label>
+					        </div>
+					      </div>
+
+					       <div class="row">
+					        <div class="input-field col s12">
+					          <input id="college" type="text" name="college"> 
+					          <label for="college">College</label>
+					        </div>
+					      </div>
+					      <div class="row">
+					      	<div class="input-field col s12">
+          				        <input id="phone" type="tel" class="validate" name="phone">
+          						<label for="phone">Phone Number</label>
+        					</div>
+					      </div>
+
+					      <div class="row">
+					      	<div class="col s4">
+					      		Gender:
+					      	</div>
+					      	<div class="col s4">
+					      		<input name="gender" type="radio" id="male" value="M"/>
+      							<label for="male">Male</label>
+					      	</div>
+					      	<div class="col s4">
+					      		<input name="gender" type="radio" id="female" value="F"/>
+					     		 <label for="female">Female</label>
+					      	</div>
+					      	</div>
+					      	<div class="col s12  m6 l6 offset-m3 offset-l3" style="display:flex;justify-content:center;margin-top:45px;">
+						 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="signup-btn" style="white-space:nowrap">SIGN UP</button>
+							</div>
+   						</form>
+ 					 </div>
+ 					 </div>
+ 					 </div>
+ 					</div>
+</body>
+</html>

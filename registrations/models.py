@@ -84,7 +84,7 @@ class Transport(models.Model):
 	g_l = models.ForeignKey('GroupLeader', on_delete=models.CASCADE)
 	no_of_passengers = models.IntegerField()
 	departure = models.CharField(max_length=50)
-	date = models.DateTimeField(max_length=50, auto_now=False, default='01/01/2017')
+	date = models.DateTimeField(max_length=50, auto_now=False, null=True)
 
 	def __unicode__(self):
 
