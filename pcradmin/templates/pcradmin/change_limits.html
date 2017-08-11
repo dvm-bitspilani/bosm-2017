@@ -25,9 +25,10 @@
                         <td>{{event.max_limit}}</td>
                         <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:sport_limit_change' event.id %}">Change</a></td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-{% endblock body %}
+{% endblock %}

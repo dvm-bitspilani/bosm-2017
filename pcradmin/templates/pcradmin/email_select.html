@@ -25,9 +25,10 @@
                         <td>{{g_l.email}}</td>
                         <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:email_compose' g_l.id %}">Compose</a></td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-{% endblock body %}
+{% endblock %}

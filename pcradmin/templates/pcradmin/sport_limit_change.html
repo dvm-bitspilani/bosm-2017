@@ -8,14 +8,14 @@
                 {% csrf_token %}
                 <div class="input-field col s6">
                     <input value="{{event.min_limit}}" id="min_limit" type="text" class="validate" name="min_limit">
-                    <label class="active" for="min_limit">First Name</label>
+                    <label class="active" for="min_limit">Minimum Limit</label>
                 </div>
                 <div class="input-field col s6">
                     <input value="{{event.max_limit}}" id="max_limit" type="text" class="validate" name="max_limit">
-                    <label class="active" for="max_limit">First Name</label>
+                    <label class="active" for="max_limit">Maximum Limit</label>
                 </div>
             </form>
             <br>
     </div>
 </div>
-{% endblock body %}
+{% endblock %}

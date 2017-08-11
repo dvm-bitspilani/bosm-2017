@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from registrations.models import *
+from django.http import HttpResponseRedirect
 from events.models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -16,7 +17,7 @@ from registrations.urls import *
 @staff_member_required
 def index(request):
 	
-	return render(request, 'pcradmin/dashboard.html')
+	return render(request, 'pcradmin/dashboard.html', {'dashboard':True})
 
 
 @staff_member_required
@@ -260,8 +261,9 @@ def generate_payment_token(teamcaptain):
 
 @staff_member_required
 def list_gl(request):
-	gls = GroupLeader.objectss.all()
+	gls = GroupLeader.objects.all()
 	return render(request, 'pcradmin/list_gls.html', {'gls':gls})
+
 @staff_member_required
 def list_tc(request, gl_id):
 
@@ -316,7 +318,7 @@ def stats(request):
 				if entry[i] == '0 | 0': entry[i] = '- -'
 
 			collegewise.append(entry)
-		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise})
+		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise, 'stats':True})
 
 
 	if order == 'Sportwise':
@@ -336,7 +338,7 @@ def stats(request):
 				if entry[i] == '0 | 0': entry[i] = '- -'
 
 			sportwise.append(entry)
-		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise})
+		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise,'stats':True})
 
 	if order == 'both':
 		g_ls = GroupLeader.objects.filter(email_verified=True, approved=True)
@@ -350,9 +352,9 @@ def stats(request):
 				teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
 				entry[event.name] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
 				if entry[event.name] == '0 | 0':
-					entry[i] = '- -'
+					entry[event.name] = '- -'
 			both[g_l.college] = entry
-		return render(request, 'pcradmin/stats_both.html', {'colleges':colleges, 'events':events_name, 'list':both})
+		return render(request, 'pcradmin/stats_both.html', {'colleges':colleges, 'events':events_name, 'list':both,'stats':True})
 
 
 ########################## HELPER function ################################
@@ -383,7 +385,10 @@ def count_players_confirmed(x,y):
 			return x
 
 ######################### PDF generators  #####################
+@staff_member_required
+def get_list(request):
 
+	return render(request, 'pcradmin/gen_pdf.html', {'pdf':True})
 @staff_member_required
 def get_list_gleaders(request):
 
@@ -519,6 +524,14 @@ def get_players(obj):
 
 	return str(total_players)
 	return str(teams)
+
+############################### End PDFs ########################
+
+@staff_member_required
+def user_logout(request):
+
+	logout(request)
+	return HttpResponseRedirect('/')
 
 ######################### Custom Error Handlers  #####################
 
