@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from events.models import *
@@ -54,10 +54,11 @@ class TeamCaptain(models.Model):
 	paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
 	total_players = models.IntegerField(default=1)
-	gender = models.CharField(max_length=10, choices=GENDERS)	
+	gender = models.CharField(max_length=10, choices=GENDERS, null=True)	
 	payment_token = models.CharField(max_length=32, null=True, blank=True)
 	order_id = models.CharField(max_length=10, null=True, blank=True)
-
+	if_payment = models.BooleanField(default=True)
+	
 	def __unicode__(self):
 
 		return self.name + '-' + str(self.g_l.college)
@@ -83,7 +84,7 @@ class Transport(models.Model):
 	g_l = models.ForeignKey('GroupLeader', on_delete=models.CASCADE)
 	no_of_passengers = models.IntegerField()
 	departure = models.CharField(max_length=50)
-	arrival = models.CharField(max_length=50)
+	date = models.DateTimeField(max_length=50, auto_now=False, null=True)
 
 	def __unicode__(self):
 

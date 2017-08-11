@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+	<title>Home</title>
+</head>
+<body>
+<h1>Welcome to BOSM 2017 Registrations</h1>
+
+{% if added_events %}
+<h2>Events</h2>
+<h3>Click on 1 of the links below to register for that sport</h3>
+{% for event in added_events %}
+<a href="{% url 'registrations:register_captain' event.id %}">{{event.name}}</a>
+{% endfor %}
+{% endif %}
+<script type="text/javascript">
+	function func(){
+		location.href = "{% url 'registrations:manage' %}"
+	}
+</script>
+<button onclick="func()">Manage Sports</button>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BOSM 17 Registerations Register_Captain</title>
+	<!-- <link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
+ -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+	<link rel="stylesheet" type="text/css" href="../../static/registrations/css/style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+
+
+</head>
+<body style="background-color:#D9E5D6;overflow-y:scroll">
+<div class="container" >
+
+	<div class="row" style="margin-top:5%;margin-bottom:50px;">
+				<div class="col s12" style="text-align:center;font-size:300%;">
+					Register as a Team ()
+				</div>
+				<div class="col s12" id="subhead" style="text-align:center;font-size:150%;"></div>
+				<div class="col s12" style="padding-top:2%;">
+				 	 <div class="row" style="margin-bottom:7px;">
+					    <form class="col s12 form2" id="signup" action="" method="post">
+					    {% csrf_token %}
+					      <div class="row">
+					        
+					        <div class="input-field col s12">
+					          <input id="name" type="text" name="name">
+					          <label for="name">Name Of Team Captain</label>
+					        </div>
+
+					      </div>
+					      
+					      <div class="row">
+					        <div class="input-field col s12">
+					          <input id="email" type="email" name="email">
+					          <label for="email">Email of Team Captain</label>
+					        </div>
+					      </div>
+					      <div class="row">
+					      	<div class="input-field col s12">
+          				        <input id="phone" type="tel" class="validate" name="phone">
+          						<label for="phone">Phone Number</label>
+        					</div>
+					      </div>
+
+					      <div class="row">
+					      	<div class="col s4">
+					      		Gender:
+					      	</div>
+					      	<div class="col s4">
+					      		<input name="gender" type="radio" id="male" value="M"/>
+      							<label for="male">Male</label>
+					      	</div>
+					      	<div class="col s4">
+					      		<input name="gender" type="radio" id="female" value="F"/>
+					     		 <label for="female">Female</label>
+					      	</div>
+					      	</div>
+					      	<div id="list">
+					      	<div class="row" style="display: flex;align-items: center;">
+					      		<div class="col input-field s12 m12 l8" id="first">
+					      			<input id="part" type="text" name="participants">
+					          		<label for="part">Name of Participant</label>
+					          	</div>
+					      	<div class="col s12 m12 l4" id="add-btn" style="display:flex;justify-content:center;margin-top:45px;">
+						 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="participant-btn" style="white-space:nowrap;font-size: 100% !important;padding-top: 5px !important;padding-bottom: 5px !important;">Add a Participant</button>
+							</div>
+							</div>
+							</div>
+							<div class="row">
+							<div class="col s12" id="add-btn" style="display:flex;justify-content:center;margin-top:45px;">
+						 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="submit-btn" style="white-space:nowrap;">Submit</button>
+							</div>
+							</div>
+   						</form>
+ 					 </div>
+ 					 </div>
+ 					 </div>
+ 					</div>
+
+ 		<script type="text/javascript">
+ 			var count = 1;
+ 			var maxcount = 10;
+ 			$('#subhead').text("You can add only " + maxcount + " participants.")
+ 			$("#participant-btn").click(function(e){
+ 				e.preventDefault();
+ 				if(count == maxcount)
+ 					{
+ 						$('#first').removeClass('l8').addClass('l12');
+ 						$('#add-btn').remove();
+ 					};
+ 				count++;
+ 				var $outerdiv = $("<div>").addClass("row");
+ 				var $div = $("<div>").addClass("col s12 input-field");
+				var $input = $("<input>",{"type":"text","id":"part"+count,"name":"participants"});
+				var $label = $("<label>",{"for":"part" + count}).text("Name of Participant");
+				$input.appendTo($div);
+				$label.appendTo($div);
+				$div.appendTo($outerdiv);
+				$('#list').prepend($outerdiv);
+ 			});
+ 		</script>
+</body>
+</html>
