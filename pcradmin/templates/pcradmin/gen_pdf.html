@@ -3,9 +3,10 @@
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
+      <div class="row center">
       <a class="waves-effect waves-light btn large pink" href="{% url 'pcradmin:get_list_gleaders' %}">Download Group Leaders PDF</a>
+      </div>
     <br><br>
-      <h2 class="header center pink-text">List of approved Group Leaders</h2>
       <h2 class="header center pink-text">List of approved Group Leaders</h2>
       <div class="center-align">
         <table class="centered">
@@ -23,9 +24,10 @@
                         <td>{{g_l.college}}</td>
                         <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:get_list_captains' gl.id %}">Download Team PDF</a></td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-{% endblock body %}
+{% endblock %}

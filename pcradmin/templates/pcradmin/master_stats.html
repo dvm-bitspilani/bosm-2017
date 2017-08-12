@@ -1,0 +1,32 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Master Stats</h2>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>College Name</th>
+                        <th>College status</th>
+                        {% for event in events %}
+                        <th>{{event}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for college,entry in both %}
+                    <tr>
+                        <td>{{college.name}}</td>
+                        <td>{{college.g_l.college}}</td>
+                        {% for event, data in entry  %}
+                        <td>{{data}}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

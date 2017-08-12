@@ -20,9 +20,10 @@
                         <td>{{g_l.college}}</td>
                         <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:list_tc' gl.id %}">Show team list</a></td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-{% endblock body %}
+{% endblock %}
