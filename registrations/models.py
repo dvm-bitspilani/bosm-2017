@@ -19,7 +19,7 @@ class GroupLeader(models.Model):
 	state = models.CharField(max_length=50)
 	phone = models.BigIntegerField()
 	email = models.EmailField(unique=True)
-	user = models.OneToOneField(User, on_delete=models.CASCADE, name='')
+	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
 	gender = models.CharField(max_length=10, choices=GENDERS)
 	events = models.ManyToManyField(Event, through=Participation, blank=True, null=True) #events.models
 	email_verified = models.BooleanField(default=False)

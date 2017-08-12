@@ -21,7 +21,7 @@
       <ul class="left hide-on-med-and-down">
         {% if dashboard %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:index' %}">Dashboard</a></li>
         {% if stats %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:stat_sport_college' %}">Stats</a></li>
-        {% if pdf %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:get_list' %}">View PDFs</a></li>
+        {% if pdf %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:get_list' %}">View Excel Sheets</a></li>
       </ul>
       <ul class="right hide-on-med-and-down">
         <li><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:logout' %}">Logout</a></li>
@@ -37,12 +37,7 @@
   {% block body %}
 
   {% endblock %}
-  <div class="container">
-    <div class="section">
-    </div>
-    <br><br>
-  </div>
-
+ 
   <footer class="page-footer purple lighten-1">
     <div class="footer-copyright center">
       <div class="container">

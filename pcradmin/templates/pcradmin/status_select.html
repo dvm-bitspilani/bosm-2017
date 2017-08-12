@@ -27,13 +27,14 @@
                         <td>{{gl.college}}</td>
                         <td>
                             <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                            <label for="{{gl.id}}">Select</label>
                         </td>
                     </tr>
                     {% endfor %}
                     <tr>
                         <td></td>
                         <td></td>
-                        <td><button class="waves-effect waves-light btn green" type="submit" value="Activate" name="submit">Activate</td>
+                        <td><button class="waves-effect waves-light btn green" type="submit" value="Activate" name="submit">Activate</button></td>
                     </tr>
                     </form>
                 </tbody>
@@ -57,14 +58,15 @@
                         <td>{{gl.name}}</td>
                         <td>{{gl.college}}</td>
                         <td>
-                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}"/>
+                            <input type="checkbox" id="{{gl.id}}" name="gls" value="{{gl.id}}" class="filled-in-box"/>
+                            <label for="{{gl.id}}">Select</label>
                         </td>
                     </tr>
                     {% endfor %}
                     <tr>
                         <td></td>
                         <td></td>
-                        <td><button class="waves-effect waves-light btn red" type="submit" value="Deactivate" name="submit">Deactivate</td>
+                        <td><button class="waves-effect waves-light btn red" type="submit" value="Deactivate" name="submit">Deactivate</button></td>
                     </tr>
                     </form>
                 </tbody>

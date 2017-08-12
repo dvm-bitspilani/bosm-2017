@@ -7,13 +7,14 @@
             <form action="{% url 'pcradmin:sport_limit_change' event.id %}" method="POST">
                 {% csrf_token %}
                 <div class="input-field col s6">
-                    <input value="{{event.min_limit}}" id="min_limit" type="text" class="validate" name="min_limit">
+                    <input value="{{event.min_limit}}" id="min_limit" type="number" class="validate" name="min_limit">
                     <label class="active" for="min_limit">Minimum Limit</label>
                 </div>
                 <div class="input-field col s6">
-                    <input value="{{event.max_limit}}" id="max_limit" type="text" class="validate" name="max_limit">
+                    <input value="{{event.max_limit}}" id="max_limit" type="number" class="validate" name="max_limit">
                     <label class="active" for="max_limit">Maximum Limit</label>
                 </div>
+                <button class="waves-effect waves-light btn green" type="submit" name="submit">Change</button>
             </form>
             <br>
     </div>
