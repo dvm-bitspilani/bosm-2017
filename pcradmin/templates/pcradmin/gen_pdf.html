@@ -22,7 +22,7 @@
                     <tr>
                         <td>{{g_l.name}}</td>
                         <td>{{g_l.college}}</td>
-                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:get_list_captains' gl.id %}">Download Team PDF</a></td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:get_list_captains' g_l.id %}">Download Team PDF</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

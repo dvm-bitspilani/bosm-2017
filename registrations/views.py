@@ -129,7 +129,6 @@ def authenticate_email_token(token):
 		gleader = GroupLeader.objects.get(email_token=token)
 		gleader.email_verified = True
 		gleader.email_token = None
-		gleader.user.is_active = True
 		gleader.save()
 
 		return gleader
@@ -149,7 +148,7 @@ def email_confirm(request, token):
 
 		context = {
 			'error_heading': 1,
-			'message': 'Your email has beeen verified. Your username and password can now be used to login at <a>bits-bosm.org.</a>',
+			'message': 'Your email has beeen verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani>',
 		}
 	else:
 		context = {

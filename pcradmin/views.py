@@ -1,18 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from registrations.models import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from events.models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail.backends.smtp import EmailBackend
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.contrib.auth import login, logout
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from functools import reduce
 from registrations.urls import *
+from django.views.decorators.csrf import csrf_exempt
 
 @staff_member_required
 def index(request):
@@ -34,15 +35,10 @@ def sport_limit_change(request, event_id):
 	if request.method == 'POST':
 
 		data = request.POST
-		try:
-
-			event.max_limit = data['max_limit']
-			event.min_limit = data['min_limit']
-			event.save()
-			return render(request, 'pcradmin/change_limits.html', {'event':event})
-		
-		except: 
-			print "invalid data"
+		event.max_limit = (data['max_limit'])
+		event.min_limit = (data['min_limit'])
+		event.save()
+		return redirect(reverse('pcradmin:sport_limit'))
 
 	return render(request, 'pcradmin/sport_limit_change.html', {'event':event})
 
@@ -100,6 +96,7 @@ def status_change(request):
 	if request.method == "POST":
 
 		data = request.POST
+		print data
 		group_leaders = data['gls']
 		if group_leaders:
 			if "Deactivate" == data['submit']:
@@ -107,7 +104,12 @@ def status_change(request):
 				for gl_id in group_leaders:
 					gl = GroupLeader.objects.get(id=gl_id)
 					gl.pcr_approved = False
+					gl.user.is_active = False
+					user = gl.user
+					user.is_active = False
 					gl.save()
+					user.save()
+					print user.username
 					send_status_email(gl.email, "Frozen")
 			elif "Activate" == data['submit']:
 				for gl_id in group_leaders:
@@ -115,7 +117,12 @@ def status_change(request):
 					if gl.email_verified:
 
 						gl.pcr_approved = True
+						gl.user.is_active = True
+						user = gl.user
 						gl.save()
+						user.is_active = True
+						user.save()
+						print user.username
 						send_status_email(gl.email, "Approved")
 					else:
 						context = {
@@ -124,16 +131,17 @@ def status_change(request):
 						'error_heading' : 'Email Unverified',
 						'error_message' : 'This user has not verified its email. This is user is deactivated.'
 						}
-						return render(request, 'pcradmin/error.html', context)
-				return render(request, 'pcradmin/success.html',)
+						return render(request, 'pcradmin/message.html', {'message':'context[error_message]'})
+			return redirect(request.META.get('HTTP_REFERER'))
 		else:
 
 			return redirect(request.META.get('HTTP_REFERER'))
 
 	else:
 
-		gl_active = GroupLeader.objects.filter(user__is_staff=False, pcr_approved=True)
-		gl_inactive = GroupLeader.objects.filter(user__is_staff=False, pcr_approved=False).order_by('email_verified')
+		gl_active = GroupLeader.objects.filter(user__is_staff=False, user__is_active=True)
+		gl_inactive = GroupLeader.objects.filter(user__is_staff=False, user__is_active=False).order_by('email_verified')
+		print gl_inactive, gl_active
 		return render(request, 'pcradmin/status_select.html', {'active':gl_active, 'inactive':gl_inactive})
 
 
@@ -141,10 +149,12 @@ def status_change(request):
 def send_status_email(send_to, status):
 	if status == 'Approved':
 		subject = "Account Approved"
+		body = "Dear User, Your account status has been changed, and is now "+status+". You can use your credentials to login to <a>bits-bosm.org/registrations</a> to add teams."
+
 	elif status == 'Frozen':
 		subject = "Account Frozen"
-	body = "Dear User, Your account status has been changed, and is now "+status+"."
-	email = EmailMessage(sub, body,'register@bits-bosm.org', [send_to])
+		body = "Dear User, Your account status has been changed, and is now "+status+". You can no longer log on using your credentials."
+	email = EmailMessage(subject, body,'register@bits-bosm.org', [send_to])
 	
 	try:
 		email.send()
@@ -162,29 +172,32 @@ def send_status_email(send_to, status):
 				email.send()	
 			except:
 				print "email not sent"
-				return
+				return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
 	return
 
 @staff_member_required
+@csrf_exempt
 def confirm_events(request, gl_id):
-	gl = get_object_or_404(GroupLeader, id=gl_id, pcr_approved=True)
+	gl = get_object_or_404(GroupLeader, pk=gl_id,)
 
 	if request.method == 'POST':
+		data = request.POST
 		confirmed=True
 		unconfirmed=True
-		try:
-			confirm = data['confirm']
-			for i in confirm:
-				p = Participation.objects.get(id=int(i))
-				p.confirmed = True
-				p.save()
+		#try:
+		confirm = data['confirm']
+		for i in confirm:
+			p = Participation.objects.get(pk=int(i))
+			p.confirmed = True
+			p.save()
 
-				event = Participation.event
-				teamcaptain = event.teamcaptain_set.filter.get(g_l=g_l)
-				send_to = teamcaptain.email
-				name = teamcaptain.name
-				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+			event = p.event
+			g_l = p.g_l
+			teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
+			send_to = teamcaptain.email
+			name = teamcaptain.name
+			body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 					<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 					<pre style="font-family:Roboto,sans-serif">
 					
@@ -192,31 +205,31 @@ def confirm_events(request, gl_id):
 					Your team registration for %s has been confirmed.
 					<a href='%s'>Click Here</a> to pay %d for the same.
 					
-					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:Index"))) + generate_payment_token(TeamCaptain.objects.get(email_id=send_to)) + '/', event.price)
+					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
 
-				email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("Index"))) + generate_payment_token(TeamCaptain.objects.get(email_id=send_to)) + '/' + ' to confirm.', 
+			email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
 												'register@bits-bosm.org', [send_to.strip()]
 												)
-				email.attach_alternative(body, "text/html")
+			email.attach_alternative(body, "text/html")
 
+			try:
+				email.send()
+					
+			except SMTPException:
+				
 				try:
+					bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
+					bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
 					email.send()
 					
 				except SMTPException:
-				
-					try:
-						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
-						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
-						email.send()
-					
-					except SMTPException:
-						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
-						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
-						email.send()
+					bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
+					bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+					email.send()
 		
 
-		except:
-			confirmed=False
+		#except:
+			#confirmed=False
 		
 		### Probably not necessary###
 		'''
@@ -232,8 +245,7 @@ def confirm_events(request, gl_id):
 			'''
 		if not confirmed:
 			return redirect(request.META.get('HTTP_REFERER'))
-		context = {}
-		return render(request, 'pcradmin/success.html', context)
+		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
 
 
 	else:
@@ -261,7 +273,7 @@ def generate_payment_token(teamcaptain):
 
 @staff_member_required
 def list_gl(request):
-	gls = GroupLeader.objects.all()
+	gls = GroupLeader.objects.filter(pcr_approved=True)
 	return render(request, 'pcradmin/list_gls.html', {'gls':gls})
 
 @staff_member_required
@@ -388,7 +400,8 @@ def count_players_confirmed(x,y):
 @staff_member_required
 def get_list(request):
 
-	return render(request, 'pcradmin/gen_pdf.html', {'pdf':True})
+	g_l = GroupLeader.objects.all()
+	return render(request, 'pcradmin/gen_pdf.html', {'pdf':True, 'gls':g_l})
 @staff_member_required
 def get_list_gleaders(request):
 
@@ -437,7 +450,7 @@ def get_list_gleaders(request):
 		worksheet.write(i+2, 1, get_players(row['obj']))
 
 	workbook.close()
-	filename = 'ExcelReport.xlsx'
+	filename = 'GroupLeaders_ExcelReport.xlsx'
 	output.seek(0)
 	response = HttpResponse(output.read(), content_type="application/ms-excel")
 	response['Content-Disposition'] = 'attachment; filename=%s' % filename
@@ -485,15 +498,16 @@ def get_list_captains(request, gl_id):
 		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'name', 'NA'))
 		worksheet.write(i+2, 2, deepgetattr(row['obj'], 'email', 'NA'))
 		worksheet.write(i+2, 3, deepgetattr(row['obj'], 'phone', 'NA'))
-		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'event.name', 'NA'))
-		worksheet.write(i+2, 1, deepgetattr(row['obj'], 'total_players', 'NA'))
+		worksheet.write(i+2, 4, str(deepgetattr(row['obj'], 'event.name', 'NA')))
+		worksheet.write(i+2, 5, deepgetattr(row['obj'], 'total_players', 'NA'))
 
 	workbook.close()
-	filename = 'ExcelReport.xlsx'
+	filename = g_leader.name + '_ExcelReport.xlsx'
 	output.seek(0)
 	response = HttpResponse(output.read(), content_type="application/ms-excel")
 	response['Content-Disposition'] = 'attachment; filename=%s' % filename
 	return response
+
 
 def deepgetattr(obj, attr, default = None):
 

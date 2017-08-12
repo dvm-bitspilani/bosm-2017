@@ -16,14 +16,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <form action="{% url 'pcradmin:confirm_events' gl.id %}" method="POST">
+                    <form action="{% url 'pcradmin:confirm_events' g_l.id %}" method="POST">
+                    {% csrf_token %}
                     {% for captain in teamcaptains %}
                     <tr>
                         <td>{{captain.name}}</td>
                         <td>{{captain.g_l.college}}</td>
                         <td>{{captain.total_players}}</td>
                         <td>{{captain.event.name}}</td>
-                        <td><input type="checkbox" id="{{captain.id}}" name="confirm" value="{{captain.id}}"/></td>
+                        <td><input type="checkbox" id="{{captain.event.id}}" name="confirm" value="{{captain.event.id}}" class="filled-in-box"/><label for="{{captain.id}}">Select</label></td>
                     </tr>
                     {% endfor %}
                     <tr>
