@@ -13,37 +13,14 @@
 <div class="container" style="margin-top:2vh;">
 	<div class="row">
 		<div class="col s12 welcome" style="">
-			Welcome to BOSM 2017!
+			Add or Remove Sports
 		</div>
 	</div>
 </div>
 <div class="container" style="margin-top:4vh;">
 	<div class="row" style="margin-bottom:0px;">
 		<div class="col s12 m5 l5 box" id="sportsadded" style="margin-bottom:10vh;">
-			<!-- <div class="row" id="1">
-				<div class="col s12 check" >
-				<input type="checkbox" id="test1" />
-      			<label for="test1">Football</label>
-      			</div>
-			</div>
-			<div class="row" id="2">
-				<div class="col s12 check" >
-				<input type="checkbox" id="test2" />
-      			<label for="test2">Cricket</label>
-      			</div>
-			</div>
-			<div class="row" id="3">
-				<div class="col s12 check" >
-				<input type="checkbox" id="test3" />
-      			<label for="test3">Basketball</label>
-      			</div>
-			</div>
-			<div class="row" id="4">
-				<div class="col s12 check" >
-				<input type="checkbox" id="test4" />
-      			<label for="test4">Tennis</label>
-      			</div>
-			</div> -->
+
 			<div class="col s12  m12 l12 " style="display:flex;justify-content:center;margin-top:30px;">
 		 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="addsport-btn" style="white-space:nowrap">Add Sport</button>
 			</div>
@@ -65,11 +42,11 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
-	function adddiv(i,sport,id,resid){
-		var $div = $("<div>", {id: i, "class": "row"});
+	function adddiv(sport,id,resid){
+		var $div = $("<div>", {id: resid, "class": "row"});
 		var $innerdiv = $("<div>").addClass("col s12 check");
-		var $input = $("<input>",{"type":"checkbox","id":"test"+i,"value":resid});
-		var $label = $("<label>",{"for":"test" + i}).text(sport);
+		var $input = $("<input>",{"type":"checkbox","id":"test"+resid,"value":resid});
+		var $label = $("<label>",{"for":"test" + resid}).text(sport);
 		$input.appendTo($innerdiv);
 		$label.appendTo($innerdiv);
 		$innerdiv.appendTo($div);
@@ -82,11 +59,11 @@ $(document).ready(function(){
 	}).done(function(res){
 		if(res.x == 1){
 		$.each(res.events_added,function(i,ele){
-			adddiv(i,ele["name"],"sportsremoved",ele["id"])
+			adddiv(ele["name"],"sportsremoved",ele["id"])
 		});
 	}
 		$.each(res.events_left,function(i,ele){
-			adddiv(i,ele["name"],"sportsadded",ele["id"])
+			adddiv(ele["name"],"sportsadded",ele["id"])
 		});
 	})
 	$('#addsport-btn').click(function(){

@@ -212,30 +212,38 @@ def manage_sports(request):
 		return JsonResponse({'x':x, 'status':1, 'events_added':events_added, 'events_left':events_left})
 
 	else:
-		data = request.POST
-		events_added = data.getlist('sportsadded[]', [])
-		events_left = data.getlist('sportsleft[]', [])
-		print events_added, events_left
-		for e_id in events_added:
-			event = get_object_or_404(Event, id=e_id)
-			try:
-				part = Participation.objects.get(g_l=g_l, event=event)
-				continue
-			except:
-				Participation.objects.create(g_l=g_l, event=event)
-		for e_id in events_left:
-			event = get_object_or_404(Event, id=e_id)
-			try:
-				part = Participation.objects.get(g_l=g_l, event=event)
-				try:
-					tc = TeamCaptain.objects.get(event=event, g_l=g_l)
-					tc.delete()
-				except:
-					print "no team registered in this event"
-				part.delete()
+		data = dict(request.POST)
+		print data
+		try:
 
-			except:
-				continue
+			events_added = data['sportsadded[]']
+			for e_id in events_added:
+				event = get_object_or_404(Event, id=e_id)
+				try:
+					part = Participation.objects.get(g_l=g_l, event=event)
+					continue
+				except:
+					Participation.objects.create(g_l=g_l, event=event)
+		except KeyError:
+			print "no added sports"
+		try:
+
+			events_left = data['sportsleft[]']
+			for e_id in events_left:
+				event = get_object_or_404(Event, id=e_id)
+				try:
+					part = Participation.objects.get(g_l=g_l, event=event)
+					try:
+						tc = TeamCaptain.objects.get(event=event, g_l=g_l)
+						tc.delete()
+					except:
+						print "no team registered in this event"
+					part.delete()
+
+				except:
+					continue
+		except KeyError:
+			print "no sports left"
 		return JsonResponse({'status':1})
 
 
@@ -287,6 +295,7 @@ def register_captain(request, event_id):
 	
 	if request.method == 'POST':
 		data = request.POST
+		print data
 		user = request.user
 		tc_form = TeamCaptainForm(data)
 
@@ -301,20 +310,21 @@ def register_captain(request, event_id):
 				part = Participation.objects.get(event=event, g_l=g_l)
 				
 				teamCaptain.g_l = g_l
-				participants = request.POST.getlist['participants[]',[]]
-				
+				participants = [i for i in dict(request.POST)['participants'] if i]
+				print participants
 				if participants:
 					
 					teamCaptain.is_single = False
 					teamCaptain.save()
-					if (event.max_limit>=participants.count()>=event.min_limit):
+					if (event.max_limit>len(participants)>=event.min_limit-1):
 						for part in participants:
-							if part:
-								Participant.objects.create(captain=teamCaptain, name = part)
+							Participant.objects.create(captain=teamCaptain, name = part)
 						teamCaptain.total_players = len(participants) + 1
 						teamCaptain.save()
+						return HttpResponseRedirect('/')
 					
-					return HttpResponseRedirect('/')
+					else:
+						return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
 				
 				else:
 					
@@ -330,12 +340,14 @@ def register_captain(request, event_id):
 
 		else:
 			return render(request, 'registrations/message.html', {'user':user,'message':tc_form.errors})
-		
+		return redirect(reverse('registrations:show'))
 	else:
 		# form = TeamCaptainForm()
+		user=request.user
+		g_l = GroupLeader.objects.get(user=user)
 		event = Event.objects.get(id=event_id)
-		
-		return render(request, 'registrations/register_tc.html', {'event':event})
+		part = get_object_or_404(Participation, event=event, g_l=g_l)
+		return render(request, 'registrations/register_captain.html', {'event':event})
 
 '''
 @login_required
@@ -367,7 +379,7 @@ def add_players(request):
 
 		print "error"
 
-'''
+
 
 @login_required
 def remove_players(request, event_id, participant_id):
@@ -386,6 +398,9 @@ def remove_players(request, event_id, participant_id):
 
 		return render(request, 'registrations/message.html', {'message':'Player does not exist.'})
 
+'''
+
+
 @login_required
 def add_extra_event(request, tc_id):
 
@@ -397,7 +412,7 @@ def add_extra_event(request, tc_id):
 		participant = Participant.objects.get(id=request.POST['participant_id'])
 		if participant in participants:
 
-			id_list = request.POST('id_list')
+			id_list = dict(request.POST)['id_list']
 
 			for e_id in id_list:
 

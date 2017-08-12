@@ -1,19 +1,13 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
 	<title>BOSM 17 Registerations Register_Captain</title>
-	<!-- <link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
+	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
- -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
-	<link rel="stylesheet" type="text/css" href="../../static/registrations/css/style.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
-
 
 </head>
 <body style="background-color:#D9E5D6;overflow-y:scroll">
@@ -21,7 +15,7 @@
 
 	<div class="row" style="margin-top:5%;margin-bottom:50px;">
 				<div class="col s12" style="text-align:center;font-size:300%;">
-					Register as a Team ()
+					Register as a Team for {{event.name}}
 				</div>
 				<div class="col s12" id="subhead" style="text-align:center;font-size:150%;"></div>
 				<div class="col s12" style="padding-top:2%;">
@@ -63,17 +57,19 @@
 					     		 <label for="female">Female</label>
 					      	</div>
 					      	</div>
+					      	{% if event.max_limit != 1 %}
 					      	<div id="list">
 					      	<div class="row" style="display: flex;align-items: center;">
 					      		<div class="col input-field s12 m12 l8" id="first">
 					      			<input id="part" type="text" name="participants">
-					          		<label for="part">Name of Participant</label>
+					          		<label for="part">Name of Team member</label>
 					          	</div>
 					      	<div class="col s12 m12 l4" id="add-btn" style="display:flex;justify-content:center;margin-top:45px;">
 						 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="participant-btn" style="white-space:nowrap;font-size: 100% !important;padding-top: 5px !important;padding-bottom: 5px !important;">Add a Participant</button>
 							</div>
 							</div>
 							</div>
+							{% endif %}
 							<div class="row">
 							<div class="col s12" id="add-btn" style="display:flex;justify-content:center;margin-top:45px;">
 						 		<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="submit-btn" style="white-space:nowrap;">Submit</button>
@@ -86,21 +82,26 @@
  					</div>
 
  		<script type="text/javascript">
- 			var count = 1;
- 			var maxcount = 10;
- 			$('#subhead').text("You can add only " + maxcount + " participants.")
+ 			var count = 2;
+ 			var maxcount = {{event.max_limit}} ;
+ 			if (maxcount!==1) {
+ 			$('#subhead').text("This is a team event. You can add only " + maxcount + " participants.")
+ 			}	
+ 			else {
+ 				$('#subhead').text("This is an individual event. The person will be registered as the Team Captain for this sport.")
+ 			}
  			$("#participant-btn").click(function(e){
  				e.preventDefault();
+ 				count++;
  				if(count == maxcount)
  					{
  						$('#first').removeClass('l8').addClass('l12');
  						$('#add-btn').remove();
  					};
- 				count++;
  				var $outerdiv = $("<div>").addClass("row");
  				var $div = $("<div>").addClass("col s12 input-field");
 				var $input = $("<input>",{"type":"text","id":"part"+count,"name":"participants"});
-				var $label = $("<label>",{"for":"part" + count}).text("Name of Participant");
+				var $label = $("<label>",{"for":"part" + count}).text("Name of Team member");
 				$input.appendTo($div);
 				$label.appendTo($div);
 				$div.appendTo($outerdiv);

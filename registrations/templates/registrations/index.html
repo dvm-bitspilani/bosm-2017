@@ -3,22 +3,55 @@
 {% load static %}
 <head>
 	<title>Home</title>
+	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
 </head>
-<body>
-<h1>Welcome to BOSM 2017 Registrations</h1>
-
+<body style="background-color:#D9E5D6;overflow-y:scroll">
+<div class="container" style="margin-top:2vh;">
+	<div class="row">
+		<div class="col s12 welcome" style="">
+			Welcome to BOSM 2017 Registrations!
+		</div>
+	</div>
+</div>
 {% if added_events %}
-<h2>Events</h2>
-<h3>Click on 1 of the links below to register for that sport</h3>
+<div class="container" style="margin-top:4vh;">
+	<div class="row" style="margin-bottom:0px;">
+		<div class="col s6 offset-s3 box" id="sportsadded" style="margin-bottom:10vh;">
+<center><h3><a href="#" style="font-weight: bold;color:#0FA3B1">Sports Added:</a></h3></center>
 {% for event in added_events %}
-<a href="{% url 'registrations:register_captain' event.id %}">{{event.name}}</a>
+<div class="row">
+				<div class="col s12" >
+				
+	<center><h3><a href="{% url 'registrations:register_captain' event.id %}" style="font-size:80%;color:#0FA3B1">{{event.name}}</a></h3></center>
+      			</div>
+</div>
 {% endfor %}
+</div>
+</div>
+</div>
+{% else %}
+<div class="row">
+	<div class="col s12" >
+		<center><h3>You have not selected any sport.<br>
+		Click on the button below to select sports.</h3></center>
+	</div>
+</div>
 {% endif %}
 <script type="text/javascript">
 	function func(){
-		location.href = "{% url 'registrations:manage' %}"
+		location.href = "{% url 'registrations:show' %}"
 	}
 </script>
-<button onclick="func()">Manage Sports</button>
+<div class="container">
+	<div class="row">
+		<div class="col s12  m12 l12 " style="display:flex;justify-content:center;">
+		 	<button class="btn waves-effect waves-light signup-button" onclick="func()" id="done-btn" style="background-color:#0FA3B1 !important;color:#D9E5D6 !important;white-space:nowrap">Manage Sports</button>
+		</div>
+	</div>
+</div>
 </body>
 </html>
