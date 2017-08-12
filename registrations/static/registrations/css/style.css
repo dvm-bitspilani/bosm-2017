@@ -84,6 +84,23 @@ body{
 .check label{
 	font-size: 200% !important;
 }
+.center{
+	display: flex;
+	align-items: center;
+}
+.a{
+	white-space: nowrap;
+	font-size: 100% !important;
+}
+.g{
+	padding: 15px !important; 
+}
+.b{
+	text-align: left;
+	font-size:200%;
+	font-weight:bold;
+}
+
 /*Responsive*/
 @media(max-width: 992px){
 	body{
