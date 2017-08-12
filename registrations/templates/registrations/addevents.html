@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BOSM' 17 Registeration</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+</head>
+<body style="background-color:#D9E5D6;overflow-y:scroll">
+<div class="container">
+	<div class="row" style="margin-top:5%;margin-bottom:50px;">>
+		<div class="col s12" style="text-align:center;font-size:300%;">
+			Add Extra Events
+		</div>
+		<div class="col s12 m8 l8 offset-m2 offset-l2" style="padding-top:5%;">
+			<div class="row form2" >
+				<form id="listofparticipants">
+						<!-- <div class="col s12 g">
+							<div class="row center">
+								<div class="col s6 b">
+									Participant
+								</div>
+								<div class="input-field col s12">
+							    <select>
+    								<option value="" disabled selected>Choose your option</option>
+      								<option value="1">Option 1</option>
+      								<option value="2">Option 2</option>
+      								<option value="3">Option 3</option>
+    								</select>
+    						     </div>
+
+							</div>
+						</div> -->
+				</form>
+			</div>
+				<div class="row">
+					<div class="col s12  m12 l12 " style="display:flex;justify-content:center;">
+		 				<button class="btn waves-effect waves-light signup-button" type="submit" name="action" id="done-btn" style="background-color:#0FA3B1 !important;color:#D9E5D6 !important;white-space:nowrap">DONE</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(document).ready(function() {
+    			$('select').material_select();
+  			});
+            
+			function add_participant(participant_name,id){
+					var $col = $("<div>").addClass("col s12 g");
+					var $row = $("<div>").addClass("row center");
+					var $name = $("<div>").addClass("col s6 b");
+					$name.text(participant_name);
+					// var $button = $("<div>",{"type":"submit","name":"action","id":id}).addClass("btn waves-effect waves-light signup-button a");
+					// $button.text("Add Extra Events");
+					var $input = $("<div>",{"id":id}).addClass("input-field col s6");
+					var $select = $("<select>");
+					var $op0 = $("<option>",{"value":"0","disabled":"","selected":""}).text("Add Extra Event");
+					var $op1 = $("<option>",{"value":"1"}).text("Option 1");
+					var $op2 = $("<option>",{"value":"2"}).text("Option 2");
+					var $op3 = $("<option>",{"value":"3"}).text("Option 3");
+					$name.appendTo($row);
+					$op0.appendTo($select);
+					$op1.appendTo($select);
+					$op2.appendTo($select);
+					$op3.appendTo($select);
+					$select.appendTo($input);
+					$input.appendTo($row);
+					$row.appendTo($col);
+					$("#listofparticipants").prepend($col);
+			}
+			// // }
+			// add_participant("Nilay",1)
+			// add_participant("Nilay",2)
+			// add_participant("Nilay",3)
+			//GET Request to get a list of all the Participants
+			$.ajax({
+				method:"GET",
+				url:""
+			}).done(function(res){
+				$.each(res.participants,function(i,ele){
+					add_participant(ele["name"],ele["id"]);
+				})
+				console.log("Added");
+			});
+
+			//
+
+			//POST Request to send form data
+			var data = {}
+			$("#done").click(function(){
+				$.each($(".input-field"),function(i,ele){
+					var id = $(ele).attr(id);
+					var val = $(ele + "select").val();
+					data[id] = val;
+				})
+				$.ajax({
+					method:"POST",
+					url:"",
+					data:data
+				}).done(function(){
+						console.log("Success")
+				})
+			});
+		
+		 });
+	</script>
+</body>
+</html>
