@@ -195,9 +195,10 @@ def confirm_events(request, gl_id):
 			event = p.event
 			g_l = p.g_l
 			teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
-			send_to = teamcaptain.email
-			name = teamcaptain.name
-			body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+			if teamcaptain.if_payment :
+				send_to = teamcaptain.email
+				name = teamcaptain.name
+				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 					<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 					<pre style="font-family:Roboto,sans-serif">
 					
@@ -207,25 +208,25 @@ def confirm_events(request, gl_id):
 					
 					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
 
-			email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
+				email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
 												'register@bits-bosm.org', [send_to.strip()]
 												)
-			email.attach_alternative(body, "text/html")
+				email.attach_alternative(body, "text/html")
 
-			try:
-				email.send()
-					
-			except SMTPException:
-				
 				try:
-					bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
-					bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
 					email.send()
 					
 				except SMTPException:
-					bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
-					bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
-					email.send()
+				
+					try:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
+						email.send()
+						
+					except SMTPException:
+						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
+						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+						email.send()
 		
 
 		#except:
@@ -251,6 +252,97 @@ def confirm_events(request, gl_id):
 	else:
 		events = list(set([{'event':p.event, 'status':p.confirmed, 'part_id':p.id} for p in Participation.objects.filter(g_l=gl).order_by('confirmed')]))
 		return render(request, 'pcradmin/confirm_events.html', {'events':events})
+
+@staff_member_required
+def final_confirmation(reqeust):
+	g_leaders = GroupLeader.objects.filter(pcr_approved=True)
+	return render(request, 'pcradmin/final_confirm.html', {'g_leaders':g_leaders})
+
+@staff_member_required
+def final_confirmation_email(request, gl_id):
+	
+	g_l = get_object_or_404(GroupLeader, id=gl_id)
+	if request.method == 'POST':
+
+		sub = request.POST['sub']
+		body = request.POST['body']
+		send_to = request.POST['to']
+		email = EmailMessage(sub, body,'register@bits-bosm.org', [send_to])
+
+		import xlsxwriter
+		try:
+			import cStringIO as StringIO
+		except ImportError:
+			import StringIO
+		a_list = []
+
+
+		gleaders = GroupLeader.objects.all()
+
+		for p in gleaders:
+			a_list.append({'obj': p})
+		data = sorted(a_list, key=lambda k: k['obj'].id)
+		output = StringIO.StringIO()
+		workbook = xlsxwriter.Workbook(output)
+		worksheet = workbook.add_worksheet('new-spreadsheet')
+		date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
+		worksheet.write(0, 0, "Generated:")
+		from time import gmtime, strftime
+		generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
+		worksheet.write(0, 1, generated)
+
+		worksheet.write(1, 0, "ID")
+		worksheet.write(1, 1, "Name")
+		worksheet.write(1, 2, "Email ID")
+		worksheet.write(1, 3, "Mobile No.")
+		worksheet.write(1, 4, "College")
+		worksheet.write(1, 5, "Total teams")
+		worksheet.write(1, 6, "Total players")
+
+		for i, row in enumerate(data):
+
+			worksheet.write(i+2, 0, deepgetattr(row['obj'], 'id', 'NA'))
+			worksheet.write(i+2, 1, deepgetattr(row['obj'], 'name', 'NA'))
+			worksheet.write(i+2, 2, deepgetattr(row['obj'], 'email', 'NA'))
+			worksheet.write(i+2, 3, deepgetattr(row['obj'], 'phone', 'NA'))
+			worksheet.write(i+2, 1, deepgetattr(row['obj'], 'college', 'NA'))
+			worksheet.write(i+2, 1, get_teams(row['obj']))
+			worksheet.write(i+2, 1, get_players(row['obj']))
+
+		workbook.close()
+		filename = 'GroupLeaders_ExcelReport.xlsx'
+		output.seek(0)
+		email.attach_file(workbook)
+		
+		try:
+			email.send()
+		except SMTPException:
+
+			try:
+				BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
+				BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
+				email.send()
+			except SMTPException:
+
+				try :
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
+					email.send()	
+				except:
+					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+
+		return render(request, "pcradmin/message.html", {'email':send_to, 'message':'Email sent'})
+
+	else:
+
+		context = {
+		'g_l':g_l,
+		'to' : g_l.email,
+		'subject' : "BOSM 2017",
+		"body" : '',
+		}
+		return render(request, 'pcradmin/email_compose.htm', context)
+
 
 
 ####### Helper function for payment token #######

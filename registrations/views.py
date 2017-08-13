@@ -12,7 +12,7 @@ import random
 from django.core.urlresolvers import reverse
 import json
 
-@login_required(login_url='/registrations/login/')
+@login_required(login_url='registrations:login')
 def index(request):
 
 	user = request.user
@@ -72,7 +72,7 @@ pcr@bits-bosm.org
 </pre>
 			'''%(name, str(request.build_absolute_uri(reverse("registrations:index"))) + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/')
 
-			email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index"))) + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/' + ' to confirm.', 
+			email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:email_confirm", kwargs={'token':generate_email_token(GroupLeader.objects.get(email=send_to))})))  + '/' + ' to confirm.', 
 											'register@bits-bosm.org', [send_to.strip()]
 											)
 			email.attach_alternative(body, "text/html")
@@ -142,7 +142,7 @@ def authenticate_email_token(token):
 
 def email_confirm(request, token):
 	
-	member = email_authenticate_token(token)
+	member = authenticate_email_token(token)
 	
 	if member:
 
@@ -157,7 +157,7 @@ def email_confirm(request, token):
 			'message': "Sorry! This is an invalid token. Email couldn't be verified.",
 		}
 	return render(request, 'registrations/message.html', context)
-
+@csrf_exempt
 def user_login(request):
 
 	if request.method == 'POST':
@@ -416,7 +416,7 @@ def add_extra_event(request, tc_id):
 			for e_id in id_list:
 
 				event = Event.objects.get(id=e_id)
-				TeamCaptain.objects.create(name=participant.name, g_l=groupleader,event=event)
+				TeamCaptain.objects.create(name=participant.name, g_l=groupleader,event=event, if_payment=False)
 			return HttpResponseRedirect('/')
 		raise Http404("nooooo!")
 	event_set = Event.objects.filter(min_limit=1, max_limit=1)
