@@ -240,7 +240,7 @@ def confirm_events(request, gl_id):
 		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':teamcaptains, 'g_l':gl})
 
 @staff_member_required
-def final_confirmation(reqeust):
+def final_confirmation(request):
 	g_leaders = GroupLeader.objects.filter(pcr_approved=True)
 	return render(request, 'pcradmin/final_confirm.html', {'g_leaders':g_leaders})
 
@@ -296,7 +296,7 @@ def final_confirmation_email(request, gl_id):
 			worksheet.write(i+2, 1, get_players(row['obj']))
 
 		workbook.close()
-		filename = 'GroupLeaders_ExcelReport.xlsx'
+		filename = 'GroupLeaders_BOSM\'17.xlsx'
 		output.seek(0)
 		email.attach_file(workbook)
 		
@@ -317,7 +317,7 @@ def final_confirmation_email(request, gl_id):
 				except:
 					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
-		return render(request, "pcradmin/message.html", {'email':send_to, 'message':'Email sent'})
+		return render(request, "pcradmin/message.html", {'message':'Email sent to ' + send_to})
 
 	else:
 
@@ -325,9 +325,9 @@ def final_confirmation_email(request, gl_id):
 		'g_l':g_l,
 		'to' : g_l.email,
 		'subject' : "BOSM 2017",
-		"body" : '',
+		"body" : 'This is the final confirmation email. PFA the list of all participating group leaders for BOSM \'17.'
 		}
-		return render(request, 'pcradmin/email_compose.htm', context)
+		return render(request, 'pcradmin/email_compose.html', context)
 
 
 
@@ -388,6 +388,11 @@ def team_detail(request, tc_id):
 
 @staff_member_required
 def stats(request):
+
+	return render(request, 'pcradmin/stats.html')
+
+@staff_member_required
+def stats_order(request, order):
 
 	if order == 'collegewise':
 

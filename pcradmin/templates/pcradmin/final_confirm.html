@@ -18,7 +18,7 @@
                     <tr>
                         <td>{{g_l.name}}</td>
                         <td>{{g_l.college}}</td>
-                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirm_email' g_l.id %}">Show team list</a></td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirmation_email' g_l.id %}">Send Email</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -1,0 +1,34 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select attribute to shuffle</h2>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Select</th>>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>College wise</td>
+                        <td><a href="../stats/college/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                    </tr>
+                    <tr>
+                        <td>Sports wise</td>
+                       <td><a href="../stats/sport/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                    </tr>
+                    <tr>
+                        <td>Both</td>
+                        <td><a href="../stats/sport_college/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                    </tr>
+                </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
