@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +11,8 @@ from .forms import *
 import random
 from django.core.urlresolvers import reverse
 import json
+from django.conf import settings
+import Checksum
 
 @login_required(login_url='registrations:login')
 def index(request):
@@ -81,15 +83,14 @@ pcr@bits-bosm.org
 				email.send()
 			
 			except SMTPException:
-				print "email not sent"
-				# try:
-				# 	BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
-				# 	BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
-				# 	email.send()
-				# except SMTPException:
-				# 	BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
-				# 	BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
-				# 	email.send()
+				try:
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
+					email.send()
+				except SMTPException:
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
+					email.send()
 
 			message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address." %(send_to)
 			return render(request, 'registrations/message.html', {'message':message})
@@ -475,12 +476,13 @@ def render_list(request):
 
 ##################################################### PayTM ###########################################################
 
+def paytm_req(request):
+
+	return HttpResponse("PayTM.")
+
 def paytm_request(request, token):
 
 	teamcaptain = TeamCaptain.objects.get(payment_token=token)
-
-	from django.conf import settings
-	import Checksum
 
 	MERCHANT_KEY = settings.PAYTM_MERCHANT_KEY
 	MERCHANT_ID = settings.PAYTM_MERCHANT_ID
@@ -488,15 +490,16 @@ def paytm_request(request, token):
 	# Generating unique temporary ids
 	order_id = Checksum.__id_generator__()
 	teamcaptain.order_id = order_id
+	teamcaptain.save()
 	bill_amount = teamcaptain.event.price
-	name = teamcaptain.name + ' ' + teamcaptain.event.name
+	name = str(teamcaptain.name) + ' ' + str(teamcaptain.event.name)
 	if bill_amount:
 
 		data_dict = {
                     'MID':MERCHANT_ID,
                     'ORDER_ID':order_id,
                     'TXN_AMOUNT': bill_amount,
-                    'CUST_ID': name,
+                    'CUST_ID': 'Cust002',
                     'INDUSTRY_TYPE_ID':'Retail',
                     'WEBSITE':'DIYtestingweb',   #testing phase
                     'CHANNEL_ID':'WEB',
@@ -504,25 +507,65 @@ def paytm_request(request, token):
                 }
 		param_dict = data_dict
 		param_dict['CHECKSUMHASH'] = Checksum.generate_checksum(data_dict, MERCHANT_KEY)
-		return render(request,"payment.html",{'paytmdict':param_dict})
+		print param_dict
+		return render(request,"registrations/payment.html",{'paytmdict':param_dict})
 	return HttpResponse("Bill Amount Error.")
 
-@login_required
+
 @csrf_exempt
-def response(request):
-    if request.method == "POST":
-        MERCHANT_KEY = settings.PAYTM_MERCHANT_KEY
-        data_dict = {}
-        for key in request.POST:
-            data_dict[key] = request.POST[key]
-        verify = Checksum.verify_checksum(data_dict, MERCHANT_KEY, data_dict['CHECKSUMHASH'])
-        if verify:
-            teamcaptain = TeamCaptain.objects.get(order_id=request.POST["ORDERID"])
-            teamcaptain.paid = True
-            return render(request,"response.html",{"paytm":data_dict})
-        else:
-            return HttpResponse("checksum verify failed")
-    return HttpResponse(status=200)
+def paytm_response(request):
+	if request.method == "POST":
+		MERCHANT_KEY = settings.PAYTM_MERCHANT_KEY
+		data_dict = {}
+		for key in request.POST:
+			data_dict[key] = request.POST[key]
+
+		verify = Checksum.verify_checksum(data_dict, MERCHANT_KEY, data_dict['CHECKSUMHASH'])
+
+		if verify:
+			teamcaptain = TeamCaptain.objects.get(order_id=request.POST["ORDERID"])
+			teamcaptain.paid = True
+			teamcaptain.save()
+			name = teamcaptain.name
+			send_to = teamcaptain.email
+			body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+			<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
+			<pre style="font-family:Roboto,sans-serif">
+Hello %s!
+
+Your payment has been received. See you at BOSM '17. 
+
+Regards,
+CoSSAcn (Head)
+Dept. of Publications & Correspondence, BOSM 2017
+BITS Pilani
++91-7240105158, +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778
+pcr@bits-bosm.org
+</pre>
+			'''% (name,)
+
+			email = EmailMultiAlternatives("Registration for BOSM '17", 'Your payment has been received. See you at BOSM \'17. ','register@bits-bosm.org', [send_to.strip()])
+			email.attach_alternative(body, "text/html")
+
+			try:
+				email.send()
+			
+			except SMTPException:
+				try:
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
+					email.send()
+				except SMTPException:
+					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
+					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
+					email.send()
+
+			return render(request,"registrations/message.html",{'message':name+ ', your payment is successful. Thank you.'})
+
+		else:
+			return HttpResponse("checksum verify failed")
+
+	return HttpResponse(status=200)
 
 
 

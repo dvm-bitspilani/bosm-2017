@@ -17,27 +17,25 @@
   <link href="{% static 'pcradmin/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
 <body>
-  <nav class="purple darken-3" role="navigation">
-    <div class="nav-wrapper container purple darken-3"><a id="logo-container" href="#" class="brand-logo center">BOSM '17 PCr Admin</a>
-      <ul class="left hide-on-med-and-down">
-        {% if dashboard %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:index' %}">Dashboard</a></li>
-        {% if stats %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:stat_sport_college' %}">Stats</a></li>
-        {% if pdf %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:get_list' %}">View Excel Sheets</a></li>
-      </ul>
-      <ul class="right hide-on-med-and-down">
-        <li><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:logout' %}">Logout</a></li>
-      </ul> 
+	<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Welcome to BOSM '17. Please do not refresh the page.</h2>
 
-      <ul id="nav-mobile" class="side-nav">
-        <li><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:logout' %}">Logout</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
-
-  {% block body %}
-
-  {% endblock %}
+    <form method="post" action="https://pguat.paytm.com/oltp-web/processTransaction" name="f1">
+<table border="1">
+<tbody>
+{% for key,value in paytmdict.items %}
+    <input type="hidden" name="{{key}}" value="{{value}}">
+{% endfor %}
+</tbody>
+</table>
+<script type="text/javascript">
+document.f1.submit();
+</script>
+</form>
+</div>
+</div>
  
   <footer class="page-footer purple lighten-1">
     <div class="footer-copyright center">

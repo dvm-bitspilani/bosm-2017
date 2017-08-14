@@ -148,11 +148,11 @@ EMAIL_HOST_USER = email_host_user[0]
 EMAIL_HOST_PASSWORD = email_host_pass[0]
 EMAIL_PORT = email_port
 EMAIL_USE_TLS = True
-
+'''
 PAYTM_MERCHANT_KEY = "bKMfNxPPf_QdZppa"
 PAYTM_MERCHANT_ID = "DIY12386817555501617"
 HOST_URL = "http://127.0.0.1:8000"
-PAYTM_CALLBACK_URL = "/paytm/response/"
-'''
+PAYTM_CALLBACK_URL = "/registrations/response/"
+
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)

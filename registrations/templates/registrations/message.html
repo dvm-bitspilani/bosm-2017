@@ -1,9 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title></title>
+  {% load staticfiles %}
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>BOSM Registrations</title>
+  <style>
+  .btn-large{
+    width: 20vw;
+    white-space: nowrap;
+  }
+  </style>
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{% static 'pcradmin/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'pcradmin/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
 <body>
-{{message}}
-</body>
+
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <h2 class="header center pink-text">{{message}}</h2>
+    </div>
+</div>
+  <footer class="page-footer purple lighten-1">
+    <div class="footer-copyright center">
+      <div class="container">
+      Made with <span style="color:white; font-size:20px;">&hearts; </span>at<a class="pink-text text-lighten-5" href="http://bits-dvm.org"><strong> DVM</strong></a>.
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{% static 'pcradmin/js/materialize.js' %}"></script>
+  <script src="{% static 'pcradmin/js/init.js' %}"></script>
+
+  </body>
 </html>

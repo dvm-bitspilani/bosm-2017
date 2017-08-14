@@ -15,4 +15,7 @@ urlpatterns = [
 	url(r'^add_extra_templ/(?P<tc_id>\d+)$',views.add_extra_event_templ, name="add_extra_templ"),
 	url(r'^add_extra/(?P<tc_id>\d+)/$',views.add_extra_event, name="add_extra_event"),
 	url(r'^transport/$', views.transport, name="transport"),
+	url(r'^api/paytm/$', views.paytm_req, name="paytm"),
+	url(r'^api/paytm/(?P<token>\w+)/$', views.paytm_request, name="paytm-request"),
+	url(r'^response/$', views.paytm_response, name="paytm-response"),
 ]

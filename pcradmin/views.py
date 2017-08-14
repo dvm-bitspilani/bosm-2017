@@ -96,52 +96,43 @@ def status_change(request):
 	if request.method == "POST":
 
 		data = request.POST
-		print data
-		group_leaders = data['gls']
-		if group_leaders:
-			if "Deactivate" == data['submit']:
+		try:
+			group_leaders = data['gls']
+			if group_leaders:
+				if "Deactivate" == data['submit']:
 
-				for gl_id in group_leaders:
-					gl = GroupLeader.objects.get(id=gl_id)
-					gl.pcr_approved = False
-					gl.user.is_active = False
-					user = gl.user
-					user.is_active = False
-					gl.save()
-					user.save()
-					print user.username
-					send_status_email(gl.email, "Frozen")
-			elif "Activate" == data['submit']:
-				for gl_id in group_leaders:
-					gl = GroupLeader.objects.get(id=gl_id)
-					if gl.email_verified:
-
-						gl.pcr_approved = True
-						gl.user.is_active = True
+					for gl_id in group_leaders:
+						gl = GroupLeader.objects.get(id=gl_id)
+						gl.pcr_approved = False
+						gl.user.is_active = False
 						user = gl.user
+						user.is_active = False
 						gl.save()
-						user.is_active = True
 						user.save()
-						print user.username
-						send_status_email(gl.email, "Approved")
-					else:
-						context = {
-						'email':gl.email,
-						'name' : gl.name,
-						'error_heading' : 'Email Unverified',
-						'error_message' : 'This user has not verified its email. This is user is deactivated.'
-						}
-						return render(request, 'pcradmin/message.html', {'message':'context[error_message]'})
-			return redirect(request.META.get('HTTP_REFERER'))
-		else:
+						send_status_email(gl.email, "Frozen")
+				elif "Activate" == data['submit']:
+					for gl_id in group_leaders:
+						gl = GroupLeader.objects.get(id=gl_id)
+						if gl.email_verified:
+
+							gl.pcr_approved = True
+							gl.user.is_active = True
+							user = gl.user
+							gl.save()
+							user.is_active = True
+							user.save()
+							send_status_email(gl.email, "Approved")
+						else:
+							error_message = 'This user has not verified its email. This is user is deactivated.'
+							return render(request, 'pcradmin/message.html', {'message':error_message})
+		except:	
 
 			return redirect(request.META.get('HTTP_REFERER'))
 
 	else:
 
-		gl_active = GroupLeader.objects.filter(user__is_staff=False, user__is_active=True)
-		gl_inactive = GroupLeader.objects.filter(user__is_staff=False, user__is_active=False).order_by('email_verified')
-		print gl_inactive, gl_active
+		gl_active = GroupLeader.objects.filter(user__is_staff=False, user__is_active=True,)
+		gl_inactive = GroupLeader.objects.filter(user__is_staff=False, user__is_active=False, email_verified=True)
 		return render(request, 'pcradmin/status_select.html', {'active':gl_active, 'inactive':gl_inactive})
 
 
@@ -183,22 +174,17 @@ def confirm_events(request, gl_id):
 
 	if request.method == 'POST':
 		data = request.POST
-		confirmed=True
-		unconfirmed=True
-		#try:
-		confirm = data['confirm']
-		for i in confirm:
-			p = Participation.objects.get(pk=int(i))
-			p.confirmed = True
-			p.save()
-
-			event = p.event
-			g_l = p.g_l
-			teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
-			if teamcaptain.if_payment :
-				send_to = teamcaptain.email
-				name = teamcaptain.name
-				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+		try:
+			confirm = data['confirm']
+			for i in confirm:
+				p = Participation.objects.get(pk=int(i))
+				event = p.event
+				g_l = p.g_l
+				teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
+				if teamcaptain.if_payment :
+					send_to = teamcaptain.email
+					name = teamcaptain.name
+					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 					<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 					<pre style="font-family:Roboto,sans-serif">
 					
@@ -206,52 +192,52 @@ def confirm_events(request, gl_id):
 					Your team registration for %s has been confirmed.
 					<a href='%s'>Click Here</a> to pay %d for the same.
 					
-					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
+					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
 
-				email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
+					email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
 												'register@bits-bosm.org', [send_to.strip()]
 												)
-				email.attach_alternative(body, "text/html")
+					email.attach_alternative(body, "text/html")
 
-				try:
-					email.send()
-					
-				except SMTPException:
-				
 					try:
-						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
-						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
 						email.send()
-						
+						p.confirmed = True
+						p.save()
+					
 					except SMTPException:
-						bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
-						bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
-						email.send()
+				
+						try:
+							bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
+							bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
+							email.send()
+							p.confirmed = True
+							p.save()
+					
+						except SMTPException:
+							bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
+							bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
+							email.send()
+							p.confirmed = True
+							p.save()
 		
+			return render(request, 'pcradmin/message.html', {'message':'Email sent'})
 
-		#except:
-			#confirmed=False
-		
-		### Probably not necessary###
-		'''
-		try:
-			unconfirm = data['unconfirm']
-			for i in unconfirm:
-				p = Participation.objects.get(id=i)
-				p.confirmed = False
-				p.save()
 		except:
-			unconfirmed = False
-
-			'''
-		if not confirmed:
 			return redirect(request.META.get('HTTP_REFERER'))
-		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
+		
 
 
 	else:
-		events = list(set([{'event':p.event, 'status':p.confirmed, 'part_id':p.id} for p in Participation.objects.filter(g_l=gl).order_by('confirmed')]))
-		return render(request, 'pcradmin/confirm_events.html', {'events':events})
+		events = []
+		for p in Participation.objects.filter(g_l=gl,confirmed=False):
+			events.append(p.event)
+		teamcaptains = []
+		for event in events:
+			teamcaptains.append(TeamCaptain.objects.get(g_l=gl, event=event))
+		print teamcaptains
+		for captain in teamcaptains:
+			print captain
+		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':teamcaptains, 'g_l':gl})
 
 @staff_member_required
 def final_confirmation(reqeust):
