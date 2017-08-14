@@ -188,7 +188,7 @@ def user_login(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect('/')
+    return redirect('registrations:index')
 
 def show_sports(request):
 	return render(request, 'registrations/manage_sports.html')
@@ -297,20 +297,23 @@ def register_captain(request, event_id):
 		print data
 		user = request.user
 		tc_form = TeamCaptainForm(data)
+		event = Event.objects.get(id=event_id)
+		g_l = GroupLeader.objects.get(user=user)
 
 		if tc_form.is_valid():
 			
-			event = Event.objects.get(id=event_id)
 			teamCaptain = tc_form.save(commit=False)
 			teamCaptain.event = event
-			g_l = GroupLeader.objects.get(user=user)
 			
 			try :
 				part = Participation.objects.get(event=event, g_l=g_l)
-				
 				teamCaptain.g_l = g_l
-				participants = [i for i in dict(request.POST)['participants'] if i]
-				print participants
+				teamCaptain.save()
+				Participant.objects.create(captain=teamCaptain, name=teamCaptain.name)
+				try:
+					participants = [i for i in dict(request.POST)['participants'] if i]
+				except:
+					participants = []
 				if participants:
 					
 					teamCaptain.is_single = False
@@ -320,7 +323,7 @@ def register_captain(request, event_id):
 							Participant.objects.create(captain=teamCaptain, name = part)
 						teamCaptain.total_players = len(participants) + 1
 						teamCaptain.save()
-						return HttpResponseRedirect('/')
+						return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
 					
 					else:
 						return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
@@ -330,7 +333,7 @@ def register_captain(request, event_id):
 					teamCaptain.is_single = True
 					if event.min_limit == event.max_limit == 1:
 						teamCaptain.save()
-
+						return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
 					else:
 						return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
 		
@@ -345,6 +348,16 @@ def register_captain(request, event_id):
 		user=request.user
 		g_l = GroupLeader.objects.get(user=user)
 		event = Event.objects.get(id=event_id)
+		try:
+			tc = TeamCaptain.objects.get(g_l=g_l, event=event)
+			if event.max_limit != 1:
+				data = {}
+				data['tc'] = tc.name
+				data['participants'] = [part.name for part in Participant.objects.filter(captain=tc)]
+				data['url'] = reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})
+				return render(request, 'registrations/participants.html', data)
+		except Exception, e:
+			print e	
 		part = get_object_or_404(Participation, event=event, g_l=g_l)
 		return render(request, 'registrations/register_captain.html', {'event':event})
 
@@ -399,7 +412,14 @@ def remove_players(request, event_id, participant_id):
 
 '''
 
+@login_required
+def add_extra_event_templ(request, tc_id):
+	get_object_or_404(TeamCaptain, id=tc_id)
+	event_set =  Event.objects.filter(min_limit=1, max_limit=1)
+	print event_set
+	return render(request, 'registrations/add_extra_event.html',{'tc_id':tc_id, 'events':event_set})
 
+@csrf_exempt
 @login_required
 def add_extra_event(request, tc_id):
 
@@ -408,21 +428,24 @@ def add_extra_event(request, tc_id):
 	participants = Participant.objects.filter(captain=teamCaptain)
 
 	if request.method == "POST":
-		participant = Participant.objects.get(id=request.POST['participant_id'])
-		if participant in participants:
-
-			id_list = dict(request.POST)['id_list']
-
-			for e_id in id_list:
+		data = request.POST
+		print data
+		for p_id, e_id in data.iteritems():
+			print p_id, e_id
+			if e_id!='0':
+				participant = Participant.objects.get(id=p_id)
 
 				event = Event.objects.get(id=e_id)
-				TeamCaptain.objects.create(name=participant.name, g_l=groupleader,event=event, if_payment=False)
-			return HttpResponseRedirect('/')
-		raise Http404("nooooo!")
-	event_set = Event.objects.filter(min_limit=1, max_limit=1)
 
-	return render(request, 'registrations/add_extra_event.html', {'tc':teamCaptain, 'parts':participants, 'events':event_set})
-		###return JsonResponse()
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False)
+				tc.save()
+				Participant.objects.create(name=tc.name, captaain=tc)
+		return JsonResponse({'status':1})
+	event_set =  [{'name':event.name, 'id':event.id} for event in Event.objects.filter(min_limit=1, max_limit=1)]
+	if participants:
+		players = [{'name':part.name, 'id':part.id} for part in participants]
+	data = {'participants':players, 'events':event_set}
+	return JsonResponse(data)
 
 @login_required
 def transport(request):
