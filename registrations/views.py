@@ -234,7 +234,7 @@ def manage_sports(request):
 				try:
 					part = Participation.objects.get(g_l=g_l, event=event)
 					try:
-						tc = TeamCaptain.objects.get(event=event, g_l=g_l)
+						tc = TeamCaptain.objects.filter(event=event, g_l=g_l)
 						tc.delete()
 					except:
 						print "no team registered in this event"
