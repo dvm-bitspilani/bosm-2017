@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^get_list/$', views.get_list, name="get_list"),
     url(r'^get_captain_list/(?P<gl_id>\d+)/$', views.get_list_captains, name="get_list_captains"),
     url(r'^get_gleaders_list/$', views.get_list_gleaders, name="get_list_gleaders"),
+    url(r'^final_list_download/$', views.final_list_download, name="final_list_download"),
     url(r'^final_confirmation/$', views.final_confirmation, name="final_confirmation"),
     url(r'^final_confirmation_email/(?P<gl_id>\d+)/$', views.final_confirmation_email, name="final_confirmation_email"),
     url(r'^logout/$', views.user_logout, name = 'logout'),

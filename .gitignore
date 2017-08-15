@@ -1,3 +1,5 @@
 *.sqlite3
 *.pyc
 config.py
+sg_config.py
+*.xlsx

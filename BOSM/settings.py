@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from config import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -139,16 +140,18 @@ USE_TZ = True
 STATIC_URL = '/2017/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+'''
 from django.core.mail.backends.smtp import EmailBackend
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-'''
+
 EMAIL_HOST = email_host
 EMAIL_HOST_USER = email_host_user[0]
 EMAIL_HOST_PASSWORD = email_host_pass[0]
 EMAIL_PORT = email_port
 EMAIL_USE_TLS = True
 '''
+
 PAYTM_MERCHANT_KEY = "bKMfNxPPf_QdZppa"
 PAYTM_MERCHANT_ID = "DIY12386817555501617"
 HOST_URL = "http://127.0.0.1:8000"

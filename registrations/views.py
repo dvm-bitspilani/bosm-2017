@@ -13,6 +13,29 @@ from django.core.urlresolvers import reverse
 import json
 from django.conf import settings
 import Checksum
+from BOSM.settings import BASE_DIR
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
+from sg_config import *
+
+
+
+def email_test(request):
+
+	a="no-reply@bits-bosm.org"
+	b = "f2016036@pilani.bits-pilani.ac.in"
+	c = "Success 2  <a href='www.google.com'>Google</a>"
+	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+	from_email = Email(a)
+	to_email = Email(b)
+	subject = "Sendgrid test"
+	content = Content("text/html", c)
+	mail = Mail(from_email, subject, to_email, content)
+	response = sg.client.mail.send.post(request_body=mail.get())
+
+	return HttpResponseRedirect('/')
+
 
 @login_required(login_url='registrations:login')
 def index(request):
