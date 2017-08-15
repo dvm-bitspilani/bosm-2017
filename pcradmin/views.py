@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from registrations.models import *
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from events.models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,13 @@ from django.db.models import Q
 from functools import reduce
 from registrations.urls import *
 from django.views.decorators.csrf import csrf_exempt
+import xlsxwriter
+from time import gmtime, strftime
 
+try:
+	import cStringIO as StringIO
+except ImportError:
+	import StringIO
 @staff_member_required
 def index(request):
 	
@@ -110,6 +116,8 @@ def status_change(request):
 						gl.save()
 						user.save()
 						send_status_email(gl.email, "Frozen")
+					return redirect('pcradmin:index')
+
 				elif "Activate" == data['submit']:
 					for gl_id in group_leaders:
 						gl = GroupLeader.objects.get(id=gl_id)
@@ -125,6 +133,7 @@ def status_change(request):
 						else:
 							error_message = 'This user has not verified its email. This is user is deactivated.'
 							return render(request, 'pcradmin/message.html', {'message':error_message})
+					return redirect('pcradmin:index')
 		except:	
 
 			return redirect(request.META.get('HTTP_REFERER'))
@@ -233,7 +242,7 @@ def confirm_events(request, gl_id):
 			events.append(p.event)
 		teamcaptains = []
 		for event in events:
-			teamcaptains.append(TeamCaptain.objects.get(g_l=gl, event=event))
+			teamcaptains.append(TeamCaptain.objects.filter(g_l=gl, event=event))
 		print teamcaptains
 		for captain in teamcaptains:
 			print captain
@@ -367,12 +376,6 @@ def search_tc(request):
 	try:
 		search = request.GET['search']
 		attr = request.GET['attr']
-		'''
-		teamcaptains = TeamCaptain.objects.filter(Q(name__icontains=search) | 
-			Q(g_l__college__icontains=search) | 
-			Q(g_l__email__icontains=search) |
-			Q(email__icontains=search))
-		'''
 		attribute = getattr(TeamCaptain,  attr)
 		teamcaptains = TeamCaptain.objects.filter(attribute__icontains=search)
 		return request(request, 'pcradmin/search_tc.html', {'teamcaptains':teamcaptains})
@@ -387,69 +390,88 @@ def team_detail(request, tc_id):
 	return redirect(request, 'pcradmin/details.html', {'teamcaptain':teamcaptain})
 
 @staff_member_required
-def stats(request):
+def stats(request, order=None):
 
 	return render(request, 'pcradmin/stats.html')
 
 @staff_member_required
-def stats_order(request, order):
+def stats_order(request, order=None):
 
-	if order == 'collegewise':
+	if order == 'college':
 
-		g_ls = GroupLeader.objects.filter(email_verified=True, approved=True)
+		g_ls = GroupLeader.objects.filter(email_verified=True, pcr_approved=True)
 		collegewise = []
 		for g_l in g_ls:
 
 			entry = {}
 			entry['name'] = g_l.college
+			entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 			teamcaptains = TeamCaptain.objects.filter(g_l=g_l)
-			entry['total'] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
+			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
-			entry['male'] = str(reduce(count_players.confirmed, teamcaptains_m)) + ' | ' + str(reduce(count_players, teamcaptains_m))
+			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 			teamcaptains_f = teamcaptains.filter(gender='F')
-			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f)) + ' | ' + str(reduce(count_players, teamcaptains_f))
+			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
 			
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
 
 			collegewise.append(entry)
-		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise, 'stats':True})
+		order = 'Stats Collegewise'
+		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : collegewise, 'stats':True})
 
 
-	if order == 'Sportwise':
-		events = Events.objects.all()
+	if order == 'sport':
+		events = Event.objects.all()
 		sportwise = []
 		for event in events:
 			entry = {}
 			entry['name'] = event.name
+			entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 			teamcaptains = TeamCaptain.objects.filter(event=event)
-			entry['total'] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
+			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
-			entry['male'] = str(reduce(count_players.confirmed, teamcaptains_m)) + ' | ' + str(reduce(count_players, teamcaptains_m))
+			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 			teamcaptains_f = teamcaptains.filter(gender='F')
-			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f)) + ' | ' + str(reduce(count_players, teamcaptains_f))
+			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
 			
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
 
 			sportwise.append(entry)
-		return render(request, 'pcradmin/stats.html', {'order':order, 'list' : collegewise,'stats':True})
+		order = 'Stats Sportwise'
+		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
 
-	if order == 'both':
-		g_ls = GroupLeader.objects.filter(email_verified=True, approved=True)
-		colleges = [g_l.college for g_l in g_ls]
-		events = Events.objects.all()
-		events_name = [event.name  for event in events]
-		both = {}
-		for g_l in g_ls:
-			entry = {}
-			for event in events:
+	if order=='master_list':
+		output = StringIO.StringIO()
+		workbook = xlsxwriter.Workbook(output)
+		worksheet = workbook.add_worksheet('new-spreadsheet')
+		date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
+		worksheet.write(0, 0, "Generated:")
+		generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
+		worksheet.write(0, 1, generated)
+		worksheet.write(1,0,"Colleges\Sport")
+
+		g_ls = GroupLeader.objects.filter(email_verified=True, pcr_approved=True)
+		events = Event.objects.all()
+		
+		for i,event in enumerate(events):
+			worksheet.write(1,i+1, event.name)
+		for i,g_l in enumerate(g_ls):
+
+			worksheet.write(2+i,0,g_l.college)
+			for j,event in enumerate(events):
 				teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
-				entry[event.name] = str(reduce(count_players_confirmed, teamcaptains)) + ' | ' + str(reduce(count_players, teamcaptains))
-				if entry[event.name] == '0 | 0':
-					entry[event.name] = '- -'
-			both[g_l.college] = entry
-		return render(request, 'pcradmin/stats_both.html', {'colleges':colleges, 'events':events_name, 'list':both,'stats':True})
+				entry = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
+				if entry == '0 | 0':
+					entry = '- -'
+				worksheet.write(2+i, 1+j, entry)
+		workbook.close()
+		filename = 'MasterList.xlsx'
+		output.seek(0)
+		response = HttpResponse(output.read(), content_type="application/ms-excel")
+		response['Content-Disposition'] = 'attachment; filename=%s' % filename
+		return response
 
 
 ########################## HELPER function ################################
@@ -461,23 +483,58 @@ def count_players(x,y):
 		return x + y.total_players
 
 def count_players_confirmed(x,y):
-	
-	g_l_y = y.g_l
-	event_y = y.event
-	try:
-		event_x = x.event
-		g_l_x = x.g_l
-		z=0
-		if Participation.objects.get(g_l=g_l_y, event=event_y).confirmed:
-			z+=y.total_players
-		if Participation.objects.get(g_l=g_l_x, event=event_x).confirmed:
-			z+=x.total_players
-		return z
-	except :
-		if Participation.objects.get(g_l=g_l_y, event=event_y).confirmed:
-			return x + y.total_players
-		else:
-			return x
+	if Participation.objects.get(g_l=y.g_l, event=y.event).confirmed:
+		return x + y.total_players
+	else:
+		return x
+
+
+@staff_member_required
+def stats_college(request, gl_id):
+	g_l = get_object_or_404(GroupLeader, pk=gl_id)
+	events = Event.objects.all()
+	sportwise = []
+	for event in events:
+		entry = {}
+		entry['name'] = event.name
+		entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
+		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
+		teamcaptains_m = teamcaptains.filter(gender='M')
+		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
+		teamcaptains_f = teamcaptains.filter(gender='F')
+		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
+		
+		for i in ['total', 'male', 'female']:
+			if entry[i] == '0 | 0': entry[i] = '- -'
+
+		sportwise.append(entry)
+	order = 'Stats Sportwise for ' + g_l.college
+	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
+
+@staff_member_required
+def stats_sport(request, e_id):
+	event = get_object_or_404(Event, pk=e_id)
+	g_ls = GroupLeader.objects.filter(pcr_approved=True, email_verified=True)
+	sportwise = []
+	for g_l in g_ls:
+		entry = {}
+		entry['name'] = g_l.name
+		entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
+		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
+		teamcaptains_m = teamcaptains.filter(gender='M')
+		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
+		teamcaptains_f = teamcaptains.filter(gender='F')
+		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
+		
+		for i in ['total', 'male', 'female']:
+			if entry[i] == '0 | 0': entry[i] = '- -'
+
+		sportwise.append(entry)
+	order = 'Stats Collegewise for ' + event.name
+	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
+
 
 ######################### PDF generators  #####################
 @staff_member_required
@@ -485,16 +542,11 @@ def get_list(request):
 
 	g_l = GroupLeader.objects.all()
 	return render(request, 'pcradmin/gen_pdf.html', {'pdf':True, 'gls':g_l})
+
 @staff_member_required
 def get_list_gleaders(request):
 
-	import xlsxwriter
-	try:
-		import cStringIO as StringIO
-	except ImportError:
-		import StringIO
 	a_list = []
-
 
 	gleaders = GroupLeader.objects.all()
 
@@ -506,7 +558,6 @@ def get_list_gleaders(request):
 	worksheet = workbook.add_worksheet('new-spreadsheet')
 	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
 	worksheet.write(0, 0, "Generated:")
-	from time import gmtime, strftime
 	generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
 	worksheet.write(0, 1, generated)
 
@@ -542,11 +593,6 @@ def get_list_gleaders(request):
 @staff_member_required
 def get_list_captains(request, gl_id):
 
-	import xlsxwriter
-	try:
-		import cStringIO as StringIO
-	except ImportError:
-		import StringIO
 	a_list = []
 
 	g_leader = get_object_or_404(GroupLeader, pk=gl_id)
@@ -560,7 +606,6 @@ def get_list_captains(request, gl_id):
 	worksheet = workbook.add_worksheet('new-spreadsheet')
 	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
 	worksheet.write(0, 0, "Generated:")
-	from time import gmtime, strftime
 	generated = strftime("%d-%m-%Y %H:%M:%S UTC", gmtime())
 	worksheet.write(0, 1, generated)
 

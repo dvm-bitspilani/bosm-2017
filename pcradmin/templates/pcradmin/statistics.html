@@ -1,0 +1,33 @@
+{% extends "pcradmin/base.html" %}
+{% load custom_tags %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">{{order}}</h2>
+      
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>College</th>
+                        <th>Male</th>
+                        <th>Female</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in list %}
+                    <tr>
+                        <td><a class="waves-effect waves-light btn pink" href="{{i|get_it:'url'}}">{{i|get_it:'name'}}</a></td>
+                        <td>{{i|get_it:'male'}}</td>
+                        <td>{{i|get_it:'female'}}</td>
+                        <td>{{i|get_it:'total'}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
