@@ -18,10 +18,12 @@ urlpatterns = [
     url(r'^list_team_gleaders/$', views.list_gl, name="list_gl"),
     url(r'^list_team_captains/(?P<gl_id>\d+)/$', views.list_tc, name="list_tc"),
     url(r'^search_team_captain/$', views.search_tc, name="search_tc"),
-    url(r'^stats/college/$', views.stats, name="stats_collegewise", kwargs={'order':'Collegewise'}),
-    url(r'^stats/sport/$', views.stats, name="stats_sportwise", kwargs={'order':'Sportwise'}),
-    url(r'^stats/sport_college/$', views.stats, name="stat_sport_college", kwargs={'order':'both'}),
-    url(r'^stats/sport_college/(?P<gl_id>\d+)/$', views.stats),
+    
+    url(r'^stats/$', views.stats, name="stats_page"),
+    url(r'^stats/(?P<order>\w+)/$', views.stats_order, name="stats"),
+    url(r'^stats/college/(?P<gl_id>\d+)/$', views.stats_college, name="collegewise"),
+    url(r'^stats/sport/(?P<e_id>\d+)/$', views.stats_sport, name="sportwise"),
+
     url(r'^get_list/$', views.get_list, name="get_list"),
     url(r'^get_captain_list/(?P<gl_id>\d+)/$', views.get_list_captains, name="get_list_captains"),
     url(r'^get_gleaders_list/$', views.get_list_gleaders, name="get_list_gleaders"),

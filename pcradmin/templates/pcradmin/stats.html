@@ -9,21 +9,21 @@
                 <thead>
                     <tr>
                         <th>Criteria</th>
-                        <th>Select</th>>
+                        <th>Select</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>College wise</td>
-                        <td><a href="../stats/college/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                        <td><a href="{% url 'pcradmin:stats' 'college' %}" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
                     </tr>
                     <tr>
                         <td>Sports wise</td>
-                       <td><a href="../stats/sport/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                       <td><a href="{% url 'pcradmin:stats' 'sport' %}" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
                     </tr>
                     <tr>
-                        <td>Both</td>
-                        <td><a href="../stats/sport_college/" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
+                        <td>Master Excel Sheet</td>
+                        <td><a href="{% url 'pcradmin:stats' 'master_list' %}" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
                     </tr>
                 </form>
                 </tbody>

@@ -18,12 +18,11 @@
 </head>
 <body>
   <ul id="dropdown1" class="dropdown-content">
-  <li><a href="./stats/college/">Collegewise</a></li>
-  <li><a href="./stats/sport/">Sportswise</a></li>
-  <li><a href="./stats/sport_college/">Both</a></li>
+  <li><a href="{% url 'pcradmin:stats' 'college' %}">Collegewise</a></li>
+  <li><a href="{% url 'pcradmin:stats' 'sport' %}">Sportswise</a></li>
 </ul>
   <nav class="purple darken-3" role="navigation">
-    <div class="nav-wrapper container purple darken-3"><a id="logo-container" href="#" class="brand-logo center">BOSM '17 PCr Admin</a>
+    <div class="nav-wrapper purple darken-3"><a id="logo-container" href="#" class="brand-logo center">BOSM '17 PCr Admin</a>
       <ul class="left hide-on-med-and-down">
         {% if dashboard %}<li class="active">{% else %}<li>{% endif %}<a href="{% url 'pcradmin:index' %}">Dashboard</a></li>
         {% if stats %}<li class="active">{% else %}<li>{% endif %}<a class="dropdown-button" href="#!" data-activates="dropdown1">Stats<i class="material-icons right">arrow_drop_down</i></a></li>
