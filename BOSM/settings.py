@@ -143,9 +143,8 @@ STATIC_URL = '/2017/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 '''
-from django.core.mail.backends.smtp import EmailBackend
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+from django.core.mail.backends.smtp import EmailBackend
 
 EMAIL_HOST = email_host
 EMAIL_HOST_USER = email_host_user[0]

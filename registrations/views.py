@@ -102,7 +102,7 @@ BITS Pilani
 +91-7240105158, +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778
 pcr@bits-bosm.org
 </pre>
-			'''%(name, str(request.build_absolute_uri(reverse("registrations:index"))) + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/')
+			'''%(name, str(request.build_absolute_uri(reverse("registrations:index"))) + 'email_confirm/' + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/')
 
 			# email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:email_confirm", kwargs={'token':generate_email_token(GroupLeader.objects.get(email=send_to))})))  + '/' + ' to confirm.', 
 			# 								'register@bits-bosm.org', [send_to.strip()]
@@ -162,7 +162,7 @@ def authenticate_email_token(token):
 
 		return gleader
 
-	except ObjectDoesNotExist:
+	except :
 
 		return False
 
@@ -177,7 +177,7 @@ def email_confirm(request, token):
 
 		context = {
 			'error_heading': 1,
-			'message': 'Your email has beeen verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani>',
+			'message': 'Your email has beeen verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani',
 		}
 	else:
 		context = {
