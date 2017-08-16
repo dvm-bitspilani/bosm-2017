@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 {% load static %}
+{% load custom_tags %}
 <head>
 	<title>Home</title>
 	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
@@ -8,6 +9,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body style="background-color:#D9E5D6;overflow-y:scroll">
 <div class="container" style="margin-top:2vh;">
@@ -26,7 +28,7 @@
 <div class="row">
 				<div class="col s12" >
 				
-	<center><h3><a href="{% url 'registrations:register_captain' event.id %}" style="font-size:80%;color:#0FA3B1">{{event.name}}</a></h3></center>
+	<center><h3><a href="{{event|get_it:'url'}}" style="font-size:80%;color:#0FA3B1">{{event|get_it:'name'}}</a><a>{% ifequal event|get_it:'players' 0 %}{% else %}{{event|get_it:'players'}}<i class="material-icons">check</i>{% endifequal %}</a></h3></center>
       			</div>
 </div>
 {% endfor %}

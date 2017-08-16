@@ -27,6 +27,7 @@ try:
 	import cStringIO as StringIO
 except ImportError:
 	import StringIO
+
 @staff_member_required
 def index(request):
 	
@@ -68,27 +69,19 @@ def email_compose(request, gl_id):
 	g_l = get_object_or_404(GroupLeader, id=gl_id)
 	if request.method == 'POST':
 
-		sub = request.POST['sub']
-		body = request.POST['body']
-		send_to = request.POST['to']
-		email = EmailMessage(sub, body,'register@bits-bosm.org', [send_to])
-		
+		subject = request.POST['sub']
+		body = Content(request.POST['body'])
+		to_email = Email(request.POST['to'])
+		from_email = Email('register@bits-bosm.org')
+		sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+
 		try:
-			email.send()
-		except SMTPException:
+			mail = Mail(from_email, subject, to_email, body)
+			response = sg.client.mail.send.post(request_body=mail.get())
 
-			try:
-				BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
-				BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
-				email.send()
-			except SMTPException:
-
-				try :
-					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
-					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
-					email.send()	
-				except:
-					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+		except:
+			print "Mail Not Sent."
+			return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
 		return render(request, "pcradmin/message.html", {'email':send_to, 'message':'Email sent'})
 
@@ -155,31 +148,20 @@ def status_change(request):
 def send_status_email(send_to, status):
 	if status == 'Approved':
 		subject = "Account Approved"
-		body = "Dear User, Your account status has been changed, and is now "+status+". You can use your credentials to login to <a>bits-bosm.org/registrations</a> to add teams."
+		body = Content("text/html", "Dear User, Your account status has been changed, and is now "+status+". You can use your credentials to login to <a>bits-bosm.org/registrations</a> to add teams.")
 
 	elif status == 'Frozen':
 		subject = "Account Frozen"
-		body = "Dear User, Your account status has been changed, and is now "+status+". You can no longer log on using your credentials."
-	email = EmailMessage(subject, body,'register@bits-bosm.org', [send_to])
-	
+		body = Content("Dear User, Your account status has been changed, and is now "+status+". You can no longer log on using your credentials.")
+	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+	to_email = Email(send_to)
+	from_email = Email('register@bits-bosm.org')
 	try:
-		email.send()
-	except SMTPException:
+		mail = Mail(from_email, subject, to_email, body)
+		response = sg.client.mail.send.post(request_body=mail.get())
 
-		try:
-			BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
-			BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
-			email.send()
-		except SMTPException:
-
-			try :
-				BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
-				BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
-				email.send()	
-			except:
-				print "email not sent"
-				return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
-
+	except :
+		print "Mail Not Sent."
 	return
 
 @staff_member_required
@@ -191,67 +173,48 @@ def confirm_events(request, gl_id):
 		data = request.POST
 		try:
 			confirm = data['confirm']
-			for i in confirm:
-				p = Participation.objects.get(pk=int(i))
-				event = p.event
-				g_l = p.g_l
-				teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
-				if teamcaptain.if_payment :
-					send_to = teamcaptain.email
-					name = teamcaptain.name
-					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-					<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
-					<pre style="font-family:Roboto,sans-serif">
-					
-					Hello %s!
-					Your team registration for %s has been confirmed.
-					<a href='%s'>Click Here</a> to pay %d for the same.
-					
-					'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
-
-					email = EmailMultiAlternatives("Payment for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:index")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/' + ' to confirm.', 
-												'register@bits-bosm.org', [send_to.strip()]
-												)
-					email.attach_alternative(body, "text/html")
-
-					try:
-						email.send()
-						p.confirmed = True
-						p.save()
-					
-					except SMTPException:
-				
-						try:
-							bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[1]
-							bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[1]
-							email.send()
-							p.confirmed = True
-							p.save()
-					
-						except SMTPException:
-							bosm2016.settings.EMAIL_HOST_USER = bosm2016.email_config.config.email_host_user[2]
-							bosm2016.settings.EMAIL_HOST_PASSWORD = bosm2016.email_config.config.email_host_pass[2]
-							email.send()
-							p.confirmed = True
-							p.save()
-		
-			return render(request, 'pcradmin/message.html', {'message':'Email sent'})
-
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
+			
+		for i in confirm:
+			p = Participation.objects.get(pk=int(i))
+			event = p.event
+			g_l = p.g_l
+			teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
+			if teamcaptain.if_payment :
+				to_email = Email(teamcaptain.email)
+				name = teamcaptain.name
+				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
+				<pre style="font-family:Roboto,sans-serif">
+				
+				Hello %s!
+				Your team registration for %s has been confirmed.
+				<a href='%s'>Click Here</a> to pay %d for the same.
+				
+				'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
+
+				subject = "Payment for BOSM '17"
+				from_email = Email('register@bits-bosm.org')
+				content = Content(body)
+
+				try:
+
+					mail = Mail(from_email, subject, to_email, content)
+					response = sg.client.mail.send.post(request_body=mail.get())
+					p.confirmed = True
+					p.save()
+				
+				except :
+					print "mail not sent"
+	
+		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
+
 		
 
-
 	else:
-		events = []
-		for p in Participation.objects.filter(g_l=gl,confirmed=False):
-			events.append(p.event)
-		teamcaptains = []
-		for event in events:
-			teamcaptains.append(TeamCaptain.objects.filter(g_l=gl, event=event))
-		print teamcaptains
-		for captain in teamcaptains:
-			print captain
+		events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=False)]
+		teamcaptains = [TeamCaptain.objects.filter(g_l=gl, event=event) for event in events]
 		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':teamcaptains, 'g_l':gl})
 
 @staff_member_required
@@ -263,7 +226,6 @@ def final_list_download(request):
 	except ImportError:
 		import StringIO
 	a_list = []
-
 
 	gleaders = GroupLeader.objects.all()
 
@@ -496,10 +458,7 @@ def stats_order(request, order=None):
 ########################## HELPER function ################################
 
 def count_players(x,y):
-	try:
-		return x.total_players + y.total_players
-	except :
-		return x + y.total_players
+	return x + y.total_players
 
 def count_players_confirmed(x,y):
 	if Participation.objects.get(g_l=y.g_l, event=y.event).confirmed:

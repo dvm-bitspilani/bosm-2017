@@ -42,9 +42,16 @@ def index(request):
 
 	user = request.user
 	g_l = GroupLeader.objects.get(user=user)
-	events_added = [part.event for part in Participation.objects.filter(g_l=g_l)]
+	events_added = [{'name':part.event.name, 'players':get_total_players(g_l, part.event), 'url':reverse('registrations:register_captain', kwargs={'event_id':part.event.id})} for part in Participation.objects.filter(g_l=g_l)]
+	events_added = sorted(events_added, key=lambda k:k['players'])
 	return render(request, 'registrations/index.html', {'user':user, 'added_events':events_added, 'g_l':g_l})
 
+def get_total_players(g_l, event):
+	tcs = TeamCaptain.objects.filter(g_l=g_l, event=event)
+	x=0
+	for tc in tcs:
+		x += tc.total_players
+	return x
 
 def signup_view(request):
 
@@ -97,23 +104,21 @@ pcr@bits-bosm.org
 </pre>
 			'''%(name, str(request.build_absolute_uri(reverse("registrations:index"))) + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/')
 
-			email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:email_confirm", kwargs={'token':generate_email_token(GroupLeader.objects.get(email=send_to))})))  + '/' + ' to confirm.', 
-											'register@bits-bosm.org', [send_to.strip()]
-											)
-			email.attach_alternative(body, "text/html")
+			# email = EmailMultiAlternatives("Registration for BOSM '17", 'Click '+ str(request.build_absolute_uri(reverse("registrations:email_confirm", kwargs={'token':generate_email_token(GroupLeader.objects.get(email=send_to))})))  + '/' + ' to confirm.', 
+			# 								'register@bits-bosm.org', [send_to.strip()]
+			# 								)
+			# email.attach_alternative(body, "text/html")
+			sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+			from_email = Email('register@bits-bosm.org')
+			to_email = Email(send_to)
+			subject = "Registration for BOSM '17"
+			content = Content('text/html', body)
 
 			try:
-				email.send()
-			
-			except SMTPException:
-				try:
-					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
-					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
-					email.send()
-				except SMTPException:
-					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
-					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
-					email.send()
+				mail = Mail(from_email, subject, to_email, content)
+				response = sg.client.mail.send.post(request_body=mail.get())
+			except :
+				print "Mail not sent"
 
 			message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address." %(send_to)
 			return render(request, 'registrations/message.html', {'message':message})
@@ -181,7 +186,7 @@ def email_confirm(request, token):
 			'message': "Sorry! This is an invalid token. Email couldn't be verified.",
 		}
 	return render(request, 'registrations/message.html', context)
-@csrf_exempt
+
 def user_login(request):
 
 	if request.method == 'POST':
@@ -190,14 +195,13 @@ def user_login(request):
 		user = authenticate(username=username, password=password)
 		if user is not None:
 			if user.is_active:
+				login(request, user)
 				if user.is_staff:
-					login(request, user)
 					if user.username == 'pcradmin':
 						return HttpResponseRedirect(reverse('pcradmin:index'))
 					else:
 						return HttpResponseRedirect(reverse('regsoft:home'))
 				else:
-					login(request, user)
 					return HttpResponseRedirect(reverse('registrations:index'))
 			else:
 				context = {'error_heading' : "Account Inactive", 'message' :  'Your account is currently INACTIVE. To activate it, call the following members of the Department of Publications and Correspondence. Karthik Maddipoti: +91-7240105158, Additional COntacts:- +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778 - pcr@bits-bosm.org .'}
@@ -223,7 +227,7 @@ def manage_sports(request):
 	user = request.user
 	g_l = GroupLeader.objects.get(user=user)
 	if not request.method=='POST':
-#[{'name':'col', 'id':1},{'name':'as', 'id':2},]
+
 		all_events = [{'name':event.name, 'id':event.id} for event in Event.objects.all()]
 		events_added = [{'name':part.event.name, 'id':part.event.id} for part in Participation.objects.filter(g_l=g_l)]
 		if events_added:
@@ -236,82 +240,28 @@ def manage_sports(request):
 
 	else:
 		data = dict(request.POST)
-		print data
 		try:
 
 			events_added = data['sportsadded[]']
 			for e_id in events_added:
 				event = get_object_or_404(Event, id=e_id)
-				try:
-					part = Participation.objects.get(g_l=g_l, event=event)
-					continue
-				except:
-					Participation.objects.create(g_l=g_l, event=event)
+				part, created = Participation.objects.get_or_create(g_l=g_l, event=event)
 		except KeyError:
-			print "no added sports"
+			pass
 		try:
-
 			events_left = data['sportsleft[]']
+
 			for e_id in events_left:
 				event = get_object_or_404(Event, id=e_id)
 				try:
-					part = Participation.objects.get(g_l=g_l, event=event)
-					try:
-						tc = TeamCaptain.objects.filter(event=event, g_l=g_l)
-						tc.delete()
-					except:
-						print "no team registered in this event"
-					part.delete()
-
+					Participation.objects.get(g_l=g_l, event=event).delete()
+					TeamCaptain.objects.filter(event=event, g_l=g_l).delete()
 				except:
 					continue
 		except KeyError:
-			print "no sports left"
+			pass
 		return JsonResponse({'status':1})
 
-
-"""
-
-@login_required
-def add_sports(request):
-
-	if request.method == 'POST':
-
-		id_list = request.POST.getlist('id_list[]')
-		g_leader = GroupLeader.objects.get(user=request.user)
-
-		if id_list:
-
-			for id in id_list:
-
-				participation = Participation()
-				participation.g_l = g_leader
-				participation.event = Event.objects.get(pk=id)
-
-				participation.save()
-
-		#participation_list = Participation.objects.filter(g_l=g_leader)
-		#return JsonResponse({'status':0,'participations':participation_list})
-
-		return HttpResponseRedirect('/')
-
-@login_required
-def remove_sports(request):
-
-	if request.method == 'POST':
-
-		id_list = request.POST.getlist('id_list[]')
-		g_leader = GroupLeader.objects.get(user=request.user)
-
-		for e_id in id_list:
-
-			event = Event.objects.get(pk=e_id)
-			Participation.objects.get(g_l=g_leader, event=event).delete()
-
-		return HttpResponseRedirect('/')
-
-
-"""
 
 @login_required
 def register_captain(request, event_id):
@@ -331,38 +281,40 @@ def register_captain(request, event_id):
 			
 			try :
 				part = Participation.objects.get(event=event, g_l=g_l)
-				teamCaptain.g_l = g_l
-				teamCaptain.save()
-				Participant.objects.create(captain=teamCaptain, name=teamCaptain.name)
-				try:
-					participants = [i for i in dict(request.POST)['participants'] if i]
-				except:
-					participants = []
-				if participants:
-					
-					teamCaptain.is_single = False
-					teamCaptain.save()
-					if (event.max_limit>len(participants)>=event.min_limit-1):
-						for part in participants:
-							Participant.objects.create(captain=teamCaptain, name = part)
-						teamCaptain.total_players = len(participants) + 1
-						teamCaptain.save()
-						return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
-					
-					else:
-						return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
-				
-				else:
-					
-					teamCaptain.is_single = True
-					if event.min_limit == event.max_limit == 1:
-						teamCaptain.save()
-						return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
-					else:
-						return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
-		
 			except:
 				return render(request, 'registrations/message.html', {'user':user,'message':'Invalid access'})
+			teamCaptain.g_l = g_l
+			teamCaptain.save()
+			Participant.objects.create(captain=teamCaptain, name=teamCaptain.name)
+			try:
+				participants = [i for i in dict(request.POST)['participants'] if i]
+			except:
+				participants = []
+			if participants:
+				
+				teamCaptain.is_single = False
+				teamCaptain.save()
+				if (event.max_limit>len(participants)>=event.min_limit-1):
+					for part in participants:
+						Participant.objects.create(captain=teamCaptain, name = part)
+					teamCaptain.total_players = len(participants) + 1
+					teamCaptain.save()
+					return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
+				
+				else:
+					teamCaptain.delete()
+					return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
+			
+			else:
+				
+				teamCaptain.is_single = True
+				if event.min_limit == event.max_limit == 1:
+					teamCaptain.save()
+					return redirect(reverse('registrations:add_extra_templ', kwargs={'tc_id':teamCaptain.id}))
+				else:
+					teamCaptain.delete()
+					return render(request, 'registrations/message.html', {'user':user,'message':'Invalid details filled.'})
+		
 
 		else:
 			return render(request, 'registrations/message.html', {'user':user,'message':tc_form.errors})
@@ -373,68 +325,15 @@ def register_captain(request, event_id):
 		g_l = GroupLeader.objects.get(user=user)
 		event = Event.objects.get(id=event_id)
 		try:
-			tc = TeamCaptain.objects.get(g_l=g_l, event=event)
 			if event.max_limit != 1:
-				data = {}
-				data['tc'] = tc.name
-				data['participants'] = [part.name for part in Participant.objects.filter(captain=tc)]
-				data['url'] = reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})
+				tc = TeamCaptain.objects.get(g_l=g_l, event=event)
+				data = {'tc':tc.name, 'participants':[part.name for part in Participant.objects.filter(captain=tc)], 'url':reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})}
 				return render(request, 'registrations/participants.html', data)
 		except Exception, e:
-			print e	
+			pass
 		part = get_object_or_404(Participation, event=event, g_l=g_l)
 		return render(request, 'registrations/register_captain.html', {'event':event})
 
-'''
-@login_required
-def add_players(request):
-
-	event_id = request.POST["event_id"]
-	event = get_object_or_404(Event, event_id)
-	user = request.user
-
-	g_l = GroupLeader.objects.get(user=user)
-
-	if Event.objects.get(event=event, g_l=g_l).exists():
-
-		if request.method == "POST":
-
-			player_name = request.POST["player_name"]
-			participant = Participant()
-			participant.name = player_name
-			participant.captain = TeamCaptain.objects.get(event=event, g_l=g_l)
-			participant.save()
-
-			return ...
-
-		else:
-
-			return ...
-
-	else:
-
-		print "error"
-
-
-
-@login_required
-def remove_players(request, event_id, participant_id):
-
-	event = Event.objects.get(id=event_id)
-	g_l = GroupLeader.objects.get(user=request.user)
-
-	if Event.objects.get(event=event, g_l=g_l).exists():
-
-		Participant.objects.get(id=participant_id).remove()
-
-		###return render(request, 'registrations/<template>', {'user':user, 'count':count})
-		###return JsonResponse()
-
-	else:
-
-		return render(request, 'registrations/message.html', {'message':'Player does not exist.'})
-
-'''
 
 @login_required
 def add_extra_event_templ(request, tc_id):
@@ -458,14 +357,14 @@ def add_extra_event(request, tc_id):
 			print p_id, e_id
 			if e_id!='0':
 				participant = Participant.objects.get(id=p_id)
-
 				event = Event.objects.get(id=e_id)
+				participation = get_object_or_404(Participation, g_l=groupleader, event=event)
 
-				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False)
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender)
 				tc.save()
-				Participant.objects.create(name=tc.name, captaain=tc)
+				Participant.objects.create(name=tc.name, captain=tc)
 		return JsonResponse({'status':1})
-	event_set =  [{'name':event.name, 'id':event.id} for event in Event.objects.filter(min_limit=1, max_limit=1)]
+	event_set =  [{'name':event.name, 'id':event.id} for event in Event.objects.filter(min_limit=1, max_limit=1) if Participation.objects.filter(event=event, g_l=groupleader)]
 	if participants:
 		players = [{'name':part.name, 'id':part.id} for part in participants]
 	data = {'participants':players, 'events':event_set}
@@ -476,14 +375,12 @@ def transport(request):
 
 	user = request.user
 	if request.method == "POST":
-
-		transport = Transport()
-		transport.g_l = GroupLeader.objects.get(user=request.user)
-		transport.departure = request.POST["departure"]
-		transport.date = request.POST["date"]
-		transport.no_of_passengers = request.POST["no_of_passengers"]
-		transport.save()
-
+		data = request.POST
+		transport = Transport.objects.create(g_l=GroupLeader.objects.get(user=request.user), 
+			departure=data['departure'], 
+			date=data['data'], 
+			no_of_passengers=data['no_of_passengers']
+			)
 	return render(request, 'registrations/transport.html', {'user':user})
 
 @login_required
@@ -494,7 +391,6 @@ def render_list(request):
 	captain_list = g_l.teamcaptain_set.all()
 
 	return render(request, 'registrations/list.html', {'user':user, 'captain_list':captain_list})
-
 
 
 ##################################################### PayTM ###########################################################
@@ -567,29 +463,26 @@ pcr@bits-bosm.org
 </pre>
 			'''% (name,)
 
-			email = EmailMultiAlternatives("Registration for BOSM '17", 'Your payment has been received. See you at BOSM \'17. ','register@bits-bosm.org', [send_to.strip()])
-			email.attach_alternative(body, "text/html")
+			# email = EmailMultiAlternatives("Registration for BOSM '17", 'Your payment has been received. See you at BOSM \'17. ','register@bits-bosm.org', [send_to.strip()])
+			# email.attach_alternative(body, "text/html")
+			sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+			from_email = from_email = Email("register@bits-bosm.org")
+			to_email = Email(send_to)
+			subject = "Registration for BOSM '17"
+			content = Content("text/html", body)
 
 			try:
-				email.send()
-			
-			except SMTPException:
-				try:
-					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[1]
-					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[1]
-					email.send()
-				except SMTPException:
-					BOSM.settings.EMAIL_HOST_USER = BOSM.config.email_host_user[2]
-					BOSM.settings.EMAIL_HOST_PASSWORD = BOSM.config.email_host_pass[2]
-					email.send()
+				mail = Mail(from_email, subject, to_email, content)
+				response = sg.client.mail.send.post(request_body=mail.get())
 
+			except :
+				print "Mail Not Sent."
 			return render(request,"registrations/message.html",{'message':name+ ', your payment is successful. Thank you.'})
 
 		else:
 			return HttpResponse("checksum verify failed")
 
 	return HttpResponse(status=200)
-
 
 
 ################################################## End of PayTM #######################################################
