@@ -68,7 +68,7 @@ def create_user(request):
 		user.is_active = False
 		user.save()
 
-		
+
 		send_to = request.data['profile']['email']
 		name = request.data['profile']['name']
 		body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
@@ -126,6 +126,54 @@ pcr@bits-bosm.org
 		
 		return Response(user_serializer._errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def show_sports(request):
+
+	g_leader = GroupLeader.objects.get(user=request.user)
+	sports = Event.objects.all()
+	sports_added = [participation.event for participation in Participation.objects.filter(g_l=g_leader)]
+	sports_left = [sport for sport in sports if sport not in sports_added]
+	added_serializer = EventSerializer(sports_added, many=True)
+	left_serializer = EventSerializer(sports_left, many=True)
+
+	return Response({'sports_added':added_serializer.data, 'sports_left':left_serializer.data,})
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def manage_sports(request):
+
+	data = request.data
+	try:
+		events_added = data.getlist('sportsadded')
+		for e_id in events_added:
+			event = get_object_or_404(Event, id=e_id)
+			part, created = Participation.objects.get_or_create(g_l=g_l, event=event)
+	except KeyError:
+		pass
+		
+	try:
+		events_left = data.getlist('sportsleft')
+
+		for e_id in events_left:
+			event = get_object_or_404(Event, id=e_id)
+			try:
+				Participation.objects.get(g_l=g_l, event=event).delete()
+				TeamCaptain.objects.filter(event=event, g_l=g_l).delete()
+			except:
+				continue
+	except KeyError:
+		pass
+	
+	g_leader = GroupLeader.objects.get(user=request.user)
+	sports = Event.objects.all()
+	sports_added = [participation.event for participation in Participation.objects.filter(g_l=g_leader)]
+	sports_left = [sport for sport in sports if sport not in sports_added]
+	added_serializer = EventSerializer(sports_added, many=True)
+	left_serializer = EventSerializer(sports_left, many=True)
+
+	return Response({'sports_added':added_serializer.data, 'sports_left':left_serializer.data,})
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))

@@ -31,7 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Event
-		fields = '__all__'
+		fields = ('id', 'name', 'min_limit', 'max_limit', 'start_date' ,'end_date','venue', 'about')
 
 class TeamCaptainSerializer(serializers.ModelSerializer):
 

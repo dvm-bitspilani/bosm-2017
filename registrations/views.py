@@ -177,7 +177,7 @@ def email_confirm(request, token):
 
 		context = {
 			'error_heading': 1,
-			'message': 'Your email has beeen verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani',
+			'message': 'Your email has been verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani',
 		}
 	else:
 		context = {
@@ -218,6 +218,7 @@ def user_logout(request):
     logout(request)
     return redirect('registrations:index')
 
+@login_required
 def show_sports(request):
 	return render(request, 'registrations/manage_sports.html')
 

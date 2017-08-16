@@ -102,14 +102,15 @@ def status_change(request):
 
 		data = request.POST
 		try:
-			group_leaders = data['gls']
+			group_leaders = request.POST.getlist('gls')
+
+			print group_leaders
 			if group_leaders:
 				if "Deactivate" == data['submit']:
 
 					for gl_id in group_leaders:
 						gl = GroupLeader.objects.get(id=gl_id)
 						gl.pcr_approved = False
-						gl.user.is_active = False
 						user = gl.user
 						user.is_active = False
 						gl.save()
@@ -120,12 +121,13 @@ def status_change(request):
 				elif "Activate" == data['submit']:
 					for gl_id in group_leaders:
 						gl = GroupLeader.objects.get(id=gl_id)
+						print gl
 						if gl.email_verified:
-
+							print gl
 							gl.pcr_approved = True
-							gl.user.is_active = True
 							user = gl.user
 							gl.save()
+							print user
 							user.is_active = True
 							user.save()
 							send_status_email(gl.email, "Approved")
