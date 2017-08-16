@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'regsoft',
     'events',
     'pcradmin',
+    'api',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

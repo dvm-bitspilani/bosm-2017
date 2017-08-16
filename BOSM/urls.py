@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'', include('Subscribe.urls')),
     url(r'^pcradmin/', include('pcradmin.urls')),
     url(r'^registrations/', include('registrations.urls')),
+    url(r'^api/', include('api.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
