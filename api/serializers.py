@@ -32,15 +32,23 @@ class EventSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Event
 		fields = ('id', 'name', 'min_limit', 'max_limit', 'start_date' ,'end_date','venue', 'about')
-
 class TeamCaptainSerializer(serializers.ModelSerializer):
 
-	g_l = GroupLeaderSerializer(required=True, write_only=True)
-	event = EventSerializer(required=True, write_only=True)
+	event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+	g_l = serializers.PrimaryKeyRelatedField(queryset=GroupLeader.objects.all())
 
 	class Meta:
 		model = TeamCaptain
-		fields = ('name', 'email', 'phone', 'event', 'g_l', 'gender', 'total_players')
+		fields = ('name', 'email', 'phone', 'gender', 'total_players','event', 'g_l')
+
+		'''
+	def create(self, validated_data):
+		print validated_data
+		g_leader = GroupLeader.objects.get(id=validated_data.pop('g_l'))
+		event = Event.objects.get(id=validated_data.pop('event'))
+		tc = TeamCaptain.objects.create(g_l=g_leader, event=event, **validated_data)
+		return tc
+		'''
 
 class ParticipantSerializer(serializers.ModelSerializer):
 
@@ -48,7 +56,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Participant
-		fields = ('name', 'captain')
+		fields = ('name', 'captain','id',)
 
 class ParticipationSerializer(serializers.ModelSerializer):
 
