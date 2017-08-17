@@ -269,7 +269,6 @@ def register_captain(request, event_id):
 	
 	if request.method == 'POST':
 		data = request.POST
-		print data
 		user = request.user
 		tc_form = TeamCaptainForm(data)
 		event = Event.objects.get(id=event_id)

@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from registrations.models import *
 from events.models import *
 from registrations.views import *
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -34,8 +35,8 @@ def index(request):
 @authentication_classes((BasicAuthentication,))
 def user_login(request, format=None):
     
-	username = request.POST['username']
-	password = request.POST['password']
+	username = request.data['username']
+	password = request.data['password']
 
 	user = authenticate(username=username, password=password)
 	if user is not None:
@@ -145,19 +146,22 @@ def show_sports(request):
 def manage_sports(request):
 
 	data = request.data
+	print data
+	g_l = GroupLeader.objects.get(user=request.user)
 	try:
-		events_added = data.getlist('sportsadded')
-		for e_id in events_added:
-			event = get_object_or_404(Event, id=e_id)
+		events_added = data['sportsadded']
+		for e_id in eval(events_added):
+			print e_id
+			event = get_object_or_404(Event, id=int(e_id))
 			part, created = Participation.objects.get_or_create(g_l=g_l, event=event)
 	except KeyError:
 		pass
 		
 	try:
-		events_left = data.getlist('sportsleft')
+		events_left = data['sportsleft']
 
-		for e_id in events_left:
-			event = get_object_or_404(Event, id=e_id)
+		for e_id in eval(events_left):
+			event = get_object_or_404(Event, id=int(e_id))
 			try:
 				Participation.objects.get(g_l=g_l, event=event).delete()
 				TeamCaptain.objects.filter(event=event, g_l=g_l).delete()
@@ -174,6 +178,103 @@ def manage_sports(request):
 	left_serializer = EventSerializer(sports_left, many=True)
 
 	return Response({'sports_added':added_serializer.data, 'sports_left':left_serializer.data,})
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def register_captain(request):
+
+	data = request.data
+	event = get_object_or_404(Event, id=data.pop('event_id'))
+	user = request.user
+	g_l = GroupLeader.objects.get(user=user)
+	captain_serializer = TeamCaptainSerializer(data=data)
+	if captain_serializer.is_valid():
+		captain = captains_serializer.save(commit=False)
+		captain.event = event
+		try:
+			participation = Participation.objects.get(event=event, g_l=g_l)
+		except:
+			return Response({'message':'Invalid access'})
+		captain.g_l = g_l
+		captain.save()
+		Participant.objects.create(name=captain.name, captain=captain)
+		try:
+			participants = [participant for participant in data['participants']]
+		except:
+			participants = []
+
+		if participants:
+
+			captain.is_single = False
+			captain.save()
+			if (event.max_limit>len(participants)>=event.min_limit-1):
+				for participant in participants:
+					Participant.objects.create(name=participant, captain=captain)
+				captain.total_players = len(participants) + 1
+				captain.save()
+				g_l_serializer = GroupLeaderSerializer(g_l)
+				captain_serializer = TeamCaptainSerializer(captain)
+				participant_data = ParticipantSerializer(participants, many=True)
+
+				return Response({'g_leader':g_l_serializer.data, 'captain':captains_serializer.data, 'participants':par
+					.data})
+
+			else:
+				captain.delete()
+				return Response({'error':'Invalid number of players'})
+
+		else:
+			captain.is_single = True
+			if event.min_limit == event.max_limit == 1:
+				captain.save()
+				g_l_serializer = GroupLeaderSerializer(g_l)
+				captain_serializer = TeamCaptainSerializer(captain)
+				return Response({'g_leader':g_l_serializer.data, 'captain':captains_serializer.data,})
+
+			else:
+				captain.delete()
+				return Response({'error':'Invalid number of players'})
+
+	else:
+		return Response({'message':captains_serializer.errors})
+
+@api_view(['GET',])
+@authentication_classes((IsAuthenticated,))
+def add_events(request):
+
+	user = request.user
+	g_leader = GroupLeader.objects.get(user=user)
+	event_set =  [{'name':event.name, 'id':event.id} for event in Event.objects.filter(min_limit=1, max_limit=1) if Participation.objects.filter(event=event, g_l=groupleader)]
+	if participants:
+		players = [{'name':part.name, 'id':part.id} for part in participants]
+	data = {'participants':players, 'events':event_set}
+	return JsonResponse(data)
+
+@api_view(['POST',])
+@permission_classes((IsAuthenticated,))
+def add_extra_event(request):
+
+	data = request.data
+	user = request.user
+	g_leader = GroupLeader.objects.get(user=user)
+	captain = TeamCaptain.objects.get(id=data.pop('captain_id'))
+	participants = Participant.objects.get(captain=captain)
+	participant_data = {}
+	for p_id, e_id in data.iteritems():
+		if e_id!='0':
+			participant = Participant.objects.get(id=p_id)
+			event = Event.objects.get(id=e_id)
+			participation = get_object_or_404(Participation, g_l=groupleader, event=event)
+
+			tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender)
+			tc.save()
+			Participant.objects.create(name=tc.name, captain=tc)
+			participant_data.append((tc.name, event.name))
+	g_l_serializer = GroupLeaderSerializer(g_l)
+	captain_serializer = TeamCaptainSerializer(captain)
+	participant_data = ParticipantSerializer(participants, many=True)
+
+	return Response({'g_leader':g_l_serializer.data, 'captain':captains_serializer.data, 'participants_changed':participant_data})
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
