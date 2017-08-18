@@ -120,7 +120,7 @@ pcr@bits-bosm.org
 		except :
 			return Response({'message':'Email sending failed.'})
 
-		message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address." %(send_to)
+		message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address.(Email may be present in the spams folder)." %(send_to)
 		return Response({'message':message})
 
 	else:
