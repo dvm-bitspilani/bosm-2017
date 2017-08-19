@@ -158,12 +158,12 @@ def send_status_email(send_to, status):
 	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
 	to_email = Email(send_to)
 	from_email = Email('register@bits-bosm.org')
-	try:
-		mail = Mail(from_email, subject, to_email, body)
-		response = sg.client.mail.send.post(request_body=mail.get())
+	#try:
+	mail = Mail(from_email, subject, to_email, body)
+	response = sg.client.mail.send.post(request_body=mail.get())
 
-	except :
-		print "Mail Not Sent."
+	#except :
+	#	print "Mail Not Sent."
 	return
 
 @staff_member_required
@@ -174,16 +174,17 @@ def confirm_events(request, gl_id):
 	if request.method == 'POST':
 		data = request.POST
 		try:
-			confirm = data['confirm']
+			confirm = data.getlist('confirm')
+			print confirm
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
 			
 		for i in confirm:
-			p = Participation.objects.get(pk=int(i))
-			event = p.event
-			g_l = p.g_l
-			teamcaptain = TeamCaptain.objects.get(g_l=g_l, event=event)
+			teamcaptain = TeamCaptain.objects.get(pk=int(i))
+			event = teamcaptain.event
+			g_l = teamcaptain.g_l
 			if teamcaptain.if_payment :
+				sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
 				to_email = Email(teamcaptain.email)
 				name = teamcaptain.name
 				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
@@ -194,7 +195,7 @@ def confirm_events(request, gl_id):
 				Your team registration for %s has been confirmed.
 				<a href='%s'>Click Here</a> to pay %d for the same.
 				
-				'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm")) + generate_payment_token(TeamCaptain.objects.get(email=send_to))) + '/', event.price)
+				'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm"))) + generate_payment_token(teamcaptain) + '/', event.price)
 
 				subject = "Payment for BOSM '17"
 				from_email = Email('register@bits-bosm.org')
@@ -204,11 +205,12 @@ def confirm_events(request, gl_id):
 
 					mail = Mail(from_email, subject, to_email, content)
 					response = sg.client.mail.send.post(request_body=mail.get())
+					p = Participation.objects.get(event=event, g_l=g_l)
 					p.confirmed = True
 					p.save()
 				
 				except :
-					print "mail not sent"
+					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 	
 		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
 
@@ -216,8 +218,17 @@ def confirm_events(request, gl_id):
 
 	else:
 		events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=False)]
-		teamcaptains = [TeamCaptain.objects.filter(g_l=gl, event=event) for event in events]
-		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':teamcaptains, 'g_l':gl})
+		teamcaptains=[]
+		for event in events:
+			teamcaptains.append(list(TeamCaptain.objects.filter(g_l=gl, event=event)))
+
+		print teamcaptains
+		captains = []
+		print len(teamcaptains[0]), len(teamcaptains[1])
+		for i in range(0,len(teamcaptains)):
+			for j in range(0,len(teamcaptains[i])):
+				captains.append(teamcaptains[i][j])
+		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':captains, 'g_l':gl})
 
 @staff_member_required
 def final_list_download(request):
@@ -228,6 +239,15 @@ def final_list_download(request):
 	except ImportError:
 		import StringIO
 	a_list = []
+
+	try:
+		xl_file = open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb")
+		xl_file.close()
+		import os
+		os.remove(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"))
+
+	except:
+		pass
 
 	gleaders = GroupLeader.objects.all()
 

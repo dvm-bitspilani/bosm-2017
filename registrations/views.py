@@ -237,7 +237,7 @@ def manage_sports(request):
 		else:
 			x=0
 			events_left = all_events
-		return JsonResponse({'x':x, 'status':1, 'events_added':events_added, 'events_left':events_left})
+		return JsonResponse({'x':x, 'status':1, 'events_added':events_added.order_by('name'), 'events_left':events_left.order_by('name')})
 
 	else:
 		data = dict(request.POST)
