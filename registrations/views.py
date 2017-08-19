@@ -162,7 +162,7 @@ def authenticate_email_token(token):
 
 		return gleader
 
-	except ObjectDoesNotExist:
+	except :
 
 		return False
 
@@ -177,7 +177,7 @@ def email_confirm(request, token):
 
 		context = {
 			'error_heading': 1,
-			'message': 'Your email has beeen verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani>',
+			'message': 'Your email has been verified. Please wait for further correspondence from the Department of PCr, BITS, Pilani',
 		}
 	else:
 		context = {
@@ -218,6 +218,7 @@ def user_logout(request):
     logout(request)
     return redirect('registrations:index')
 
+@login_required
 def show_sports(request):
 	return render(request, 'registrations/manage_sports.html')
 
@@ -268,7 +269,6 @@ def register_captain(request, event_id):
 	
 	if request.method == 'POST':
 		data = request.POST
-		print data
 		user = request.user
 		tc_form = TeamCaptainForm(data)
 		event = Event.objects.get(id=event_id)
@@ -360,7 +360,7 @@ def add_extra_event(request, tc_id):
 				event = Event.objects.get(id=e_id)
 				participation = get_object_or_404(Participation, g_l=groupleader, event=event)
 
-				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender)
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender, email=teamCaptain.email)
 				tc.save()
 				Participant.objects.create(name=tc.name, captain=tc)
 		return JsonResponse({'status':1})

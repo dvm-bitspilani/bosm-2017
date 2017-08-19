@@ -10,15 +10,21 @@
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
 </head>
 <body style="background-color:#D9E5D6;overflow-y:scroll">
-<div class="container" style="margin-top:2vh;">
-	<div class="row">
-		<div class="col s12 welcome" style="">
-			Welcome to BOSM 2017 Registrations!
-		</div>
-	</div>
-</div>
+
+	<nav class="transparent z-depth-1" role="navigation">
+    <div class="nav-wrapper transparent"><a id="logo-container" href="#" class="brand-logo center" style="font-size:300%;font-weight:bold;color:#0FA3B1;">Welcome to BOSM 2017 Registrations!</a>
+    	<ul class="right hide-on-med-and-down">
+        <li><a class="waves-effect waves-light btn blue darken-1" href="{% url 'registrations:logout' %}">Logout</a></li>
+      </ul> 
+      <ul id="nav-mobile" class="side-nav">
+        <li><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:logout' %}">Logout</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
 {% if added_events %}
 <div class="container" style="margin-top:4vh;">
 	<div class="row" style="margin-bottom:0px;">
@@ -28,7 +34,7 @@
 <div class="row">
 				<div class="col s12" >
 				
-	<center><h3><a href="{{event|get_it:'url'}}" style="font-size:80%;color:#0FA3B1">{{event|get_it:'name'}}</a><a>{% ifequal event|get_it:'players' 0 %}{% else %}{{event|get_it:'players'}}<i class="material-icons">check</i>{% endifequal %}</a></h3></center>
+	<center><h3><a href="{{event|get_it:'url'}}" style="font-size:80%;color:#0FA3B1">{{event|get_it:'name'}}</a><a>{% ifequal event|get_it:'players' 0 %}{% else %}{{event|get_it:'players'}}<i class="material-icons"><input type="checkbox" value="sports"></i>{% endifequal %}</a></h3></center>
       			</div>
 </div>
 {% endfor %}

@@ -10,10 +10,11 @@
         <table class="centered">
                 <thead>
                     <tr>
-                        <th>College</th>
+                        <th>{{name}}</th>
                         <th>Male</th>
                         <th>Female</th>
                         <th>Total</th>
+                        <th>Coach</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,6 +24,7 @@
                         <td>{{i|get_it:'male'}}</td>
                         <td>{{i|get_it:'female'}}</td>
                         <td>{{i|get_it:'total'}}</td>
+                        <td>{{i|get_it:'coach'}}</td>                        
                     </tr>
                     {% endfor %}
                 </tbody>
