@@ -81,9 +81,9 @@ Thank you for registering!
 
 Greetings from BITS Pilani!
 
-It gives me immense pleasure in inviting your institute to the 32nd edition of BITS Open Sports Meet (BOSM), the annual national sports meet of Birla Institute of Technology & Science, Pilani, India. This year, BOSM will be held from September 21st to 25th.
+It gives me immense pleasure in inviting your institute to the 32nd edition of BITS Open Sports Meet (BOSM), the annual national sports meet of Birla Institute of Technology & Science, Pilani, India. This year, BOSM will be held from September 21st to 25th.             
 
-Applications close on 31st August 2017 at 1700 hrs.            
+ Applications close on 31st August 2017 at 1700 hrs.            
 
 Please apply as soon as possible to enable us to confirm your participation at the earliest.             
 
