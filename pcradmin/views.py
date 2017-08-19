@@ -397,6 +397,8 @@ def stats_order(request, order=None):
 			entry['name'] = g_l.college
 			entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 			teamcaptains = TeamCaptain.objects.filter(g_l=g_l)
+			if not teamcaptains:
+				continue
 			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
 			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
@@ -420,6 +422,8 @@ def stats_order(request, order=None):
 			entry['name'] = event.name
 			entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 			teamcaptains = TeamCaptain.objects.filter(event=event)
+			if not teamcaptains:
+				continue
 			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
 			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
@@ -486,6 +490,8 @@ def stats_college(request, gl_id):
 		entry['name'] = event.name
 		entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		if not teamcaptains:
+			continue
 		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 		teamcaptains_m = teamcaptains.filter(gender='M')
 		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
@@ -510,6 +516,8 @@ def stats_sport(request, e_id):
 		entry['name'] = g_l.college
 		entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		if not teamcaptains:
+			continue
 		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 		teamcaptains_m = teamcaptains.filter(gender='M')
 		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
