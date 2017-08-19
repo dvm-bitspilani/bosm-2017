@@ -327,7 +327,10 @@ def register_captain(request, event_id):
 		try:
 			if event.max_limit != 1:
 				tc = TeamCaptain.objects.get(g_l=g_l, event=event)
-				data = {'tc':tc.name, 'participants':[part.name for part in Participant.objects.filter(captain=tc)], 'url':reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})}
+				data = {'tc':tc.name,
+				 'participants':[part.name for part in Participant.objects.filter(captain=tc)],
+				  'url':reverse('registrations:add_extra_templ',
+				 kwargs={'tc_id':tc.id})}
 				return render(request, 'registrations/participants.html', data)
 		except Exception, e:
 			pass

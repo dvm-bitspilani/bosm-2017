@@ -91,8 +91,9 @@
  		<script type="text/javascript">
  			var count = 2;
  			var maxcount = {{event.max_limit}} ;
+ 			var mincount = {{event.min_limit}};
  			if (maxcount!==1) {
- 			$('#subhead').text("This is a team event. You can add only " + maxcount + " participants.")
+ 			$('#subhead').text("This is a team event. Total no. of participants must be between " + mincount + "and" + maxcount + " participants.")
  			}	
  			else {
  				$('#subhead').text("This is an individual event. The person will be registered as the Team Captain for this sport.")
