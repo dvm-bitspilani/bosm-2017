@@ -34,7 +34,7 @@
 <div class="row">
 				<div class="col s12" >
 				
-	<center><h3><a href="{{event|get_it:'url'}}" style="font-size:80%;color:#0FA3B1">{{event|get_it:'name'}}</a><a>{% ifequal event|get_it:'players' 0 %}{% else %}{{event|get_it:'players'}}<i class="material-icons"><input type="checkbox" value="sports"></i>{% endifequal %}</a></h3></center>
+	<center><h3><a href="{{event|get_it:'url'}}" style="font-size:80%;color:#0FA3B1">{{event|get_it:'name'}}</a><a>{% ifequal event|get_it:'players' 0 %}{% else %}:{{event|get_it:'players'}}<i class="material-icons"><input type="checkbox" value="sports"></i>{% endifequal %}</a></h3></center>
       			</div>
 </div>
 {% endfor %}

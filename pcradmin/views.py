@@ -150,7 +150,7 @@ def status_change(request):
 def send_status_email(send_to, status):
 	if status == 'Approved':
 		subject = "Account Approved"
-		body = Content("text/html", "Dear User, Your account status has been changed, and is now "+status+". You can use your credentials to login to <a>bits-bosm.org/registrations</a> to add teams.")
+		body = Content("text/html", "Dear User, Your account status has been changed, and is now "+status+". You can use your credentials to login to <a>bits-bosm.org/2017/registrations</a> to add teams.")
 
 	elif status == 'Frozen':
 		subject = "Account Frozen"
@@ -176,6 +176,7 @@ def confirm_events(request, gl_id):
 		try:
 			confirm = data.getlist('confirm')
 			print confirm
+
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
 			
@@ -183,34 +184,49 @@ def confirm_events(request, gl_id):
 			teamcaptain = TeamCaptain.objects.get(pk=int(i))
 			event = teamcaptain.event
 			g_l = teamcaptain.g_l
-			if teamcaptain.if_payment :
-				sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+			sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+			if teamcaptain.email:
 				to_email = Email(teamcaptain.email)
 				name = teamcaptain.name
-				body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+				if teamcaptain.if_payment :
+					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 				<pre style="font-family:Roboto,sans-serif">
 				
 				Hello %s!
 				Your team registration for %s has been confirmed.
 				<a href='%s'>Click Here</a> to pay %d for the same.
-				
+
 				'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm"))) + generate_payment_token(teamcaptain) + '/', event.price)
 
-				subject = "Payment for BOSM '17"
-				from_email = Email('register@bits-bosm.org')
-				content = Content(body)
+					subject = "Payment for BOSM '17"
+					from_email = Email('register@bits-bosm.org')
+					content = Content("text/html", body)
 
-				try:
-
-					mail = Mail(from_email, subject, to_email, content)
-					response = sg.client.mail.send.post(request_body=mail.get())
-					p = Participation.objects.get(event=event, g_l=g_l)
-					p.confirmed = True
-					p.save()
+				else:
+					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
+				<pre style="font-family:Roboto,sans-serif">
 				
-				except :
-					return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+				Hello %s!
+				Your team registration for %s has been confirmed.
+
+				'''%(name, event.name,)
+
+					subject = "Confirmation for BOSM '17"
+					from_email = Email('register@bits-bosm.org')
+					content = Content("text/html", body)
+
+				#try:
+
+				mail = Mail(from_email, subject, to_email, content)
+				response = sg.client.mail.send.post(request_body=mail.get())
+				p = Participation.objects.get(event=event, g_l=g_l)
+				p.confirmed = True
+				p.save()
+				
+			#	except :
+			#			return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 	
 		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
 
@@ -218,6 +234,7 @@ def confirm_events(request, gl_id):
 
 	else:
 		events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=False)]
+
 		teamcaptains=[]
 		for event in events:
 			teamcaptains.append(list(TeamCaptain.objects.filter(g_l=gl, event=event)))
@@ -229,6 +246,7 @@ def confirm_events(request, gl_id):
 			for j in range(0,len(teamcaptains[i])):
 				captains.append(teamcaptains[i][j])
 		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':captains, 'g_l':gl})
+
 
 @staff_member_required
 def final_list_download(request):
@@ -410,18 +428,21 @@ def stats_order(request, order=None):
 			entry['name'] = g_l.college
 			entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 			teamcaptains = TeamCaptain.objects.filter(g_l=g_l)
+			if not teamcaptains:
+				continue
 			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
 			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 			teamcaptains_f = teamcaptains.filter(gender='F')
 			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-			
+			entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
+			print entry['coach']
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
-
-			collegewise.append(entry)
+			if entry['total']!='- -':
+				collegewise.append(entry)
 		order = 'Stats Collegewise'
-		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : collegewise, 'stats':True})
+		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : collegewise, 'stats':True, 'name':'College'})
 
 
 	if order == 'sport':
@@ -432,18 +453,20 @@ def stats_order(request, order=None):
 			entry['name'] = event.name
 			entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 			teamcaptains = TeamCaptain.objects.filter(event=event)
+			if not teamcaptains:
+				continue
 			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 			teamcaptains_m = teamcaptains.filter(gender='M')
 			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 			teamcaptains_f = teamcaptains.filter(gender='F')
 			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-			
+			entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
-
-			sportwise.append(entry)
+			if entry['total']!='- -':
+				sportwise.append(entry)
 		order = 'Stats Sportwise'
-		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
+		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Events'})
 
 	if order=='master_list':
 		output = StringIO.StringIO()
@@ -488,7 +511,6 @@ def count_players_confirmed(x,y):
 	else:
 		return x
 
-
 @staff_member_required
 def stats_college(request, gl_id):
 	g_l = get_object_or_404(GroupLeader, pk=gl_id)
@@ -499,18 +521,21 @@ def stats_college(request, gl_id):
 		entry['name'] = event.name
 		entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		if not teamcaptains:
+			continue
 		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 		teamcaptains_m = teamcaptains.filter(gender='M')
 		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 		teamcaptains_f = teamcaptains.filter(gender='F')
 		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-		
+		entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
+
 		for i in ['total', 'male', 'female']:
 			if entry[i] == '0 | 0': entry[i] = '- -'
-
-		sportwise.append(entry)
+		if entry['total']!='- -':
+			sportwise.append(entry)
 	order = 'Stats Sportwise for ' + g_l.college
-	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
+	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Event'})
 
 @staff_member_required
 def stats_sport(request, e_id):
@@ -519,21 +544,24 @@ def stats_sport(request, e_id):
 	sportwise = []
 	for g_l in g_ls:
 		entry = {}
-		entry['name'] = g_l.name
+		entry['name'] = g_l.college
 		entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
+		if not teamcaptains:
+			continue
 		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
 		teamcaptains_m = teamcaptains.filter(gender='M')
 		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
 		teamcaptains_f = teamcaptains.filter(gender='F')
 		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
+		entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
 		
 		for i in ['total', 'male', 'female']:
 			if entry[i] == '0 | 0': entry[i] = '- -'
-
-		sportwise.append(entry)
+		if entry['total']!='- -':
+			sportwise.append(entry)
 	order = 'Stats Collegewise for ' + event.name
-	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True})
+	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'College'})
 
 
 ######################### PDF generators  #####################

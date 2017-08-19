@@ -25,7 +25,7 @@
 <div class="container" style="margin-top:4vh;">
 	<div class="row" style="margin-bottom:0px;">
 		<div class="col s6 offset-s3 box" id="sportsadded" style="margin-bottom:10vh;">
-<center><h3><a style="font-weight: bold;color:#0FA3B1">Participants</a></h3></center>
+<center><h3><a style="font-weight: bold;color:#0FA3B1">Participants for {{event}}</a></h3></center>
 {% for i in participants %}
 <div class="row">
 				<div class="col s12" >
@@ -40,7 +40,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col s12  m12 l12 " style="display:flex;justify-content:center;">
-		 	<button class="btn waves-effect waves-light signup-button" onclick="locations.href='/2017/registrations/'" id="done-btn" style="background-color:#0FA3B1 !important;color:#D9E5D6 !important;white-space:nowrap">Home</button>
+		 	<button class="btn waves-effect waves-light signup-button" id="done-btn" style="background-color:#0FA3B1 !important;color:#D9E5D6 !important;white-space:nowrap"><a href="{% url 'registrations:index' %}" style="color:#ffffff;">Home</a></button>
 		</div>
 	</div>
 </div>

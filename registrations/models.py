@@ -50,6 +50,7 @@ class TeamCaptain(models.Model):
 	g_l = models.ForeignKey(GroupLeader, on_delete=models.CASCADE, default=None)
 	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
 	acco = models.NullBooleanField('passed recnacc', null=True, blank=True)
+	coach = models.CharField(max_length=200, null=True, default='')
 	room = models.ForeignKey(Room, null=True, blank=True)
 	paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
@@ -89,3 +90,8 @@ class Transport(models.Model):
 	def __unicode__(self):
 
 		return str(self.g_l.name)
+
+# class Coach(models.Model):
+
+# 	name = models.CharField(max_length=100)
+# 	captain = models.OneToOneField(TeamCaptain, on_delete=models.CASCADE)

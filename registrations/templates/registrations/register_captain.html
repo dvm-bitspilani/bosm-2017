@@ -2,7 +2,7 @@
 <html>
 {% load static %}
 <head>
-	<title>BOSM 17 Registerations Register_Captain</title>
+	<title>BOSM 17 Registerations Register Captain</title>
 	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -15,7 +15,7 @@
 <div class="container" >
 	<div class="row" style="margin-top:5%;margin-bottom:50px;">
 				<div class="col s12" style="text-align:center;font-size:300%;">
-					Register as a Team for {{event.name}}
+					Team Registrations for {{event.name}}
 				</div>
 				<div class="col s12" id="subhead" style="text-align:center;font-size:150%;"></div>
 				<div class="col s12" style="padding-top:2%;">
@@ -43,6 +43,13 @@
           						<label for="phone">Phone Number</label>
         					</div>
 					      </div>
+					      <div class="row">
+					      	<div class="input-field col s12">
+          				        <input id="coach" type="tel" class="validate" name="coach">
+          						<label for="coach">Coach Name</label>
+        					</div>
+					      </div>
+
 
 					      <div class="row">
 					      	<div class="col s4">
@@ -84,8 +91,9 @@
  		<script type="text/javascript">
  			var count = 2;
  			var maxcount = {{event.max_limit}} ;
+ 			var mincount = {{event.min_limit}};
  			if (maxcount!==1) {
- 			$('#subhead').text("This is a team event. You can add only " + maxcount + " participants.")
+ 			$('#subhead').text("This is a team event. Total no. of participants must be between " + mincount + " and " + maxcount +".")
  			}	
  			else {
  				$('#subhead').text("This is an individual event. The person will be registered as the Team Captain for this sport.")

@@ -81,15 +81,15 @@ Thank you for registering!
 
 Greetings from BITS Pilani!
 
-It gives me immense pleasure in inviting your institute to the 32nd edition of BITS Open Sports Meet (BOSM), the annual national sports meet of Birla Institute of Technology & Science, Pilani, India. This year, BOSM will be held from September 15th to 19th.             
+It gives me immense pleasure in inviting your institute to the 32nd edition of BITS Open Sports Meet (BOSM), the annual national sports meet of Birla Institute of Technology & Science, Pilani, India. This year, BOSM will be held from September 21st to 25th.
 
-Kindly go through the invite attached with this email and apply through our website www.bits-bosm.org. Applications close on 31st August 2016 at 1700 hrs.            
+Applications close on 31st August 2017 at 1700 hrs.            
 
 Please apply as soon as possible to enable us to confirm your participation at the earliest.             
 
 We would be really happy to see your college represented at our sports festival.            
 
-We look forward to seeing you at BOSM 2016.
+We look forward to seeing you at BOSM 2017.
 
 <a href='%s'>Click Here</a> to verify your email.
 
@@ -99,7 +99,7 @@ Regards,
 CoSSAcn (Head)
 Dept. of Publications & Correspondence, BOSM 2017
 BITS Pilani
-+91-7240105158, +91-9829491835, +91-9829493083, +91-9928004772, +91-9928004778
++91-9929022741
 pcr@bits-bosm.org
 </pre>
 			'''%(name, str(request.build_absolute_uri(reverse("registrations:index"))) + 'email_confirm/' + generate_email_token(GroupLeader.objects.get(email=send_to)) + '/')
@@ -118,7 +118,9 @@ pcr@bits-bosm.org
 				mail = Mail(from_email, subject, to_email, content)
 				response = sg.client.mail.send.post(request_body=mail.get())
 			except :
-				print "Mail not sent"
+				return render(request, 'registrations/message.html', {'message':"Mail not sent. Please try again"})
+				user.delete()
+
 
 			message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address." %(send_to)
 			return render(request, 'registrations/message.html', {'message':message})
@@ -237,7 +239,9 @@ def manage_sports(request):
 		else:
 			x=0
 			events_left = all_events
-		return JsonResponse({'x':x, 'status':1, 'events_added':events_added.order_by('name'), 'events_left':events_left.order_by('name')})
+		added_events =  sorted(events_added, key=lambda k: k['name'])
+		left_events = sorted(events_left, key=lambda k: k['name'])
+		return JsonResponse({'x':x, 'status':1, 'events_added':added_events, 'events_left':left_events})
 
 	else:
 		data = dict(request.POST)
@@ -327,7 +331,10 @@ def register_captain(request, event_id):
 		try:
 			if event.max_limit != 1:
 				tc = TeamCaptain.objects.get(g_l=g_l, event=event)
-				data = {'tc':tc.name, 'participants':[part.name for part in Participant.objects.filter(captain=tc)], 'url':reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})}
+				data = {'tc':tc.name,'event':event.name,
+				 'participants':[part.name for part in Participant.objects.filter(captain=tc)],
+				  'url':reverse('registrations:add_extra_templ',
+				 kwargs={'tc_id':tc.id})}
 				return render(request, 'registrations/participants.html', data)
 		except Exception, e:
 			pass
@@ -360,7 +367,7 @@ def add_extra_event(request, tc_id):
 				event = Event.objects.get(id=e_id)
 				participation = get_object_or_404(Participation, g_l=groupleader, event=event)
 
-				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender)
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender, email=teamCaptain.email)
 				tc.save()
 				Participant.objects.create(name=tc.name, captain=tc)
 		return JsonResponse({'status':1})
@@ -476,7 +483,7 @@ pcr@bits-bosm.org
 				response = sg.client.mail.send.post(request_body=mail.get())
 
 			except :
-				print "Mail Not Sent."
+				return render(request,"registrations/message.html",{'message':'There was some error processing the payment. Please contact PCr, BITS Pilani.'})
 			return render(request,"registrations/message.html",{'message':name+ ', your payment is successful. Thank you.'})
 
 		else:
