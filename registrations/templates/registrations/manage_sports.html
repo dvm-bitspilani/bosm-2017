@@ -55,7 +55,7 @@ $(document).ready(function(){
 	// adddiv(5,"Badmintion","sportsadded");
 	$.ajax({
 		method:"GET",
-		url:"/registrations/manage_sports/",
+		url:"{% url 'registrations:manage_sports' %}",
 	}).done(function(res){
 		if(res.x == 1){
 		$.each(res.events_added,function(i,ele){
