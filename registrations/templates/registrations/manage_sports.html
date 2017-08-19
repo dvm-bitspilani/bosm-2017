@@ -55,7 +55,7 @@ $(document).ready(function(){
 	// adddiv(5,"Badmintion","sportsadded");
 	$.ajax({
 		method:"GET",
-		url:"{% url 'registrations:manage_sports' %}",
+		url:"{% url 'registrations:manage' %}",
 	}).done(function(res){
 		if(res.x == 1){
 		$.each(res.events_added,function(i,ele){
@@ -112,11 +112,11 @@ $(document).ready(function(){
 		}
 		$.ajax({
 			method:'POST',
-			url:'/registrations/manage_sports/',
+			url:"{% url 'registrations:manage' %}",
 			data:data
 		}).done(function(){
 			console.log("success!");
-			window.location.href = "/registrations/";
+			window.location.href = "{% url 'registrations:index' %}";
 		});
 	});
 })

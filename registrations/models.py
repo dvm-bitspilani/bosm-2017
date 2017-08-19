@@ -50,6 +50,7 @@ class TeamCaptain(models.Model):
 	g_l = models.ForeignKey(GroupLeader, on_delete=models.CASCADE, default=None)
 	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
 	acco = models.NullBooleanField('passed recnacc', null=True, blank=True)
+	coach = models.CharField(max_length=200, null=True)
 	room = models.ForeignKey(Room, null=True, blank=True)
 	paid = models.BooleanField(default=False)
 	is_single = models.NullBooleanField()
