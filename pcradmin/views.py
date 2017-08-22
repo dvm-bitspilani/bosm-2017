@@ -259,10 +259,13 @@ def final_list_download(request):
 	a_list = []
 
 	try:
-		xl_file = open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb")
+		try:
+			xl_file = open("/root/live/bosm/others/workbooks/final_list_2017.xlsx", "rb")
+		except:
+			xl_file = open("/home/auto-reload/Downloads/final_list_2017.xlsx", "rb")
 		xl_file.close()
 		import os
-		os.remove(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"))
+		os.remove(os.path.join(BASE_DIR, "workbooks/final_list_2017.xlsx"))
 
 	except:
 		pass
@@ -273,7 +276,7 @@ def final_list_download(request):
 		a_list.append({'obj': p})
 	data = sorted(a_list, key=lambda k: k['obj'].id)
 	output = StringIO.StringIO()
-	workbook = xlsxwriter.Workbook(os.path.join(BASE_DIR, 'workbooks/final_list.xlsx'))
+	workbook = xlsxwriter.Workbook(os.path.join(BASE_DIR, 'workbooks/final_list_2017.xlsx'))
 	worksheet = workbook.add_worksheet('new-spreadsheet')
 	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
 	worksheet.write(0, 0, "Generated:")
