@@ -25,7 +25,8 @@ class GroupLeader(models.Model):
 	email_verified = models.BooleanField(default=False)
 	email_token = models.CharField(max_length=32, null=True, blank=True)
 	pcr_approved = models.BooleanField(default=False)
-
+	barcode = models.CharField(max_length=50, null=True)
+	
 	def __unicode__(self):
 
 		return self.name + ' ' + self.college
