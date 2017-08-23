@@ -10,11 +10,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authentication import BasicAuthentication
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework.views import APIView
 from rest_framework import status
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+	def enforce_csrf(self, request):
+		return
 
 @api_view(['GET'])
 def index(request):
@@ -32,7 +36,7 @@ def index(request):
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@authentication_classes((BasicAuthentication,))
+@authentication_classes((BasicAuthentication, CsrfExemptSessionAuthentication))
 def user_login(request, format=None):
     
 	username = request.data['username']
