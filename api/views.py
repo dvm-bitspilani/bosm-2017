@@ -16,27 +16,27 @@ from .serializers import *
 from rest_framework.views import APIView
 from rest_framework import status
 
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-	def enforce_csrf(self, request):
-		return
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def api_test(request):
+	g_leader = GroupLeader.objects.get(user=request.user)
+	g_l_serializer = GroupLeaderSerializer(g_leader)
+	captains = TeamCaptain.objects.filter(g_l=g_leader)
+	captains_serializer = TeamCaptainSerializer(captains,many=True)
+	return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def index(request):
-
-	if request.user.is_authenticated():
-		g_leader = GroupLeader.objects.get(user=request.user)
-		g_l_serializer = GroupLeaderSerializer(g_leader)
-		captains = TeamCaptain.objects.filter(g_l=g_leader)
-		captains_serializer = TeamCaptainSerializer(captains,many=True)
-		return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
-
-	else:
-		return Response({'user':unicode(request.user)})
-
+	g_leader = GroupLeader.objects.get(user=request.user)
+	g_l_serializer = GroupLeaderSerializer(g_leader)
+	captains = TeamCaptain.objects.filter(g_l=g_leader)
+	captains_serializer = TeamCaptainSerializer(captains,many=True)
+	return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@authentication_classes((BasicAuthentication, CsrfExemptSessionAuthentication))
 def user_login(request, format=None):
     
 	username = request.data['username']

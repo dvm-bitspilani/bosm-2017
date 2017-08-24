@@ -17,3 +17,15 @@ def index(request):
 		return redirect(reverse('regsoft:firewallzi-home'))
 	else:
 		return render(request, 'registrations/messsage.html', {'messsage':'Access denied.'})
+
+@staff_member_required
+def controlz_home(request):
+	if request.method == 'POST':
+		try:
+			barcode = request.POST['code']
+			g_leader = GroupLeader.objects.get(id=barcode[::2])
+
+		except:
+			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
+
+		
