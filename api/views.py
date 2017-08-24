@@ -200,6 +200,7 @@ def register_captain(request):
 		try:
 			participation = Participation.objects.get(event=event, g_l=g_l)
 		except:
+			captain.delete()
 			return Response({'message':'Invalid access'})
 		Participant.objects.create(name=data['name'], captain=captain)
 		try:
