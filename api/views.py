@@ -233,14 +233,14 @@ def register_captain(request):
 				captain.save()
 				g_l_serializer = GroupLeaderSerializer(g_l)
 				captain_serializer = TeamCaptainSerializer(captain)
-				return Response({'g_leader':g_l_serializer.data, 'captain':captains_serializer.data,})
+				return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data,})
 
 			else:
 				captain.delete()
 				return Response({'error':'Invalid number of players'})
 
 	else:
-		return Response({'message':captains_serializer.errors})
+		return Response({'message':captain_serializer.errors})
 
 @api_view(['GET',])
 @authentication_classes((IsAuthenticated,))
