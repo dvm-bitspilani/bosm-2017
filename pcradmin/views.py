@@ -252,6 +252,7 @@ def confirm_events(request, gl_id):
 def final_list_download(request):
 
 	import xlsxwriter
+	import os
 	try:
 		import cStringIO as StringIO
 	except ImportError:
@@ -259,12 +260,8 @@ def final_list_download(request):
 	a_list = []
 
 	try:
-		try:
-			xl_file = open("/root/live/bosm/others/workbooks/final_list_2017.xlsx", "rb")
-		except:
-			xl_file = open("/home/auto-reload/Downloads/final_list_2017.xlsx", "rb")
+		xl_file = open(os.path.join(BASE_DIR, "workbooks/final_list_2017.xlsx"))
 		xl_file.close()
-		import os
 		os.remove(os.path.join(BASE_DIR, "workbooks/final_list_2017.xlsx"))
 
 	except:
