@@ -8,7 +8,7 @@ class GroupLeaderSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = GroupLeader
-		fields = ('name', 'gender', 'college', 'city', 'state', 'email', 'phone')
+		fields = ('name', 'gender', 'college', 'city', 'state', 'email', 'phone', 'id')
 
 class UserSerializer(serializers.ModelSerializer):
 

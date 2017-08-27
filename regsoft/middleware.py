@@ -21,7 +21,7 @@ class RegsoftMiddleware(object):
 		if 'regsoft' not in request.path:
 			return None
 
-		if view_func == views.index or 'getbarcode' in request.path:
+		if view_func == views.index or 'getbarcode' in request.path or 'help' in request.path:
 			return None
 
 		message='You don\'t have access to this page.'

@@ -116,3 +116,14 @@ def allot_room(request, gl_id):
 @staff_member_required
 def main_list(request):
 	TeamCaptain.objects.filter()
+
+def controlz_home(request):
+	if request.method == 'POST':
+		try:
+			barcode = request.POST['code']
+			g_leader = GroupLeader.objects.get(id=barcode[::2])
+
+		except:
+			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
+
+		

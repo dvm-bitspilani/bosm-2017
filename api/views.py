@@ -10,29 +10,33 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authentication import BasicAuthentication
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework.views import APIView
 from rest_framework import status
 
+
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def api_test(request):
+	g_leader = GroupLeader.objects.get(user=request.user)
+	g_l_serializer = GroupLeaderSerializer(g_leader)
+	captains = TeamCaptain.objects.filter(g_l=g_leader)
+	captains_serializer = TeamCaptainSerializer(captains,many=True)
+	return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def index(request):
-
-	if request.user.is_authenticated():
-		g_leader = GroupLeader.objects.get(user=request.user)
-		g_l_serializer = GroupLeaderSerializer(g_leader)
-		captains = TeamCaptain.objects.filter(g_l=g_leader)
-		captains_serializer = TeamCaptainSerializer(captains,many=True)
-		return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
-
-	else:
-		return Response({'user':unicode(request.user)})
-
+	g_leader = GroupLeader.objects.get(user=request.user)
+	g_l_serializer = GroupLeaderSerializer(g_leader)
+	captains = TeamCaptain.objects.filter(g_l=g_leader)
+	captains_serializer = TeamCaptainSerializer(captains,many=True)
+	return Response({'user':unicode(request.user), 'g_leader':g_l_serializer.data, 'captains':captains_serializer.data})
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@authentication_classes((BasicAuthentication,))
 def user_login(request, format=None):
     
 	username = request.data['username']
@@ -58,9 +62,6 @@ def user_login(request, format=None):
 @permission_classes((AllowAny, ))
 def create_user(request):
 
-	print request.data
-	print request.data['profile']
-	print request.data['profile']['email']
 	user_serializer = UserSerializer(data=request.data)
 
 	if user_serializer.is_valid():
@@ -124,9 +125,24 @@ pcr@bits-bosm.org
 		return Response({'message':message})
 
 	else:
-		
-		return Response(user_serializer._errors, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'message':get_errors(user_serializer._errors)}, status=status.HTTP_400_BAD_REQUEST)
 
+############ Get Errors #############
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static_vars(message='')
+def get_errors(d):
+	for k,v in d.iteritems():
+		if isinstance(v, dict):
+			get_errors.message += get_errors(v)
+		else:
+			return v[0]
+	return get_errors.message
 
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))
@@ -196,6 +212,7 @@ def register_captain(request):
 		try:
 			participation = Participation.objects.get(event=event, g_l=g_l)
 		except:
+			captain.delete()
 			return Response({'message':'Invalid access'})
 		Participant.objects.create(name=data['name'], captain=captain)
 		try:
@@ -229,14 +246,14 @@ def register_captain(request):
 				captain.save()
 				g_l_serializer = GroupLeaderSerializer(g_l)
 				captain_serializer = TeamCaptainSerializer(captain)
-				return Response({'g_leader':g_l_serializer.data, 'captain':captains_serializer.data,})
+				return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data,})
 
 			else:
 				captain.delete()
 				return Response({'error':'Invalid number of players'})
 
 	else:
-		return Response({'message':captains_serializer.errors})
+		return Response({'message':captain_serializer.errors})
 
 @api_view(['GET',])
 @authentication_classes((IsAuthenticated,))

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 from config import *
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -123,6 +124,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA':datetime.timedelta(seconds=600),
+    'JWT_ALLOW_REFRESH':True,
+    'JWT_REFRESH_EXPIRATION_DELTA':datetime.timedelta(days=30),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -162,3 +179,12 @@ PAYTM_CALLBACK_URL = "/registrations/response/"
 
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
+
+'''
+
+curl http://127.0.0.1:8000/api/api_test/
+
+curl -H "Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJvcmlnX2lhdCI6MTUwMzU2MTA4MCwidXNlcl9pZCI6MjQsImVtYWlsIjoiIiwiZXhwIjoxNTAzNTYxNjgwfQ.uOcHrzrtC1mtexyZr2rlcGMd7dGWlnfV-EemDWzHvZI" http://127.0.0.1:8000/api
+
+
+'''
