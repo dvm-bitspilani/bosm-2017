@@ -259,10 +259,13 @@ def final_list_download(request):
 	a_list = []
 
 	try:
-		xl_file = open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb")
+		try:
+			xl_file = open("/root/live/bosm/others/workbooks/final_list_2017.xlsx", "rb")
+		except:
+			xl_file = open("/home/auto-reload/Downloads/final_list_2017.xlsx", "rb")
 		xl_file.close()
 		import os
-		os.remove(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"))
+		os.remove(os.path.join(BASE_DIR, "workbooks/final_list_2017.xlsx"))
 
 	except:
 		pass
@@ -273,7 +276,7 @@ def final_list_download(request):
 		a_list.append({'obj': p})
 	data = sorted(a_list, key=lambda k: k['obj'].id)
 	output = StringIO.StringIO()
-	workbook = xlsxwriter.Workbook(os.path.join(BASE_DIR, 'workbooks/final_list.xlsx'))
+	workbook = xlsxwriter.Workbook(os.path.join(BASE_DIR, 'workbooks/final_list_2017.xlsx'))
 	worksheet = workbook.add_worksheet('new-spreadsheet')
 	date_format = workbook.add_format({'num_format': 'mmmm d yyyy'})
 	worksheet.write(0, 0, "Generated:")
@@ -467,6 +470,17 @@ def stats_order(request, order=None):
 				sportwise.append(entry)
 		order = 'Stats Sportwise'
 		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Events'})
+
+	if order == 'total_players':
+		tcs = TeamCaptain.objects.filter(if_payment=True)
+		tcs_m = tcs.filter(gender='M')
+		tcs_f = tcs.filter(gender='F')
+		
+		entry = {'total':str(reduce(count_players_confirmed, tcs,0)) + ' | ' + str(reduce(count_players, tcs,0)),
+				'male': str(reduce(count_players_confirmed, tcs_m,0)) + ' | ' + str(reduce(count_players, tcs_m,0)),
+				'female' : str(reduce(count_players_confirmed, tcs_f,0)) + ' | ' + str(reduce(count_players, tcs_f,0)),
+				}
+		return render(request, 'pcradmin/total_stats.html', {'order':'Total No. of Participants', 'list':[entry,] })
 
 	if order=='master_list':
 		output = StringIO.StringIO()

@@ -27,7 +27,7 @@ class PCrAdminMiddleware(object):
 
 				if not request.user.username == 'pcradmin' and 'pcradmin' in request.path:
 
-					return render(request, 'pcradmin/error.html',)
+					return render(request, 'pcradmin/message.html',{'message':'Access Denied'})
 
 				else:
 

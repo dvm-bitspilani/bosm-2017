@@ -5,10 +5,10 @@ app_name = 'registrations'
 
 urlpatterns = [
 	url(r'^$', views.index, name="index"),
-	url(r'^email_test$', views.email_test,),
 	url(r'^login/$', views.user_login, name="login"),
 	url(r'^logout/$', views.user_logout, name="logout"),
 	url(r'^signup/$', views.signup_view, name="signup"),
+	url(r'^help_download/$', views.help_download, name="help_download"),
 	url(r'^show_sports/$', views.show_sports, name="show"),
 	url(r'^manage_sports/$', views.manage_sports, name="manage"),
 	url(r'^email_confirm/(?P<token>\w+)/$', views.email_confirm, name="email_confirm"),

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^stats/(?P<order>\w+)/$', views.stats_order, name="stats"),
     url(r'^stats/college/(?P<gl_id>\d+)/$', views.stats_college, name="collegewise"),
     url(r'^stats/sport/(?P<e_id>\d+)/$', views.stats_sport, name="sportwise"),
+    # url(r'^stats/total_players_registered/$', views.total_players_registered, name="total_players_registered"),
 
     url(r'^get_list/$', views.get_list, name="get_list"),
     url(r'^get_captain_list/(?P<gl_id>\d+)/$', views.get_list_captains, name="get_list_captains"),

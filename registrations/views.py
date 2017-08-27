@@ -19,24 +19,6 @@ import os
 from sendgrid.helpers.mail import *
 from sg_config import *
 
-
-
-def email_test(request):
-
-	a="no-reply@bits-bosm.org"
-	b = "f2016036@pilani.bits-pilani.ac.in"
-	c = "Success 2  <a href='www.google.com'>Google</a>"
-	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
-	from_email = Email(a)
-	to_email = Email(b)
-	subject = "Sendgrid test"
-	content = Content("text/html", c)
-	mail = Mail(from_email, subject, to_email, content)
-	response = sg.client.mail.send.post(request_body=mail.get())
-
-	return HttpResponseRedirect('/')
-
-
 @login_required(login_url='registrations:login')
 def index(request):
 
@@ -170,6 +152,19 @@ def authenticate_email_token(token):
 
 
 #################   End of helper functions  ####################
+
+def help_download(request):
+
+	try:
+		with open("/root/live/bosm/others/workbooks/Registration_Details.pdf", "rb") as xl_file:
+			response = HttpResponse(xl_file, content_type="application/pdf")
+			response['Content-disposition'] = "attachment; filename=%s" %(os.path.basename("/root/live/bosm/others/workbooks/Registration_Details.pdf"))
+	except:
+		with open("/home/auto-reload/Downloads/Registration_Details.pdf", "rb") as xl_file:
+			response = HttpResponse(xl_file, content_type="application/pdf")
+			response['Content-disposition'] = "attachment; filename=%s" %(os.path.basename("/root/live/bosm/others/workbooks/Registration_Details.pdf"))
+	
+	return response	
 
 def email_confirm(request, token):
 	

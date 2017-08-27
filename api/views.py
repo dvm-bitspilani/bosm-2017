@@ -179,6 +179,7 @@ def manage_sports(request):
 
 	return Response({'sports_added':added_serializer.data, 'sports_left':left_serializer.data,})
 
+
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
 def register_captain(request):
@@ -281,4 +282,4 @@ def add_extra_event(request, tc_id):
 def user_logout(request):
 	logout(request)
 
-	return HttpResponseRedirect('/api')
+	return Response({'message':'Successfully logged out.'})
