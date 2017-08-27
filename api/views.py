@@ -62,9 +62,6 @@ def user_login(request, format=None):
 @permission_classes((AllowAny, ))
 def create_user(request):
 
-	print request.data
-	print request.data['profile']
-	print request.data['profile']['email']
 	user_serializer = UserSerializer(data=request.data)
 
 	if user_serializer.is_valid():
@@ -128,9 +125,24 @@ pcr@bits-bosm.org
 		return Response({'message':message})
 
 	else:
-		
-		return Response(user_serializer._errors, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'message':get_errors(user_serializer._errors)}, status=status.HTTP_400_BAD_REQUEST)
 
+############ Get Errors #############
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static_vars(message='')
+def get_errors(d):
+	for k,v in d.iteritems():
+		if isinstance(v, dict):
+			get_errors.message += get_errors(v)
+		else:
+			return v[0]
+	return get_errors.message
 
 @api_view(['GET',])
 @permission_classes((IsAuthenticated,))
