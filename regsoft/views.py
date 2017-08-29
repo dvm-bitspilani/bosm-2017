@@ -24,8 +24,16 @@ def controlz_home(request):
 		try:
 			barcode = request.POST['code']
 			g_leader = GroupLeader.objects.get(id=barcode[::2])
-
 		except:
 			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
 
-		
+		participant_list = []
+		for captain in TeamCaptain.objects.filter(g_l=g_leader):
+			participant_list += Participant.objects.filter(captain=captain)
+
+		for p in participant_list:
+			if p.firewallz_passed == True:
+				events = ""
+				participation_list = Participation.objects.filter(g_l = p.captain.g_l) 
+				event_list = [p.event for p in participant_list]
+				
