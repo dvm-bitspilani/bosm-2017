@@ -12,7 +12,9 @@ urlpatterns = [
 
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
-
+	url(r'^recnacc/allot_room/(?P<gl_id>\d+)/$', views.allot_room, name='allot_room'),
+	url(r'recnacc/main_list',views.main_list, name="main_list"),
+	
 	########## Controlz #############
 	url(r'^controlz/$', views.controlz_home, name='controlz-home'),
 

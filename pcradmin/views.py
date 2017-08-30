@@ -468,6 +468,17 @@ def stats_order(request, order=None):
 		order = 'Stats Sportwise'
 		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Events'})
 
+	if order == 'total_players':
+		tcs = TeamCaptain.objects.filter(if_payment=True)
+		tcs_m = tcs.filter(gender='M')
+		tcs_f = tcs.filter(gender='F')
+		
+		entry = {'total':str(reduce(count_players_confirmed, tcs,0)) + ' | ' + str(reduce(count_players, tcs,0)),
+				'male': str(reduce(count_players_confirmed, tcs_m,0)) + ' | ' + str(reduce(count_players, tcs_m,0)),
+				'female' : str(reduce(count_players_confirmed, tcs_f,0)) + ' | ' + str(reduce(count_players, tcs_f,0)),
+				}
+		return render(request, 'pcradmin/total_stats.html', {'order':'Total No. of Participants', 'list':[entry,] })
+
 	if order=='master_list':
 		output = StringIO.StringIO()
 		workbook = xlsxwriter.Workbook(output)
