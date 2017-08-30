@@ -202,13 +202,13 @@ def controlz_home(request):
 		return render(request,'regsoft/tables.html', context)
 
 	else:
-		return ###HOME
+		return render(request, 'regsoft/controlz_home.html')
 
 @staff_member_required
 def view_captain(request, tc_id):
 
-	captain = =get_object_or_404(TeamCaptain, id=tc_id)
-	##### DELETE PARTICIPANT #####
+	captain = get_object_or_404(TeamCaptain, id=tc_id)
+	##### DELETE/ADD PARTICIPANT #####
 	if request.method == 'POST':
 		if 'delete' in request.POST:
 			participant_list = request.POST.getlist('remove')
@@ -218,12 +218,19 @@ def view_captain(request, tc_id):
 		if 'add' in request.POST:
 			new_list = request.POST.getlist('increase')
 			if captain.total_players + new_list.count() > captain.event.max_limit:
-				return ERROR
+				return render(request, 'registrations/message.html', {'message':'Error hai bro!'})
 			
 			else:
 				for part in new_list:
 					Participant.objects.create(name=part, captain=captain)
 					Participant.save()
+
+		if 'change' in request.POST:
+			data = request.POST.pop(0)
+			for key,value in data:
+				participant = Participant.objects.get(id=key)
+				participant.name = value
+				participant.save()
 
 	participant_list = Participant.objects.filter(captain=captain)
 	rows = []
@@ -234,3 +241,5 @@ def view_captain(request, tc_id):
 		'rows':rows,
 		'title':'Edit Participants for ' + captain.event.name + ' ' + captain.g_l.college
 	}
+
+	return render(request, 'regsoft/tables.html', {'tables':[tables]})

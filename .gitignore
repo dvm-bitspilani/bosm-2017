@@ -3,3 +3,4 @@
 config.py
 sg_config.py
 *.xlsx
+.vscode
