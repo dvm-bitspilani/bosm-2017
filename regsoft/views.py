@@ -210,12 +210,13 @@ def view_captain(request, tc_id):
 	captain = get_object_or_404(TeamCaptain, id=tc_id)
 	##### DELETE/ADD PARTICIPANT #####
 	if request.method == 'POST':
-		if 'delete' in request.POST:
+		task = request.POST['task']
+		if 'delete' == task:
 			participant_list = request.POST.getlist('remove')
 			for p in participant_list:
 				Participant.objects.remove(p)
 
-		if 'add' in request.POST:
+		elif 'add' == task:
 			new_list = request.POST.getlist('increase')
 			if captain.total_players + new_list.count() > captain.event.max_limit:
 				return render(request, 'registrations/message.html', {'message':'Error hai bro!'})
@@ -225,7 +226,7 @@ def view_captain(request, tc_id):
 					Participant.objects.create(name=part, captain=captain)
 					Participant.save()
 
-		if 'change' in request.POST:
+		elif 'change' == task:
 			data = request.POST.pop(0)
 			for key,value in data:
 				participant = Participant.objects.get(id=key)
@@ -245,6 +246,7 @@ def view_captain(request, tc_id):
 	return render(request, 'regsoft/tables.html', {'tables':[tables]})
 
 
+
 @staff_member_required
 def firewallz_home(request):
 	if request.method == 'POST':
@@ -253,3 +255,47 @@ def firewallz_home(request):
 
 	events = Event.objects.all()
 	return render(request, 'regsoft/firewallz_home.html', {'events':events})
+
+
+@staff_member_required
+def get_details(request):
+	if request.method == 'POST':
+		if 'event' in request.POST:
+			event = Event.objects.get(id=request.POST['id'])
+			captain_list = TeamCaptain.objects.filter(event=event)
+			participant_list = []
+			for captain in captain_list:
+				participant_list += Participant.objects.filter(captain=captain)
+
+			rows = []
+			for participant in participant_list:
+				rows.append((str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.g_l.college).title(), participant.captain.paid))
+
+			headings = ['Name', 'Captain', 'College', 'Payment']
+			title = 'Participant list for ' + event.name
+
+		elif 'college' in request.POST:
+			g_leader = GroupLeader.objects.get(college=request.POST['college'])
+			captain_list = TeamCaptain.objects.filter(g_l=g_leader)
+			participant_list = []
+			for captain in captain_list:
+				participant_list += Participant.objects.filter(captain=captain)
+
+			rows = []
+			for participant in participant_list:
+				rows.append((str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.event.name).title(), participant.captain.paid))
+
+			headings = ['Name', 'Captain', 'Event', 'Payment']
+			title = 'Participant list for ' + request.POST['college']
+
+		table = {
+			'headings':headings,
+			'rows':rows,
+			'title':title
+		}
+
+		context = {
+			'tables':[table,]
+		}
+	
+	return render(request, 'regsoft/controlz-details.html', context)
