@@ -767,8 +767,8 @@ def show_participants(request, gl_id, event_id):
 	email = ''
 	participants = []
 	for tc in tcs:
-		phone += tc.phone + '  '
-		email += tc.email + '  '
+		phone += str(tc.phone) + '  '
+		email += str(tc.email) + '  '
 		for part in Participant.objects.filter(captain=tc):
 			participants.append(part.name)
 	return render(request, 'pcradmin/show_participants.html',
