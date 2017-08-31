@@ -248,13 +248,68 @@ def view_captain(request, tc_id):
 
 
 @staff_member_required
-def firewallz_home(request):
+def firewallzo_home(request):
 	if request.method == 'POST':
-		pass
-
+		try:
+			barcode = request.POST['barcode']
+			g_l = GroupLeader.objects.get(barcode=barcode)
+		except:
+			return render(request.META.get('HTTP_REFERER')))
+		parts = Participant.objects.filter(captain__g_l=g_l)
+		confirmed = [{'name':part.name,
+			'college': part.captain.g_l.college,
+			'event': part.captain.event.name,
+			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain.event.name')]
+		unconfirmed = [{'name':part.name,
+			'college': part.captain.g_l.college,
+			'event': part.captain.event.name,
+			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain.event.name')]
+		return render(request, 'regsoft/firewallzo_home.html',
+			{'confirmed':confirmed, 'unconfirmed':unconfirmed})
 
 	events = Event.objects.all()
 	return render(request, 'regsoft/firewallz_home.html', {'events':events})
+
+@staff_member_required
+def firewallz_swap(request):
+	try:
+		data = request.POST
+	except:
+		return render(request.META.get('HTTP_REFERER'))
+
+	if 'confirm' in data['submit']:
+		part_ids = dict(data)['data']
+		for part_id in part_ids:
+			part = Participant.objects.get(id=part_id)
+			part.firewallz_passed=True
+			part.save()
+			tc = part.captain
+			if all((part.firewallz_passed for part in Participant.objects.filter(captain=tc))):
+				tc.firewallz_passed=True
+				tc.save()
+		return redirect('regsoft:firewallz-home')
+	elif 'unconfirm' in data['submit']:
+		part_ids = dict(data)['data']
+		for part_id in part_ids:
+			part = Participant.objects.get(id=part_id)
+			part.firewallz_passed=False
+			part.save()
+			tc = part.captain
+			tc.firewallz_passed=False
+			tc.save()
+		return redirect('regsoft:firewallz-home')
+			
+	return render(request.META.get('HTTP_REFERER'))
+
+
+@staff_member_required
+def firewallz_edit(request, part_id):
+	
+	if request.method == 'POST':
+
+	
 
 
 @staff_member_required
