@@ -243,3 +243,13 @@ def view_captain(request, tc_id):
 	}
 
 	return render(request, 'regsoft/tables.html', {'tables':[tables]})
+
+
+@staff_member_required
+def firewallz_home(request):
+	if request.method == 'POST':
+		pass
+
+
+	events = Event.objects.all()
+	return render(request, 'regsoft/firewallz_home.html', {'events':events})
