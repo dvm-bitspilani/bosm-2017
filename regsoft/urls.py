@@ -8,7 +8,9 @@ urlpatterns = [
 	url(r'^test$', views.home, name='home'),	
 
 	########## Firewallz #############
-	#url(r'^firewallz/$', views.firewallzO_home, name='firewallz-home'),
+
+	url(r'^firewallz/$', views.firewallzO_home, name='firewallz-home'),
+	url(r'^firewallz/swap/$', views.firewallz_swap, name='firewallz_swap'),
 
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
