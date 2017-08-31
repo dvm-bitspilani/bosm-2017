@@ -8,6 +8,9 @@ from regsoft.models import *
 import barg
 from functools import reduce
 
+def home(request):
+	return render(request, 'regsoft/base.html')
+
 @staff_member_required
 def index(request):
 	if request.user.username.lower() == 'firewallz':
@@ -59,7 +62,7 @@ def recnacc_college(request, gl_id):
 	rows = [{'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id})}]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, g_l=g_l, if_payment=True)]
 	headings = ['Team Captain', 'Event', 'College', 'No. of Players', 'Select']
 	tables = [{'title':'Select Team', 'rows':rows, 'headings':headings}]
-	return render(request,'regsoft/tables.html' {'tables':tables})
+	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
@@ -143,7 +146,7 @@ def all_bhavans(request):
 	rows =[{'data':[room.room, room.bhavan.name, room.vacancy], 'link':[] } for room in Room.objects.all()]
 	headings = ['Room', 'Bhavan', 'Vacancy']
 	tables = [{'title':'All Bhavans', 'headings':headings, 'rows':rows}]
-	return render(request,'regsoft/tables.html' {'tables':tables})
+	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
@@ -151,7 +154,7 @@ def college_vs_bhavan(request):
 	rows = list(set([{'data':[tc.g_l.college, tc.room.bhavan.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, if_payment=True, acco=True)]))
 	headings = ['College', 'Bhavan']
 	tables = [{'title':'Bhavans vs College', 'headings':headings, 'rows':rows}]
-	return render(request,'regsoft/tables.html' {'tables':tables})
+	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
@@ -159,7 +162,7 @@ def firewallz_approved(request):
 	rows = [[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco ] for tc in TeamCaptain.objects.filter(firewallz_passed=True, if_payment=True, acco=True) for part in Participant.objects.filter(captain=tc)]
 	headings = ['Participant', 'College', 'Gender', 'Group Leader', 'Event', 'Alloted']
 	tables = [{'title':'Firewallz Approved Participants', 'headings':headings, 'rows':rows}]
-	return render(request,'regsoft/tables.html' {'tables':tables})
+	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 ##################################################   CONTROLZ ######################################################
