@@ -4,6 +4,7 @@ from registrations import views, urls
 from events.models import *
 from django.shortcuts import render, redirect, get_object_or_404
 from registrations.models import *
+from regsoft.models import *
 import barg
 from functools import reduce
 
@@ -161,6 +162,9 @@ def firewallz_approved(request):
 	return render(request,'regsoft/tables.html' {'tables':tables})
 
 
+##################################################   CONTROLZ ######################################################
+
+
 @staff_member_required
 def controlz_home(request):
 	if request.method == 'POST':
@@ -236,7 +240,7 @@ def view_captain(request, tc_id):
 	participant_list = Participant.objects.filter(captain=captain)
 	rows = []
 	for p in participant_list:
-		rows.append({'data':[str(p.name).title(), p.firewallz_passed, ]])
+		rows.append({'data':[str(p.name).title(), p.firewallz_passed, ]})
 	tables = {
 		'headings':['Participant Name', 'Firewallz Approved', 'Delete Participant'],
 		'rows':rows,
@@ -354,3 +358,78 @@ def get_details(request):
 		}
 	
 	return render(request, 'regsoft/controlz-details.html', context)
+
+####################    BILLINGS      #########################
+
+@staff_member_required
+def view_captains_controlz(request, gl_id):
+	g_leader = GroupLeader.objects.get(id=gl_id)
+	c_rows = []
+	paid_captains = TeamCaptain.objects.filter(g_l=g_leader, paid=True)
+	for captain in paid_captains:
+		c_rows.append({'data':[str(captain.name).title(), str(g_leader.name).title(), str(g_leader.college).title(), captain.total_players, str(captain.gender).title(), str(captain.event.name).title()], 'links':[{'title':'Print Receipt', 'url':reverse('regsoft:print_bill', kwargs={'tc_id':captain.id})}]})
+	u_rows = []
+	unpaid_captains = TeamCaptain.objects.filter(g_l=g_leader, paid=False)
+	for captain in paid_captains:
+		u_rows.append({'data':[str(captain.name).title(), str(g_leader.name).title(), str(g_leader.college).title(), captain.total_players, str(captain.gender).title(), str(captain.event.name).title()], 'links':[{'title':'Create Bill', 'url':reverse('regsoft:create_bill', kwargs={'tc_id':captain.id})}]})
+
+	confirmed = {
+		'title':'Paid teams from ' + g_leader.college,
+		'headings' : ['Captain Name', 'Group Leader', 'College', 'Total Players', 'Gender', 'Event', 'Print Receipt'],
+		'rows':c_rows,
+	}
+	unconfirmed = {
+		'title':'Unpaid teams from ' + g_leader.college,
+		'headings' : ['Captain Name', 'Group Leader', 'College', 'Total Players', 'Gender', 'Event', 'Create Bill'],
+		'rows':u_rows,
+	}
+
+	context = {
+		'tables':[confirmed, unconfirmed],
+	}
+	return render(request, 'regsoft/tables.html', context)
+
+@staff_member_required
+def create_bill(request, tc_id):
+	captain = get_object_or_404(TeamCaptain, id=tc_id)
+	if request.method == 'POST':
+		data = request.POST
+		bill = Bill()
+		bill.two_thousands = data['twothousands']
+		bill.five_hundreds = data['fivehundreds']
+		bill.hundreds = data['hundreds']
+		bill.fifties = data['fifties']
+		bill.twenties = data['twenties']
+		bill.tens = data['tens']
+		amount_dict = {'twothousands':2000, 'fivehundreds':500, 'hundreds':100, 'fifties':50, 'twenties':20, 'tens':10}
+		bill.amount = 0
+		for key,value in amount_dict.iteritems():
+			bill.amount += data[key]*value
+		
+		if bill.amount == 0:
+			try:
+				bill.draft_number = data['draft_number']
+			except:
+				pass
+			bill.draft_amount = data['draft_amount']
+		
+		if not (bill.amount == 0 and bill.draft_amount == 0):
+			bill.captain = captain
+			bill.save()
+			captain.paid = True
+			captain.save()
+
+			return redirect(reverse('regsoft:view_captains_controlz', kwargs={'gl_id':captain.g_l.id}))
+
+		else:
+			return redirect(reverse('regsoft:create_bill', kwargs={'tc_id':tc_id}))
+		
+	return render(request, 'regsoft/create_bill.html')
+
+@staff_member_required
+def print_bill(request, tc_id):
+	from datetime import datetime
+	time_stamp = datetime.now()
+	captain = TeamCaptain.objects.get(id=tc_id)
+	g_leader = captain.g_l
+	return render(request, 'regsoft/receipt.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp})
