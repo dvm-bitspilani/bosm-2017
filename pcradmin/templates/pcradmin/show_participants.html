@@ -1,0 +1,29 @@
+{% extends "pcradmin/base.html" %}
+{% load custom_tags %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Participants of {{college}} in {{event}} </h2>
+
+      <h4>Phone Number(s) - {{phone}}</h4>
+        <h4>Email Id(s) {{email}}</h4>
+      <div class="center-align">
+        <table>
+            <thead>
+                <tr>
+                    <th>Participants</th>
+                </tr>
+            </thead>
+                <tbody>
+                    {% for i in parts %}
+                    <tr>
+                        <td>{{i}}
+                        </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -422,25 +422,28 @@ def stats_order(request, order=None):
 
 		g_ls = GroupLeader.objects.filter(email_verified=True, pcr_approved=True)
 		collegewise = []
+		totals = [0,0,0,0,0,0,0]
 		for g_l in g_ls:
 
-			entry = {}
-			entry['name'] = g_l.college
-			entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 			teamcaptains = TeamCaptain.objects.filter(g_l=g_l)
 			if not teamcaptains:
 				continue
-			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
-			teamcaptains_m = teamcaptains.filter(gender='M')
-			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
-			teamcaptains_f = teamcaptains.filter(gender='F')
-			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-			entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
-			print entry['coach']
+			entry, counts = helper_for_stats(teamcaptains)
+			if entry['total']=='- -':
+				continue
+			entry['name'] = g_l.college
+			entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
+			for i in range(7):
+				totals[i] += counts[i]
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
-			if entry['total']!='- -':
-				collegewise.append(entry)
+			collegewise.append(entry)
+		collegewise.append({'name':'Total', 'url':'#',
+		 	'total':str(totals[0]) + ' | ' + str(totals[1]),
+		 	'male':str(totals[2]) + ' | ' + str(totals[3]),
+			'female':str(totals[4]) + ' | ' + str(totals[5]),
+			'coach':str(totals[6])}
+			)
 		order = 'Stats Collegewise'
 		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : collegewise, 'stats':True, 'name':'College'})
 
@@ -448,36 +451,31 @@ def stats_order(request, order=None):
 	if order == 'sport':
 		events = Event.objects.all()
 		sportwise = []
+		totals = [0,0,0,0,0,0,0]
 		for event in events:
-			entry = {}
-			entry['name'] = event.name
-			entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
+			
 			teamcaptains = TeamCaptain.objects.filter(event=event)
 			if not teamcaptains:
 				continue
-			entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
-			teamcaptains_m = teamcaptains.filter(gender='M')
-			entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
-			teamcaptains_f = teamcaptains.filter(gender='F')
-			entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-			entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
+			entry, counts = helper_for_stats(teamcaptains)
+			if entry['total']=='- -':
+				continue
+			entry['name'] = event.name
+			entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
+			for i in range(7):
+				totals[i] += counts[i]
 			for i in ['total', 'male', 'female']:
 				if entry[i] == '0 | 0': entry[i] = '- -'
-			if entry['total']!='- -':
-				sportwise.append(entry)
+			sportwise.append(entry)
+		sportwise.append({'name':'Total', 'url':'#',
+		 	'total':str(totals[0]) + ' | ' + str(totals[1]),
+		 	'male':str(totals[2]) + ' | ' + str(totals[3]),
+			'female':str(totals[4]) + ' | ' + str(totals[5]),
+			'coach':str(totals[6])}
+			)
 		order = 'Stats Sportwise'
 		return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Events'})
 
-	if order == 'total_players':
-		tcs = TeamCaptain.objects.filter(if_payment=True)
-		tcs_m = tcs.filter(gender='M')
-		tcs_f = tcs.filter(gender='F')
-		
-		entry = {'total':str(reduce(count_players_confirmed, tcs,0)) + ' | ' + str(reduce(count_players, tcs,0)),
-				'male': str(reduce(count_players_confirmed, tcs_m,0)) + ' | ' + str(reduce(count_players, tcs_m,0)),
-				'female' : str(reduce(count_players_confirmed, tcs_f,0)) + ' | ' + str(reduce(count_players, tcs_f,0)),
-				}
-		return render(request, 'pcradmin/total_stats.html', {'order':'Total No. of Participants', 'list':[entry,] })
 
 	if order=='master_list':
 		output = StringIO.StringIO()
@@ -527,24 +525,28 @@ def stats_college(request, gl_id):
 	g_l = get_object_or_404(GroupLeader, pk=gl_id)
 	events = Event.objects.all()
 	sportwise = []
+	totals = [0,0,0,0,0,0,0]
 	for event in events:
-		entry = {}
-		entry['name'] = event.name
-		entry['url'] = reverse('pcradmin:sportwise', kwargs={'e_id':event.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
 		if not teamcaptains:
 			continue
-		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
-		teamcaptains_m = teamcaptains.filter(gender='M')
-		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
-		teamcaptains_f = teamcaptains.filter(gender='F')
-		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-		entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
-
+		entry, counts = helper_for_stats(teamcaptains)
+		if entry['total']=='- -':
+			continue
+		entry['name'] = event.name
+		entry['url'] = reverse('pcradmin:show_participants', kwargs={'gl_id':g_l.id, 'event_id':event.id})
+		for i in range(7):
+			totals[i] += counts[i]
 		for i in ['total', 'male', 'female']:
 			if entry[i] == '0 | 0': entry[i] = '- -'
-		if entry['total']!='- -':
-			sportwise.append(entry)
+		sportwise.append(entry)
+	sportwise.append({'name':'Total', 'url':'#',
+		'total':str(totals[0]) + ' | ' + str(totals[1]),
+		'male':str(totals[2]) + ' | ' + str(totals[3]),
+		'female':str(totals[4]) + ' | ' + str(totals[5]),
+		'coach':str(totals[6])}
+		)
+		
 	order = 'Stats Sportwise for ' + g_l.college
 	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'Event'})
 
@@ -553,24 +555,28 @@ def stats_sport(request, e_id):
 	event = get_object_or_404(Event, pk=e_id)
 	g_ls = GroupLeader.objects.filter(pcr_approved=True, email_verified=True)
 	sportwise = []
+	totals = [0,0,0,0,0,0,0]
 	for g_l in g_ls:
-		entry = {}
-		entry['name'] = g_l.college
-		entry['url'] = reverse('pcradmin:collegewise', kwargs={'gl_id':g_l.id})
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
 		if not teamcaptains:
 			continue
-		entry['total'] = str(reduce(count_players_confirmed, teamcaptains,0)) + ' | ' + str(reduce(count_players, teamcaptains,0))
-		teamcaptains_m = teamcaptains.filter(gender='M')
-		entry['male'] = str(reduce(count_players_confirmed, teamcaptains_m,0)) + ' | ' + str(reduce(count_players, teamcaptains_m,0))
-		teamcaptains_f = teamcaptains.filter(gender='F')
-		entry['female'] = str(reduce(count_players_confirmed, teamcaptains_f,0)) + ' | ' + str(reduce(count_players, teamcaptains_f,0))
-		entry['coach'] = str(len([tc.coach for tc in teamcaptains if tc.coach]))
-		
+		entry, counts = helper_for_stats(teamcaptains)
+		if entry['total']=='- -':
+			continue
+		entry['name'] = g_l.college
+		entry['url'] = reverse('pcradmin:show_participants', kwargs={'gl_id':g_l.id, 'event_id':event.id})
+		for i in range(7):
+			totals[i] += counts[i]
 		for i in ['total', 'male', 'female']:
 			if entry[i] == '0 | 0': entry[i] = '- -'
-		if entry['total']!='- -':
-			sportwise.append(entry)
+		sportwise.append(entry)
+	sportwise.append({'name':'Total', 'url':'#',
+		'total':str(totals[0]) + ' | ' + str(totals[1]),
+		'male':str(totals[2]) + ' | ' + str(totals[3]),
+		'female':str(totals[4]) + ' | ' + str(totals[5]),
+		'coach':str(totals[6])}
+		)
+	
 	order = 'Stats Collegewise for ' + event.name
 	return render(request, 'pcradmin/statistics.html', {'order':order, 'list' : sportwise,'stats':True, 'name':'College'})
 
@@ -730,3 +736,41 @@ def custom_permission_denied(request):
 def custom_bad_request(request):
 
 	return render(request, 'pcradmin/400page.html')	
+
+
+def helper_for_stats(teamcaptains):
+	entry = {}
+	total_c = reduce(count_players_confirmed, teamcaptains,0)
+	total = reduce(count_players, teamcaptains,0)
+	entry['total'] = str(total_c) + ' | ' + str(total)
+	teamcaptains_m = teamcaptains.filter(gender='M')
+	male_c = reduce(count_players_confirmed, teamcaptains_m,0)
+	male = reduce(count_players, teamcaptains_m,0)
+	entry['male'] = str(male_c) + ' | ' + str(male)
+	teamcaptains_f = teamcaptains.filter(gender='F')
+	female_c = reduce(count_players_confirmed, teamcaptains_f,0)
+	female = reduce(count_players, teamcaptains_f,0)
+	entry['female'] = str(female_c) + ' | ' + str(female)
+	coach = len([tc.coach for tc in teamcaptains if tc.coach])
+	entry['coach'] = str(coach)
+	return [entry, [total, total_c, male_c, male, female_c, female, coach]]
+
+@staff_member_required
+def show_participants(request, gl_id, event_id):
+	try:
+		g_l = GroupLeader.objects.get(id=gl_id)
+		event = Event.objects.get(id=event_id)
+		tcs = TeamCaptain.objects.filter(event=event, g_l=g_l)
+	except:
+		return redirect(request.META.get('HTTP_REFERER'))
+	phone = ''
+	email = ''
+	participants = []
+	for tc in tcs:
+		phone += str(tc.phone) + '  '
+		email += str(tc.email) + '  '
+		for part in Participant.objects.filter(captain=tc):
+			participants.append(part.name)
+	return render(request, 'pcradmin/show_participants.html',
+	{'college':g_l.college, 'event':event.name, 'phone':phone, 'email':email, 'parts':participants}
+	)
