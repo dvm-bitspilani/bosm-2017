@@ -556,7 +556,7 @@ def stats_sport(request, e_id):
 	g_ls = GroupLeader.objects.filter(pcr_approved=True, email_verified=True)
 	sportwise = []
 	totals = [0,0,0,0,0,0,0]
-	for event in events:
+	for g_l in g_ls:
 		teamcaptains = TeamCaptain.objects.filter(event=event, g_l=g_l)
 		if not teamcaptains:
 			continue
