@@ -18,7 +18,7 @@
                 <tbody>
                     <form action="{% url 'pcradmin:confirm_events' g_l.id %}" method="POST">
                     {% csrf_token %}
-                    {% for captain in teamcaptains %}
+                    {% for captain in unconf_teamcaptains %}
                     <tr>
                         <td>{{captain.name}}</td>
                         <td>{{captain.g_l.college}}</td>
@@ -38,6 +38,37 @@
                 </tbody>
             </table>
         </div>
+
+        <h2 class="header center pink-text">Confirmed teams under {{g_l.name}} from {{g_l.college}}</h2>
+        <div class="center-align">
+          <table class="centered">
+                  <thead>
+                      <tr>
+                          <th>Team Captain Name</th>
+                          <th>College</th>
+                          <th>Participants</th>
+                          <th>Sport</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for captain in conf_teamcaptains %}
+                      <tr>
+                          <td>{{captain.name}}</td>
+                          <td>{{captain.g_l.college}}</td>
+                          <td>{{captain.total_players}}</td>
+                          <td>{{captain.event.name}}</td>
+                      </tr>
+                      {% endfor %}
+                      <tr>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td><button class="waves-effect waves-light btn pink" type="submit" value="Confirm" name="submit">Confirm</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
     </div>
 </div>
 {% endblock %}

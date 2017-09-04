@@ -13,7 +13,7 @@ def home(request):
 
 @staff_member_required
 def index(request):
-	if request.user.username.lower() == 'firewallz':
+	if request.user.username.lower() == 'firewallz' or request.user.is_superuser:
 		return redirect(reverse('regsoft:firewallz-home'))
 	elif request.user.username.lower() == 'recnacc':
 		return redirect(reverse('regsoft:recnacc-home'))
@@ -22,7 +22,7 @@ def index(request):
 	elif request.user.username.lower() == 'firewallzi':
 		return redirect(reverse('regsoft:firewallzi-home'))
 	else:
-		return render(request, 'registrations/messsage.html', {'messsage':'Access denied.'})
+		return render(request, 'pcradmin/messsage.html', {'messsage':'Access denied.'})
 
 @staff_member_required
 def gen_barcode(gl_id):
@@ -209,7 +209,7 @@ def controlz_home(request):
 		return render(request,'regsoft/tables.html', context)
 
 	else:
-		return render(request, 'regsoft/controlz_home.html')
+		return render(request, 'regsoft/firewallz_home.html')
 
 @staff_member_required
 def view_captain(request, tc_id):

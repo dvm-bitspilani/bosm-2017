@@ -192,27 +192,26 @@ def confirm_events(request, gl_id):
 					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 				<pre style="font-family:Roboto,sans-serif">
 				
-				Greetings, %s!
+Greetings, %s!
 
-				Your team has been shortlisted to participate for %s in BOSM 2017. 
-				To cofirm Your participation, please make the pre-payment of %s within 3 days of receiving this mail.
-
-				The link for pre-payment is : <a>https://paytm.com/education</a>
+Your team has been shortlisted to participate for %s in BOSM 2017. 
+To cofirm Your participation, please make the pre-payment of %s within 3 days of receiving this ma
+The link for pre-payment is : <a href="https://paytm.com/education">https://paytm.com/education</a>
 
 				<b>
-				The steps for pre-payment are attached below.
-				Only the captain can make the pre-payment.
-				The payment for each team is mentioned below:
-				</b>
-				<br><br>
-				<img src="https://bits-bosm.org/2017/static/images/rates.png">
+The steps for pre-payment are attached below.
+Only the captain can make the pre-payment.
+The payment for each team is mentioned below:
+</b>
+<br><br>
+<img src="https://bits-bosm.org/2017/static/images/rates.png">
 
-				Regards,
-				Ashay Anurag
-				CoSSAcn (Head)
-				Dept. of Publications & Correspondence, BOSM 2017
-				BITS Pilani
-				+91-9929022741
+Regards,
+Ashay Anurag
+CoSSAcn (Head)
+Dept. of Publications & Correspondence, BOSM 2017
+BITS Pilani
++91-9929022741
 
 				'''%(name, event.name, event.price)
 
@@ -220,67 +219,67 @@ def confirm_events(request, gl_id):
 					from_email = Email('register@bits-bosm.org')
 					content = Content("text/html", body)
 					import base64
+					try:
+						with open(os.path.join(BASE_DIR, "workbooks/Pre-PaymentProcess.pdf"), "rb") as xl_file:
+							encoded_string = base64.b64encode(xl_file.read())
 
-					with open(os.path.join(BASE_DIR, "workbooks/Pre-Payment Process.pdf"), "rb") as xl_file:
-						encoded_string = base64.b64encode(xl_file.read())
+					except:
+						with open("/home/auto-reload/Downloads/Pre-PaymentProcess.pdf", "rb") as xl_file:
+							encoded_string = base64.b64encode(xl_file.read())
 
 					attachment = Attachment()
 					attachment.content = encoded_string
 					attachment.filename = "Pre-Payment Process.pdf"
 
-				else:
-					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-				<pre style="font-family:Roboto,sans-serif">
+					try:
+
+						mail = Mail(from_email, subject, to_email, content)
+						if attachment:
+							mail.add_attachment(attachment)
+						response = sg.client.mail.send.post(request_body=mail.get())
+						p = Participation.objects.get(event=event, g_l=g_l)
+						p.confirmed = True
+						p.save()
 				
-				Hello %s!
-				Your team registration for %s has been confirmed for BOSM 2017.
+					except :
+						return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
-				Regards,
-				Ashay Anurag
-				CoSSAcn (Head)
-				Dept. of Publications & Correspondence, BOSM 2017
-				BITS Pilani
-				+91-9929022741
-
-				'''%(name, event.name,)
-					
-					subject = "Confirmation for BOSM '17"
-					from_email = Email('register@bits-bosm.org')
-					content = Content("text/html", body)
-
-				try:
-
-					mail = Mail(from_email, subject, to_email, content)
-					if attachment:
-						mail.add_attachment(attachment)
-					response = sg.client.mail.send.post(request_body=mail.get())
-					p = Participation.objects.get(event=event, g_l=g_l)
-					p.confirmed = True
+				else:
 					teamcaptain.paid = True
 					teamcaptain.save()
+					p = Participation.objects.get(event=event, g_l=g_l)
+					p.confirmed = True
 					p.save()
-				
-				except :
-						return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
-	
+		
 		return render(request, 'pcradmin/message.html', {'message':'Emails sent'})
 
 		
 
 	else:
-		events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=False)]
+		unconf_events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=False)]
+		conf_events = [p.event for p in Participation.objects.filter(g_l=gl,confirmed=True)]
+		unconf_teamcaptains=[]
+		for event in unconf_events:
+			unconf_teamcaptains.append(list(TeamCaptain.objects.filter(g_l=gl, event=event)))
+		conf_teamcaptains=[]
+		for event in conf_events:
+			conf_teamcaptains.append(list(TeamCaptain.objects.filter(g_l=gl, event=event)))
 
-		teamcaptains=[]
-		for event in events:
-			teamcaptains.append(list(TeamCaptain.objects.filter(g_l=gl, event=event)))
 
-		print teamcaptains
-		captains = []
-		print len(teamcaptains[0]), len(teamcaptains[1])
-		for i in range(0,len(teamcaptains)):
-			for j in range(0,len(teamcaptains[i])):
-				captains.append(teamcaptains[i][j])
-		return render(request, 'pcradmin/confirm_events.html', {'teamcaptains':captains, 'g_l':gl})
+		# print teamcaptains
+		conf_captains = []
+		unconf_captains = []
+
+		# print len(teamcaptains[0]), len(teamcaptains[1])
+		for i in range(0,len(unconf_teamcaptains)):
+			for j in range(0,len(unconf_teamcaptains[i])):
+				unconf_captains.append(unconf_teamcaptains[i][j])
+		for i in range(0,len(conf_teamcaptains)):
+			for j in range(0,len(conf_teamcaptains[i])):
+				conf_captains.append(conf_teamcaptains[i][j])
+		
+		
+		return render(request, 'pcradmin/confirm_events.html', {'unconf_teamcaptains':unconf_captains,'conf_teamcaptains':conf_captains, 'g_l':gl})
 
 
 @staff_member_required

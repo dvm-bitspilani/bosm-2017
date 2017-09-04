@@ -179,12 +179,3 @@ PAYTM_CALLBACK_URL = "/registrations/response/"
 
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
-
-'''
-
-curl http://127.0.0.1:8000/api/api_test/
-
-curl -H "Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJvcmlnX2lhdCI6MTUwMzU2MTA4MCwidXNlcl9pZCI6MjQsImVtYWlsIjoiIiwiZXhwIjoxNTAzNTYxNjgwfQ.uOcHrzrtC1mtexyZr2rlcGMd7dGWlnfV-EemDWzHvZI" http://127.0.0.1:8000/api
-
-
-'''
