@@ -261,7 +261,7 @@ def firewallzo_home(request):
 			barcode = request.POST['barcode']
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
-			return render(request.META.get('HTTP_REFERER')))
+			return render(request.META.get('HTTP_REFERER'))
 		parts = Participant.objects.filter(captain__g_l=g_l)
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
@@ -309,12 +309,6 @@ def firewallz_swap(request):
 		return redirect('regsoft:firewallz-home')
 			
 	return render(request.META.get('HTTP_REFERER'))
-
-
-@staff_member_required
-def firewallz_edit(request, part_id):
-	
-	if request.method == 'POST':
 
 	
 

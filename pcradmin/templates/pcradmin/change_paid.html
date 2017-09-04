@@ -1,0 +1,87 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select the TeamCaptain to change Payment status</h2>
+      <br>
+      <h2 class="header center pink-text">Status : Unpaid</h2>
+      <div class="row center">
+        <!--<h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5> -->
+      </div>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>TeamCaptain</th>
+                        <th>College</th>
+                        <th>Phone number</th>
+                        <th>Event</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:change_paid' %}" method="POST">
+                    {% csrf_token %}
+                    {% for tc in unpaid %}
+                    <tr>
+                        <td>{{tc.name}}</td>
+                        <td>{{tc.g_l.college}}</td>
+                        <td>{{tc.phone}}</td>
+                        <td>{{tc.event.name}}</td>
+                        <td>
+                            <input type="checkbox" id="{{tc.id}}" name="tc" value="{{tc.id}}"/>
+                            <label for="{{tc.id}}">Select</label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><button class="waves-effect waves-light btn green" type="submit" value="paid" name="submit">Confirm Payment</button></td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+            <br>
+            <h2 class="header center pink-text">Status : Paid</h2>
+            <br>
+            <table class="centered">
+                <thead>
+                    <tr>
+                        <th>TeamCaptain</th>
+                        <th>College</th>
+                        <th>Phone number</th>
+                        <th>Event</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <form action="{% url 'pcradmin:change_paid' %}" method="POST">
+                    {% csrf_token %}
+                    {% for tc in paid %}
+                    <tr>
+                        <td>{{tc.name}}</td>
+                        <td>{{tc.g_l.college}}</td>
+                        <td>{{tc.phone}}</td>
+                        <td>{{tc.event.name}}</td>
+                        <td>
+                            <input type="checkbox" id="{{tc.id}}" name="tc" value="{{tc.id}}"/>
+                            <label for="{{tc.id}}">Select</label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><button class="waves-effect waves-light btn green" type="submit" value="unpaid" name="submit">UnConfirm Payment</button></td>
+                    </tr>
+                    </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body %}

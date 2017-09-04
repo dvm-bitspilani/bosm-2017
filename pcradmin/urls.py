@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^final_confirmation/$', views.final_confirmation, name="final_confirmation"),
     url(r'^final_confirmation_email/(?P<gl_id>\d+)/$', views.final_confirmation_email, name="final_confirmation_email"),
     url(r'^logout/$', views.user_logout, name = 'logout'),
+    url(r'^change_paid/$', views.change_paid, name='change_paid'),
 ]
