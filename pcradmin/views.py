@@ -190,45 +190,80 @@ def confirm_events(request, gl_id):
 				name = teamcaptain.name
 				if teamcaptain.if_payment :
 					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 				<pre style="font-family:Roboto,sans-serif">
 				
-				Hello %s!
-				Your team registration for %s has been confirmed.
-				<a href='%s'>Click Here</a> to pay %d for the same.
+				Greetings, %s!
 
-				'''%(name, event.name, str(request.build_absolute_uri(reverse("registrations:paytm"))) + generate_payment_token(teamcaptain) + '/', event.price)
+				Your team has been shortlisted to participate for %s in BOSM 2017. 
+				To cofirm Your participation, please make the pre-payment of %s within 3 days of receiving this mail.
+
+				The link for pre-payment is : <a>https://paytm.com/education</a>
+
+				<b>
+				The steps for pre-payment are attached below.
+				Only the captain can make the pre-payment.
+				The payment for each team is mentioned below:
+				</b>
+				<br><br>
+				<img src="https://bits-bosm.org/2017/static/images/rates.png">
+
+				Regards,
+				Ashay Anurag
+				CoSSAcn (Head)
+				Dept. of Publications & Correspondence, BOSM 2017
+				BITS Pilani
+				+91-9929022741
+
+				'''%(name, event.name, event.price)
 
 					subject = "Payment for BOSM '17"
 					from_email = Email('register@bits-bosm.org')
 					content = Content("text/html", body)
+					import base64
+
+					with open(os.path.join(BASE_DIR, "workbooks/Pre-Payment Process.pdf"), "rb") as xl_file:
+						encoded_string = base64.b64encode(xl_file.read())
+
+					attachment = Attachment()
+					attachment.content = encoded_string
+					attachment.filename = "Pre-Payment Process.pdf"
 
 				else:
 					body = '''<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-				<center><img src="http://bits-bosm.org/2016/static/docs/email_header.jpg"></center>
 				<pre style="font-family:Roboto,sans-serif">
 				
 				Hello %s!
-				Your team registration for %s has been confirmed.
+				Your team registration for %s has been confirmed for BOSM 2017.
+
+				Regards,
+				Ashay Anurag
+				CoSSAcn (Head)
+				Dept. of Publications & Correspondence, BOSM 2017
+				BITS Pilani
+				+91-9929022741
 
 				'''%(name, event.name,)
-
+					
 					subject = "Confirmation for BOSM '17"
 					from_email = Email('register@bits-bosm.org')
 					content = Content("text/html", body)
 
-				#try:
+				try:
 
-				mail = Mail(from_email, subject, to_email, content)
-				response = sg.client.mail.send.post(request_body=mail.get())
-				p = Participation.objects.get(event=event, g_l=g_l)
-				p.confirmed = True
-				p.save()
+					mail = Mail(from_email, subject, to_email, content)
+					if attachment:
+						mail.add_attachment(attachment)
+					response = sg.client.mail.send.post(request_body=mail.get())
+					p = Participation.objects.get(event=event, g_l=g_l)
+					p.confirmed = True
+					teamcaptain.paid = True
+					teamcaptain.save()
+					p.save()
 				
-			#	except :
-			#			return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+				except :
+						return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 	
-		return render(request, 'pcradmin/message.html', {'message':'Email sent'})
+		return render(request, 'pcradmin/message.html', {'message':'Emails sent'})
 
 		
 
