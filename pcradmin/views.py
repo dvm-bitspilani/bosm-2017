@@ -154,7 +154,7 @@ def send_status_email(send_to, status):
 
 	elif status == 'Frozen':
 		subject = "Account Frozen"
-		body = Content("Dear User, Your account status has been changed, and is now "+status+". You can no longer log on using your credentials.")
+		body = Content("Dear User, Your account status has been changed, and is now "+status+". You can no longer log in using your credentials.")
 	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
 	to_email = Email(send_to)
 	from_email = Email('register@bits-bosm.org')

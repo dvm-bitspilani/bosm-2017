@@ -7,6 +7,10 @@ from registrations.models import *
 from events.models import *
 from registrations.views import *
 from django.views.decorators.csrf import csrf_exempt
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
+from registrations.sg_config import *
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
