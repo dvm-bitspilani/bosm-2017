@@ -780,8 +780,11 @@ def show_participants(request, gl_id, event_id):
 def change_paid(request):
 	if request.method == 'POST':
 		data = request.POST
-		tc_ids = dict(data['tc'])
-		if not tc_ids:
+		try:
+			tc_ids = dict(data['tc'])
+			if not tc_ids:
+				return render(request.META.get('HTTP_REFERER'))
+		except:
 			return render(request.META.get('HTTP_REFERER'))
 		if 'paid' == data['submit']:
 			x=True
