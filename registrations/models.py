@@ -60,6 +60,7 @@ class TeamCaptain(models.Model):
 	payment_token = models.CharField(max_length=32, null=True, blank=True)
 	order_id = models.CharField(max_length=10, null=True, blank=True)
 	if_payment = models.BooleanField(default=True)
+	payment = models.IntegerField(default=0)
 	
 	def __unicode__(self):
 

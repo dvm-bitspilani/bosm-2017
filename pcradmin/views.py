@@ -416,7 +416,7 @@ def generate_payment_token(teamcaptain):
 @staff_member_required
 def list_gl(request):
 	gls = GroupLeader.objects.filter(pcr_approved=True)
-	return render(request, 'pcradmin/list_gls.html', {'gls':gls})
+	return render(request, 'pcradmin/list_gls.html', {'gls':gls,})
 
 @staff_member_required
 def list_tc(request, gl_id):
@@ -809,28 +809,35 @@ def show_participants(request, gl_id, event_id):
 	{'college':g_l.college, 'event':event.name, 'phone':phone, 'email':email, 'parts':participants}
 	)
 
-
 @staff_member_required
 def change_paid(request):
+	gls = GroupLeader.objects.filter(pcr_approved=True)
+	return render(request, 'pcradmin/list_gls_paid.html', {'gls':gls,})
+
+@staff_member_required
+def change_paid_college(request, gl_id):
+	gl = GroupLeader.objects.get(id=gl_id)
+
 	if request.method == 'POST':
 		data = request.POST
-		try:
-			tc_ids = dict(data['tc'])
-			if not tc_ids:
-				return render(request.META.get('HTTP_REFERER'))
-		except:
-			return render(request.META.get('HTTP_REFERER'))
-		if 'paid' == data['submit']:
-			x=True
-		elif 'unpaid' == data['submit']:
-			x=False
-		for tc_id in tc_ids:
-			TeamCaptain.objects.filter(id=tc_id).update(paid=x)
-		
-		return redirect('pcradmin:index')
+		print data
+		for key, value in data.iteritems():
+			try:
+				captain = TeamCaptain.objects.get(id=int(key))
+				captain.payment = int(value)
+				captain.save()
+			except:
+				pass
+
+		return redirect(reverse('pcradmin:change_paid'))
+	
 	paid = []
-	unpaid = []
-	for participation in Participation.objects.filter(confirmed=True):
-		paid.append(list(TeamCaptain.objects.filter(g_l=participation.g_l, event=participation.event,paid=True)))
-		unpaid.append(list(TeamCaptain.objects.filter(g_l=participation.g_l, event=participation.event, paid=False, if_payment=True)))
-	return render(request, 'pcradmin/change_paid.html', {'unpaid':unpaid, 'paid':paid})
+	for participation in Participation.objects.filter(confirmed=True, g_l=gl):
+		paid.append(list(TeamCaptain.objects.filter(g_l=participation.g_l, event=participation.event)))
+
+	print paid
+	final_paid = []
+	for p in paid:
+		for i in p:
+			final_paid.append(i)
+	return render(request, 'pcradmin/change_paid.html', {'paid':final_paid, 'gl':gl})
