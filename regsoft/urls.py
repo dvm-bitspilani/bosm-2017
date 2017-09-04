@@ -9,7 +9,7 @@ urlpatterns = [
 
 	########## Firewallz #############
 
-	url(r'^firewallz/$', views.firewallzO_home, name='firewallz-home'),
+	url(r'^firewallz/$', views.firewallzo_home, name='firewallz-home'),
 	url(r'^firewallz/swap/$', views.firewallz_swap, name='firewallz_swap'),
 
 	########## RecNAcc #############

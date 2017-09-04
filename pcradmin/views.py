@@ -774,3 +774,29 @@ def show_participants(request, gl_id, event_id):
 	return render(request, 'pcradmin/show_participants.html',
 	{'college':g_l.college, 'event':event.name, 'phone':phone, 'email':email, 'parts':participants}
 	)
+
+
+@staff_member_required
+def change_paid(request):
+	if request.method == 'POST':
+		data = request.POST
+		try:
+			tc_ids = dict(data['tc'])
+			if not tc_ids:
+				return render(request.META.get('HTTP_REFERER'))
+		except:
+			return render(request.META.get('HTTP_REFERER'))
+		if 'paid' == data['submit']:
+			x=True
+		elif 'unpaid' == data['submit']:
+			x=False
+		for tc_id in tc_ids:
+			TeamCaptain.objects.filter(id=tc_id).update(paid=x)
+		
+		return redirect('pcradmin:index')
+	paid = []
+	unpaid = []
+	for participation in Participation.objects.filter(confirmed=True):
+		paid.append(list(TeamCaptain.objects.filter(g_l=participation.g_l, event=participation.event,paid=True)))
+		unpaid.append(list(TeamCaptain.objects.filter(g_l=participation.g_l, event=participation.event, paid=False, if_payment=True)))
+	return render(request, 'pcradmin/change_paid.html', {'unpaid':unpaid, 'paid':paid})
