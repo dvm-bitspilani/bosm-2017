@@ -7,6 +7,7 @@ from registrations.models import *
 from regsoft.models import *
 import barg
 from functools import reduce
+from django.http import HttpResponseRedirect
 
 def home(request):
 	return render(request, 'regsoft/base.html')
@@ -273,11 +274,16 @@ def firewallzo_home(request):
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain.event.name')]
+		
+		total = Participant.objects.all().count()
+		passed = Participation.objects.filter(firewallz_passed=True).count()
 		return render(request, 'regsoft/firewallzo_home.html',
-			{'confirmed':confirmed, 'unconfirmed':unconfirmed})
+			{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'total':total, 'passed':passed})
 
 	events = Event.objects.all()
-	return render(request, 'regsoft/firewallz_home.html', {'events':events})
+	total = Participant.objects.all().count()
+	passed = Participation.objects.filter(firewallz_passed=True).count()
+	return render(request, 'regsoft/firewallz_home.html', {'events':events, 'total':total, 'passed':passed})
 
 @staff_member_required
 def firewallz_swap(request):
@@ -430,3 +436,8 @@ def print_bill(request, tc_id):
 	captain = TeamCaptain.objects.get(id=tc_id)
 	g_leader = captain.g_l
 	return render(request, 'regsoft/receipt.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp})
+
+@staff_member_required
+def user_logout(request):
+	logout(request)
+	return HttpResponseRedirect('/')
