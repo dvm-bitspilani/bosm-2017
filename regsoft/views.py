@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.admin.views.decorators import staff_member_required
 from registrations import views, urls
 from events.models import *
@@ -10,6 +10,7 @@ import barg
 from functools import reduce
 import string
 from random import randint
+
 
 @staff_member_required
 def home(request):
@@ -260,6 +261,7 @@ def firewallzo_home(request):
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return render(request.META.get('HTTP_REFERER'))
+<<<<<<< HEAD
 		# parts = Participant.objects.filter(captain__g_l=g_l)
 		# confirmed = [{'name':part.name,
 		# 	'college': part.captain.g_l.college,
@@ -276,6 +278,29 @@ def firewallzo_home(request):
 		return HttpResponse('OK')
 	events = Event.objects.all()
 	return render(request, 'regsoft/firewallzo_home.html', {'events':events})
+=======
+		parts = Participant.objects.filter(captain__g_l=g_l)
+		confirmed = [{'name':part.name,
+			'college': part.captain.g_l.college,
+			'event': part.captain.event.name,
+			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain.event.name')]
+		unconfirmed = [{'name':part.name,
+			'college': part.captain.g_l.college,
+			'event': part.captain.event.name,
+			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain.event.name')]
+		
+		total = Participant.objects.all().count()
+		passed = Participation.objects.filter(firewallz_passed=True).count()
+		return render(request, 'regsoft/firewallzo_home.html',
+			{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'total':total, 'passed':passed})
+
+	events = Event.objects.all()
+	total = Participant.objects.all().count()
+	passed = Participation.objects.filter(firewallz_passed=True).count()
+	return render(request, 'regsoft/firewallz_home.html', {'events':events, 'total':total, 'passed':passed})
+>>>>>>> 0f4b7cd70044ad593332512a970b39db2b462ab3
 
 @staff_member_required
 def firewallz_swap(request):
@@ -429,6 +454,7 @@ def print_bill(request, tc_id):
 	g_leader = captain.g_l
 	return render(request, 'regsoft/receipt.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp})
 
+<<<<<<< HEAD
 
 @staff_member_required
 def get_barcode(request):
@@ -437,3 +463,9 @@ def get_barcode(request):
 		bc = gen_barcode(g_l)
 
 	return redirect('regsoft:firewallz-home')
+=======
+@staff_member_required
+def user_logout(request):
+	logout(request)
+	return HttpResponseRedirect('/')
+>>>>>>> 0f4b7cd70044ad593332512a970b39db2b462ab3
