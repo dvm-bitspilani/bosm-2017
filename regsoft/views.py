@@ -10,7 +10,8 @@ from functools import reduce
 from django.http import HttpResponseRedirect
 
 def home(request):
-	return render(request, 'regsoft/base.html')
+	
+	gleaders = GroupLeader.objects.filter(pcr_approved=True)
 
 @staff_member_required
 def index(request):
