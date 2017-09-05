@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.admin.views.decorators import staff_member_required
 from registrations import views, urls
 from events.models import *
@@ -7,45 +8,42 @@ from registrations.models import *
 from regsoft.models import *
 import barg
 from functools import reduce
-from django.http import HttpResponseRedirect
+import string
+from random import randint
 
+
+@staff_member_required
 def home(request):
 	
 	gleaders = GroupLeader.objects.filter(pcr_approved=True)
 
-@staff_member_required
-def index(request):
-	if request.user.username.lower() == 'firewallz' or request.user.is_superuser:
-		return redirect(reverse('regsoft:firewallz-home'))
-	elif request.user.username.lower() == 'recnacc':
-		return redirect(reverse('regsoft:recnacc-home'))
-	elif request.user.username.lower() == 'controlz':
-		return redirect(reverse('regsoft:controlz-home'))
-	elif request.user.username.lower() == 'firewallzi':
-		return redirect(reverse('regsoft:firewallzi-home'))
-	else:
-		return render(request, 'pcradmin/messsage.html', {'messsage':'Access denied.'})
 
 @staff_member_required
-def gen_barcode(gl_id):
+def index(request):
+	g_ls = GroupLeader.objects.filter(pcr_approved=True)
+	return render(request, 'regsoft/barcodes.html', {'groupleaders':g_ls})
+
+
+# @staff_member_required
+def gen_barcode(g_l):
 	try:
-		try:
-			g_l = GroupLeader.objects.get(id=gl_id)
-			encoded = g_l.barcode
-		except ObjectDoesNotExist:
-			return None
-		encoded = ""+encoded
+		gl_id = g_l.id
+		encoded = g_l.barcode
+		if encoded == '':
+			raise ValueError
 	except:
 		gl_ida = "%04d" % int(gl_id)
 		mixed = string.ascii_uppercase + string.ascii_lowercase
 		encoded = ''.join([x+mixed[randint(0,51)] for x in gl_ida])
 		g_l.barcode = encoded
 		g_l.save()
+	print 'encoded: ', encoded
 	try:
-		image='/home/dvm/bosm/public_html/bosm2017/barcodes/%s.gif' % str(gl_id)
+		image='/home/dvm/bosm/public_html/bosm2017/barcodes/%04s.gif' % int(gl_id)
+		barg.code128_image(encoded).save(image)
 	except:
-		image = '~/barcodes/%s.gif' % str(gl_id)
-	barg.code128_image(encoded).save(image)
+		image = '/home/tushar/barcodes/%04d.gif' % int(gl_id)
+		barg.code128_image(encoded).save(image)
 	return encoded
 
 
@@ -264,6 +262,24 @@ def firewallzo_home(request):
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return render(request.META.get('HTTP_REFERER'))
+<<<<<<< HEAD
+		# parts = Participant.objects.filter(captain__g_l=g_l)
+		# confirmed = [{'name':part.name,
+		# 	'college': part.captain.g_l.college,
+		# 	'event': part.captain.event.name,
+		# 	'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+		# 	'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain.event.name')]
+		# unconfirmed = [{'name':part.name,
+		# 	'college': part.captain.g_l.college,
+		# 	'event': part.captain.event.name,
+		# 	'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+		# 	'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain.event.name')]
+		# return render(request, 'regsoft/firewallzo_home.html',
+		# 	{'confirmed':confirmed, 'unconfirmed':unconfirmed})
+		return HttpResponse('OK')
+	events = Event.objects.all()
+	return render(request, 'regsoft/firewallzo_home.html', {'events':events})
+=======
 		parts = Participant.objects.filter(captain__g_l=g_l)
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
@@ -285,6 +301,7 @@ def firewallzo_home(request):
 	total = Participant.objects.all().count()
 	passed = Participation.objects.filter(firewallz_passed=True).count()
 	return render(request, 'regsoft/firewallz_home.html', {'events':events, 'total':total, 'passed':passed})
+>>>>>>> 0f4b7cd70044ad593332512a970b39db2b462ab3
 
 @staff_member_required
 def firewallz_swap(request):
@@ -438,7 +455,18 @@ def print_bill(request, tc_id):
 	g_leader = captain.g_l
 	return render(request, 'regsoft/receipt.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp})
 
+<<<<<<< HEAD
+
+@staff_member_required
+def get_barcode(request):
+	g_ls = GroupLeader.objects.all()
+	for g_l in g_ls:
+		bc = gen_barcode(g_l)
+
+	return redirect('regsoft:firewallz-home')
+=======
 @staff_member_required
 def user_logout(request):
 	logout(request)
 	return HttpResponseRedirect('/')
+>>>>>>> 0f4b7cd70044ad593332512a970b39db2b462ab3
