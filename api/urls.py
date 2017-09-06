@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^api_token', obtain_jwt_token),
     url(r'^api_token_refresh', refresh_jwt_token),
     url(r'^api_test', views.api_test),
+    url(r'^get_id', views.get_id),
     url(r'^logout$', views.user_logout, name='logout'),
 ]
