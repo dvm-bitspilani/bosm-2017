@@ -10,6 +10,7 @@ import barg
 from functools import reduce
 import string
 from random import randint
+from django.contrib.auth import logout
 
 def home(request):
 	
