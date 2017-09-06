@@ -45,6 +45,7 @@ def gen_barcode(g_l):
 		encoded = g_l.barcode
 		if encoded == '':
 			raise ValueError
+		return encoded
 	except:
 		gl_ida = "%04d" % int(gl_id)
 		mixed = string.ascii_uppercase + string.ascii_lowercase
@@ -281,22 +282,22 @@ def firewallzo_home(request):
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
-			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain.event.name')]
+			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
-			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain.event.name')]
+			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
 		
 		total = Participant.objects.all().count()
-		passed = Participation.objects.filter(firewallz_passed=True).count()
+		passed = Participant.objects.filter(firewallz_passed=True).count()		
 		return render(request, 'regsoft/firewallzo_home.html',
 			{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'total':total, 'passed':passed})
 
 	events = Event.objects.all()
 	total = Participant.objects.all().count()
-	passed = Participation.objects.filter(firewallz_passed=True).count()
-	return render(request, 'regsoft/firewallz_home.html', {'events':events, 'total':total, 'passed':passed})
+	passed = Participant.objects.filter(firewallz_passed=True).count()
+	return render(request, 'regsoft/firewallzo_home.html', {'events':events, 'total':total, 'passed':passed})
 
 @staff_member_required
 def firewallz_swap(request):

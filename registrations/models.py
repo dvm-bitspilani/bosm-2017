@@ -77,7 +77,7 @@ class Participant(models.Model):
 	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
 	acco = models.NullBooleanField('passed recnacc', null=True, blank=True)
 	room = models.ForeignKey(Room, null=True, blank=True)
-
+	controlz = models.NullBooleanField('controlz passed')
 	def __unicode__(self):
 
 		return self.name
