@@ -90,7 +90,7 @@
                 <ul class="list">
                     <li class="header">MAIN NAVIGATION</li>
                     <li class="active">
-                        <a href="#">
+                        <a href="{% url 'regsoft:index' %}">
                             <i class="material-icons">home</i>
                             <span>Home</span>
                         </a>
@@ -103,20 +103,9 @@
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a href="pages/charts/morris.html">Morris</a>
+                                <a href="{% url 'regsoft:firewallz-home' %}">Firewallz Home</a>
                             </li>
-                            <li>
-                                <a href="pages/charts/flot.html">Flot</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/chartjs.html">ChartJS</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/sparkline.html">Sparkline</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/jquery-knob.html">Jquery Knob</a>
-                            </li>
+                            
                         </ul>
                     </li>
                     <li>

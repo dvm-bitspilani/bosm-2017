@@ -276,23 +276,22 @@ def firewallzo_home(request):
 			barcode = request.POST['barcode']
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
-			return render(request.META.get('HTTP_REFERER'))
+			return redirect(request.META.get('HTTP_REFERER'))
 		parts = Participant.objects.filter(captain__g_l=g_l)
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
+			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
 		
-		total = Participant.objects.all().count()
-		passed = Participant.objects.filter(firewallz_passed=True).count()		
-		return render(request, 'regsoft/firewallzo_home.html',
-			{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'total':total, 'passed':passed})
+		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed})
 
 	events = Event.objects.all()
 	total = Participant.objects.all().count()
@@ -306,7 +305,7 @@ def firewallz_swap(request):
 	except:
 		return render(request.META.get('HTTP_REFERER'))
 
-	if 'confirm' in data['submit']:
+	if 'confirm' in data['action']:
 		part_ids = dict(data)['data']
 		for part_id in part_ids:
 			part = Participant.objects.get(id=part_id)
@@ -317,7 +316,7 @@ def firewallz_swap(request):
 				tc.firewallz_passed=True
 				tc.save()
 		return redirect('regsoft:firewallz-home')
-	elif 'unconfirm' in data['submit']:
+	elif 'unconfirm' in data['action']:
 		part_ids = dict(data)['data']
 		for part_id in part_ids:
 			part = Participant.objects.get(id=part_id)

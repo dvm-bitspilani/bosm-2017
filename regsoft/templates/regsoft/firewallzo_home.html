@@ -1,15 +1,140 @@
 {% extends "regsoft/base.html" %}
 {% block body %}
-<div class="search-bar">
-        <div class="search-icon">
-            <i class="material-icons">search</i>
-        </div>
-        <input type="text" placeholder="START TYPING...">
-        <input type="submit" name="">
-        <div class="close-search">
-            <i class="material-icons">close</i>
-        </div>
+<div class="form-group">
+<div class="form-line">
+<form action="" method="post">
+{% csrf_token %}
+<fieldset>
+<legend>View Participants</legend>
+<input type="text" name="barcode" class="form-control" placeholder="Enter Barcode">
+<br>
+<button type="submit" class="btn btn-default waves-effect">Submit</button>
+</fieldset>
+</form>
+</div>
 </div>
 
-<li><a href="javascript:void(0);" class="js-search" data-close="true"><i class="material-icons">search</i></a></li>
+
+
+{% if uncomfirmed %}
+<div class="card">
+    <div class="header">
+        <h2>
+            UnConfirmed Participants
+        </h2>
+    </div>
+	<div class="body">
+	<form action="{% url 'regsoft:firewallz_swap' %}" method="post">
+	{% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Event</th>
+                        <th>Team Captain</th>
+                        <th>Pcr Approved</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Event</th>
+                        <th>Team Captain</th>
+                        <th>Pcr Approved</th>
+                        <th>Select</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                	{% for i in confirmed %}
+                    <tr>
+                        <td>i.name</td>
+                        <td>i.college</td>
+                        <td>i.event</td>
+                        <td>i.captain</td>
+                        <td>i.pcr</td>
+                        <td>
+                        {% if i.pcr %}
+                        	<input type="checkbox" name="data" id="i.id" value="i.id">
+                        {% else %}
+							<input type="checkbox" name="data" id="i.id" value="i.id" disabled="disabled">
+						{% endif %}
+                        	<label for="i.id"></label>
+						</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="hidden" value="comfirm" name="action">
+            <button type="submit" class="btn btn-default waves-effect">Confirm</button>
+        </div>
+	</form>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+{% if confirmed %}
+<div class="card">
+    <div class="header">
+        <h2>
+            Confirmed Participants
+        </h2>
+    </div>
+	<div class="body">
+	<form action="{% url 'regsoft:firewallz_swap' %}" method="post">
+	{% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Event</th>
+                        <th>Team Captain</th>
+                        <th>Pcr Approved</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Event</th>
+                        <th>Team Captain</th>
+                        <th>Pcr Approved</th>
+                        <th>Select</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                	{% for i in confirmed %}
+                    <tr>
+                        <td>i.name</td>
+                        <td>i.college</td>
+                        <td>i.event</td>
+                        <td>i.captain</td>
+                        <td>i.pcr</td>
+                        <td>
+                        	<input type="checkbox" name="data" id="i.id" value="i.id">
+                        	<label for="i.id"></label>
+						</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="hidden" value="uncomfirm" name="action">
+            <button type="submit" class="btn btn-default waves-effect">Unconfirm</button>
+        </div>
+	</form>
+    </div>
+</div>
+{% endif %}
+
+
+
 {% endblock %}
