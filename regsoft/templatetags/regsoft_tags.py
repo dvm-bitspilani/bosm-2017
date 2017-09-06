@@ -2,7 +2,7 @@ from django import template
 from registrations.models import *
 from events.models import *
 from functools import reduce
-register = template.Libarary()
+register = template.Library()
 
 @register.inclusion_tag('regsoft/show_tags.html')
 def show_tags():
@@ -20,13 +20,13 @@ def show_tags():
 	return {'pcr':pcr, 'controlz':controlz, 'firewallz':firewallz, 'recnacc':recnacc}
 
 @register.simple_tag
-def navbar_color():
-	username = request.user.username
-	if request.user.is_superuser:
-		return 'black'
+def navbar_color(name):
+	username = name
 	if 'firewallz' in username:
-		return 'blue'
+		return 'cyan'
 	if 'controlz' in username:
-		return 'green'
+		return 'light-green'
 	if 'recnacc' in username:
 		return 'orange'
+	else:
+		return 'black'
