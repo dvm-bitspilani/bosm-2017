@@ -74,10 +74,10 @@ class Participant(models.Model):
 
 	name = models.CharField(max_length=200)
 	captain = models.ForeignKey(TeamCaptain, on_delete=models.CASCADE)
-	firewallz_passed = models.NullBooleanField('passed firewallz_o', null=True, blank=True)
-	acco = models.NullBooleanField('passed recnacc', null=True, blank=True)
+	firewallz_passed = models.BooleanField('passed firewallz_o', default=False)
+	acco = models.BooleanField('passed recnacc', default=False)
 	room = models.ForeignKey(Room, null=True, blank=True)
-	controlz = models.NullBooleanField('controlz passed')
+	controlz = models.BooleanField('controlz passed', default=False)
 	def __unicode__(self):
 
 		return self.name
