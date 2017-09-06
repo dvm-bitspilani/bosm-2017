@@ -16,10 +16,12 @@
 
     <link href="{% static 'regsoft/plugins/animate-css/animate.css' %}" rel="stylesheet" />
 
-    <link href="{% static 'regsoft/plugins/morrisjs/morris.css' %}" rel="stylesheet" />
+    <!-- <link href="{% static 'regsoft/plugins/morrisjs/morris.css' %}" rel="stylesheet" /> -->
+    <link href="{% static 'regsoft/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css' %}" rel="stylesheet">
 
     <link href="{% static 'regsoft/css/style.css' %}" rel="stylesheet">
-
+    {% block head %}
+    {% endblock %}
     <link href="{% static 'regsoft/css/themes/all-themes.css' %}" rel="stylesheet" />
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
     
@@ -228,7 +230,6 @@
         </aside>
         <!-- #END# Right Sidebar -->
     </section>
-
     <section class="content">
         <div class="container-fluid">
             <div class="block-header">
@@ -285,42 +286,6 @@
             <!-- #END# Widgets -->
             {% block body %}
             {% endblock %}
-            <!-- CPU Usage -->
-            <div class="row clearfix">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="card">
-                        <div class="header">
-                            <div class="row clearfix">
-                                <div class="col-xs-12 col-sm-6">
-                                    <h2>CPU USAGE (%)</h2>
-                                </div>
-                                <div class="col-xs-12 col-sm-6 align-right">
-                                    <div class="switch panel-switch-btn">
-                                        <span class="m-r-10 font-12">REAL TIME</span>
-                                        <label>OFF<input type="checkbox" id="realtime" checked><span class="lever switch-col-cyan"></span>ON</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <ul class="header-dropdown m-r--5">
-                                <li class="dropdown">
-                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                        <i class="material-icons">more_vert</i>
-                                    </a>
-                                    <ul class="dropdown-menu pull-right">
-                                        <li><a href="javascript:void(0);">Action</a></li>
-                                        <li><a href="javascript:void(0);">Another action</a></li>
-                                        <li><a href="javascript:void(0);">Something else here</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="body">
-                            <div id="real_time_chart" class="dashboard-flot-chart"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- #END# CPU Usage -->
             </div>
         </div>
     </section>
@@ -340,32 +305,48 @@
     <!-- Waves Effect Plugin Js -->
     <script src="{% static 'regsoft/plugins/node-waves/waves.js' %}"></script>
 
+
+   
     <!-- Jquery CountTo Plugin Js -->
     <script src="{% static 'regsoft/plugins/jquery-countto/jquery.countTo.js' %}"></script>
-
-    <!-- Morris Plugin Js -->
-    <script src="{% static 'regsoft/plugins/raphael/raphael.min.js' %}"></script>
-    <script src="{% static 'regsoft/plugins/morrisjs/morris.js' %}"></script>
+    <!-- <script src="{% static 'regsoft/plugins/raphael/raphael.min.js' %}"></script> -->
+    <!-- <script src="{% static 'regsoft/plugins/morrisjs/morris.js' %}"></script> -->
 
     <!-- ChartJs -->
-    <script src="{% static 'regsoft/plugins/chartjs/Chart.bundle.js' %}"></script>
+    <!-- <script src="{% static 'regsoft/plugins/chartjs/Chart.bundle.js' %}"></script> -->
 
     <!-- Flot Charts Plugin Js -->
-    <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.js' %}"></script>
-    <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.resize.js' %}"></script>
-    <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.pie.js' %}"></script>
-    <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.categories.js' %}"></script>
-    <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.time.js' %}"></script>
+    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.js' %}"></script> -->
+    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.resize.js' %}"></script> -->
+    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.pie.js' %}"></script> -->
+    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.categories.js' %}"></script> -->
+    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.time.js' %}"></script> -->
 
     <!-- Sparkline Chart Plugin Js -->
-    <script src="{% static 'regsoft/plugins/jquery-sparkline/jquery.sparkline.js' %}"></script>
+    <!-- <script src="{% static 'regsoft/plugins/jquery-sparkline/jquery.sparkline.js' %}"></script> -->
 
     <!-- Custom Js -->
-    <script src="{% static 'regsoft/js/admin.js' %}"></script>
+ 
     <script src="{% static 'regsoft/js/pages/index.js' %}"></script>
 
     <!-- Demo Js -->
     <script src="{% static 'regsoft/js/demo.js' %}"></script>
+    
+        <!-- Jquery DataTable Plugin Js -->
+    <script src="{% static 'regsoft/plugins/jquery-datatable/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/buttons.flash.min.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/jszip.min.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/pdfmake.min.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/vfs_fonts.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'regsoft/plugins/jquery-datatable/extensions/export/buttons.print.min.js' %}"></script>
+    <script src="{% static 'regsoft/js/pages/tables/jquery-datatable.js' %}"></script>
+
+    <script src="{% static 'regsoft/js/admin.js' %}"></script>
+    <script src="{% static 'regsoft/js/demo.js' %}"></script>
+    
 </body>
 
 </html>
