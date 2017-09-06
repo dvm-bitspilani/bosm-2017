@@ -206,11 +206,34 @@ def get_id(request):
 	g_l_serializer = GroupLeaderSerializer(gl)
 	return Response(g_l_serializer.data)
 
+@api_view(['GET', ])
+def test_sport(request, e_id):
+	data = request.data
+	g_l = GroupLeader.objects.get(user=request.user)
+	try:
+		event = Event.objects.get(id=e_id)
+	except:
+		return Response({'message':'Event does not exist'})
+	if event.min_limit == 1 and event.max_limit == 1:
+		return Response({'message':'Success'})
+	try:
+		Participation.objects.get(g_l=g_l, event = event)
+		try:
+			tc = TeamCaptain.objects.get(g_l=g_l, event=event)
+			participants = ParticipantSerializer(tc.participant_set.all(), many=True)
+			return Response({'participants':participants.data, 'message':'Details already added'})
+		except:
+			return Response({'message':'Success'})
+	
+	except:
+		return Response({'message':'Add sport first'})
+
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
 def register_captain(request):
 
 	data = request.data
+	print data
 	e_id = int(data['event'])
 	g_id = int(data['g_l'])
 	try:
@@ -219,16 +242,21 @@ def register_captain(request):
 		return Response({'error':'Error in event.'})
 	user = request.user
 	g_l = GroupLeader.objects.get(user=user)
+	print g_l
 	if g_id == g_l.id:
+		try:
+			participation = Participation.objects.get(event=event, g_l=g_l)
+			tc = TeamCaptain.objects.get(g_l=g_l, event=event)
+			# captain.delete()
+			participants = ParticipantSerializer(tc.participant_set.all(), many=True)
+
+			return Response({'participants':participants.data, 'message':'Sports already added'})
+		except:
+			pass
 		captain_serializer = TeamCaptainSerializer(data=data)
 		if captain_serializer.is_valid():
 			captain = captain_serializer.save()
-			print captain
-			try:
-				participation = Participation.objects.get(event=event, g_l=g_l)
-			except:
-				captain.delete()
-				return Response({'message':'Invalid access'})
+			
 			Participant.objects.create(name=data['name'], captain=captain)
 			try:
 				participants = [participant for participant in eval(data['participants'])]
@@ -253,7 +281,7 @@ def register_captain(request):
 
 				else:
 					captain.delete()
-					return Response({'error':'Invalid number of players'})
+					return Response({'message':'Invalid number of players'})
 
 			else:
 				captain.is_single = True
@@ -265,15 +293,15 @@ def register_captain(request):
 
 				else:
 					captain.delete()
-					return Response({'error':'Invalid number of players'})
+					return Response({'message':'Invalid number of players'})
 
 		else:
-			return Response({'message':captain_serializer.errors})
+			return Response({'message':get_errors(captain_serializer.errors)})
 	else:
-		return Response({'error':'Access Denied'})
+		return Response({'message':'Access Denied'})
 
 @api_view(['GET',])
-@authentication_classes((IsAuthenticated,))
+@permission_classes((IsAuthenticated,))
 def add_events(request, tc_id):
 
 	user = request.user
