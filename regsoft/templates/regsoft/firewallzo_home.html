@@ -16,7 +16,7 @@
 
 
 
-{% if uncomfirmed %}
+{% if unconfirmed %}
 <div class="card">
     <div class="header">
         <h2>
@@ -49,20 +49,20 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                	{% for i in confirmed %}
+                	{% for i in unconfirmed %}
                     <tr>
-                        <td>i.name</td>
-                        <td>i.college</td>
-                        <td>i.event</td>
-                        <td>i.captain</td>
-                        <td>i.pcr</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.college}}</td>
+                        <td>{{i.event}}</td>
+                        <td>{{i.captain}}</td>
+                        <td>{{i.pcr}}</td>
                         <td>
                         {% if i.pcr %}
-                        	<input type="checkbox" name="data" id="i.id" value="i.id">
+                        	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
                         {% else %}
-							<input type="checkbox" name="data" id="i.id" value="i.id" disabled="disabled">
+							<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}" disabled="disabled">
 						{% endif %}
-                        	<label for="i.id"></label>
+                        	<label for="{{i.id}}"></label>
 						</td>
                     </tr>
                     {% endfor %}
@@ -77,7 +77,7 @@
 {% endif %}
 
 
-
+{{unconfirmed}}
 
 {% if confirmed %}
 <div class="card">
@@ -114,14 +114,14 @@
                 <tbody>
                 	{% for i in confirmed %}
                     <tr>
-                        <td>i.name</td>
-                        <td>i.college</td>
-                        <td>i.event</td>
-                        <td>i.captain</td>
-                        <td>i.pcr</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.college}}</td>
+                        <td>{{i.event}}</td>
+                        <td>{{i.captain}}</td>
+                        <td>{{i.pcr}}</td>
                         <td>
-                        	<input type="checkbox" name="data" id="i.id" value="i.id">
-                        	<label for="i.id"></label>
+                        	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
+                        	<label for="{{i.id}}"></label>
 						</td>
                     </tr>
                     {% endfor %}

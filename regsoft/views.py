@@ -278,21 +278,22 @@ def firewallzo_home(request):
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
 		parts = Participant.objects.filter(captain__g_l=g_l)
+		print parts
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
+		print confirmed
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
-		
+		print unconfirmed
 		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed})
-
 	events = Event.objects.all()
 	total = Participant.objects.all().count()
 	passed = Participant.objects.filter(firewallz_passed=True).count()
