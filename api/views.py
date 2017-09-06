@@ -199,6 +199,12 @@ def manage_sports(request):
 
 	return Response({'sports_added':added_serializer.data, 'sports_left':left_serializer.data,})
 
+@api_view(['GET', ])
+@permission_classes((IsAuthenticated,))
+def get_id(request):
+	gl = GroupLeader.objects.get(user=request.user)
+	g_l_serializer = GroupLeaderSerializer(gl)
+	return Response(g_l_serializer.data)
 
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
@@ -206,58 +212,65 @@ def register_captain(request):
 
 	data = request.data
 	e_id = int(data['event'])
-	event = get_object_or_404(Event, id=e_id)
+	g_id = int(data['g_l'])
+	try:
+		event = Event.objects.get(id=e_id)
+	except:
+		return Response({'error':'Error in event.'})
 	user = request.user
 	g_l = GroupLeader.objects.get(user=user)
-	captain_serializer = TeamCaptainSerializer(data=data)
-	if captain_serializer.is_valid():
-		captain = captain_serializer.save()
-		print captain
-		try:
-			participation = Participation.objects.get(event=event, g_l=g_l)
-		except:
-			captain.delete()
-			return Response({'message':'Invalid access'})
-		Participant.objects.create(name=data['name'], captain=captain)
-		try:
-			participants = [participant for participant in eval(data['participants'])]
-		except:
-			participants = []
+	if g_id == g_l.id:
+		captain_serializer = TeamCaptainSerializer(data=data)
+		if captain_serializer.is_valid():
+			captain = captain_serializer.save()
+			print captain
+			try:
+				participation = Participation.objects.get(event=event, g_l=g_l)
+			except:
+				captain.delete()
+				return Response({'message':'Invalid access'})
+			Participant.objects.create(name=data['name'], captain=captain)
+			try:
+				participants = [participant for participant in eval(data['participants'])]
+			except:
+				participants = []
 
-		if participants:
-			participants_added = []
-			captain.is_single = False
-			captain.save()
-			print len(participants)
-			if (event.max_limit>len(participants)>=event.min_limit-1):
-				for participant in participants:
-					participants_added.append(Participant.objects.create(name=participant, captain=captain))
-				captain.total_players = len(participants) + 1
+			if participants:
+				participants_added = []
+				captain.is_single = False
 				captain.save()
-				g_l_serializer = GroupLeaderSerializer(g_l)
-				captain_serializer = TeamCaptainSerializer(captain)
-				participant_data = ParticipantSerializer(participants_added, many=True)
+				print len(participants)
+				if (event.max_limit>len(participants)>=event.min_limit-1):
+					for participant in participants:
+						participants_added.append(Participant.objects.create(name=participant, captain=captain))
+					captain.total_players = len(participants) + 1
+					captain.save()
+					g_l_serializer = GroupLeaderSerializer(g_l)
+					captain_serializer = TeamCaptainSerializer(captain)
+					participant_data = ParticipantSerializer(participants_added, many=True)
 
-				return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data, 'participants':participant_data.data})
+					return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data, 'participants':participant_data.data})
+
+				else:
+					captain.delete()
+					return Response({'error':'Invalid number of players'})
 
 			else:
-				captain.delete()
-				return Response({'error':'Invalid number of players'})
+				captain.is_single = True
+				if event.min_limit == event.max_limit == 1:
+					captain.save()
+					g_l_serializer = GroupLeaderSerializer(g_l)
+					captain_serializer = TeamCaptainSerializer(captain)
+					return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data,})
+
+				else:
+					captain.delete()
+					return Response({'error':'Invalid number of players'})
 
 		else:
-			captain.is_single = True
-			if event.min_limit == event.max_limit == 1:
-				captain.save()
-				g_l_serializer = GroupLeaderSerializer(g_l)
-				captain_serializer = TeamCaptainSerializer(captain)
-				return Response({'g_leader':g_l_serializer.data, 'captain':captain_serializer.data,})
-
-			else:
-				captain.delete()
-				return Response({'error':'Invalid number of players'})
-
+			return Response({'message':captain_serializer.errors})
 	else:
-		return Response({'message':captain_serializer.errors})
+		return Response({'error':'Access Denied'})
 
 @api_view(['GET',])
 @authentication_classes((IsAuthenticated,))
