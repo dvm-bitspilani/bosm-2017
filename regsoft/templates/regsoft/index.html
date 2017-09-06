@@ -1,0 +1,53 @@
+﻿{% extends 'regsoft/base.html' %}
+{% load static %}
+
+{% block body %}
+
+<div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Barcodes
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>College</th>
+                                    <th>City</th>
+                                    <th>Phone</th>
+                                    <th>Barcode</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>College</th>
+                                    <th>City</th>
+                                    <th>Phone</th>
+                                    <th>Barcode</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for i in groupleaders %}
+                                <tr>
+                                    <td>{{i.name}}</td>
+                                    <td>{{i.college}}</td>
+                                    <td>{{i.city}}</td>
+                                    <td>{{i.phone}}</td>
+                                    <td>{{i.barcode}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
