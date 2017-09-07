@@ -255,7 +255,14 @@ def manage_sports(request):
 				event = get_object_or_404(Event, id=e_id)
 				try:
 					Participation.objects.get(g_l=g_l, event=event).delete()
+					if not (event.min_limit == 1 and event.max_limit == 1):
+						t = TeamCaptain.objects.get(event=event, g_l=g_l)
+						for tc in TeamCaptain.objects.filter(is_extra=True, extra_id=t.id):
+							tc.delete()
+
+
 					TeamCaptain.objects.filter(event=event, g_l=g_l).delete()
+
 				except:
 					continue
 		except KeyError:
@@ -364,7 +371,7 @@ def add_extra_event(request, tc_id):
 				event = Event.objects.get(id=e_id)
 				participation = get_object_or_404(Participation, g_l=groupleader, event=event)
 
-				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender, email=teamCaptain.email)
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=teamCaptain.gender, email=teamCaptain.email, is_extra=True, extra_id=tc_id)
 				tc.save()
 				Participant.objects.create(name=tc.name, captain=tc)
 		return JsonResponse({'status':1})

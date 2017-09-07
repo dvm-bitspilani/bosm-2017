@@ -184,6 +184,10 @@ def manage_sports(request):
 			event = get_object_or_404(Event, id=int(e_id))
 			try:
 				Participation.objects.get(g_l=g_l, event=event).delete()
+				if not (event.min_limit == 1 and event.max_limit == 1):
+					t = TeamCaptain.objects.get(event=event, g_l=g_l)
+					for tc in TeamCaptain.objects.filter(is_extra=True, extra_id=t.id):
+						tc.delete()
 				TeamCaptain.objects.filter(event=event, g_l=g_l).delete()
 			except:
 				continue
@@ -215,7 +219,10 @@ def test_sport(request, e_id):
 	except:
 		return Response({'message':'Event does not exist'})
 	if event.min_limit == 1 and event.max_limit == 1:
-		return Response({'message':'Success'})
+		# gl = GroupLeader.objects.get(user=request.user)
+		captains = TeamCaptain.objects.filter(g_l=g_l, event=Event.objects.get(id=e_id))
+		captain_serializer = TeamCaptainSerializer(captains, many=True)
+		return Response({'message':'Single Event', 'players':captain_serializer.data})
 	try:
 		Participation.objects.get(g_l=g_l, event = event)
 		try:
@@ -244,15 +251,15 @@ def register_captain(request):
 	g_l = GroupLeader.objects.get(user=user)
 	print g_l
 	if g_id == g_l.id:
-		try:
-			participation = Participation.objects.get(event=event, g_l=g_l)
-			tc = TeamCaptain.objects.get(g_l=g_l, event=event)
-			# captain.delete()
-			participants = ParticipantSerializer(tc.participant_set.all(), many=True)
+		if not(event.min_limit==1 and event.max_limit==1):
+			try:
+				participation = Participation.objects.get(event=event, g_l=g_l)
+				tc = TeamCaptain.objects.get(g_l=g_l, event=event)
+				participants = ParticipantSerializer(tc.participant_set.all(), many=True)
 
-			return Response({'participants':participants.data, 'message':'Sports already added'})
-		except:
-			pass
+				return Response({'participants':participants.data, 'message':'Sports already added'})
+			except:
+				pass
 		captain_serializer = TeamCaptainSerializer(data=data)
 		if captain_serializer.is_valid():
 			captain = captain_serializer.save()
@@ -263,7 +270,7 @@ def register_captain(request):
 			except:
 				participants = []
 
-			if participants:
+			if participants and participants[0]!="":
 				participants_added = []
 				captain.is_single = False
 				captain.save()
@@ -324,13 +331,14 @@ def add_extra_event(request, tc_id):
 	participants = Participant.objects.filter(captain=captain)
 	participant_data = []
 	for e_id in eval(data['part_data']):
+		e_id = eval(e_id)
 		if e_id[0]!='0':
 			print e_id[0]
 			for i in e_id[1:]:
 				participant = Participant.objects.get(id=int(i))
 				event = Event.objects.get(id=int(e_id[0]))
 				participation = get_object_or_404(Participation, g_l=groupleader, event=event)
-				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=captain.gender)
+				tc = TeamCaptain(name=participant.name, g_l=groupleader,event=event, if_payment=False, gender=captain.gender, is_extra=True, extra_id=tc_id)
 				tc.save()
 				participant_data.append(Participant.objects.create(name=tc.name, captain=tc))
 	g_l_serializer = GroupLeaderSerializer(groupleader)

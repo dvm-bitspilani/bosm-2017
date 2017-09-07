@@ -61,7 +61,9 @@ class TeamCaptain(models.Model):
 	order_id = models.CharField(max_length=10, null=True, blank=True)
 	if_payment = models.BooleanField(default=True)
 	payment = models.IntegerField(default=0)
-	
+	is_extra = models.BooleanField(default=False)
+	extra_id = models.IntegerField(default=0)
+
 	def __unicode__(self):
 
 		return self.name + '-' + str(self.g_l.college)
