@@ -10,11 +10,12 @@ import barg
 from functools import reduce
 import string
 from random import randint
+from django.contrib.auth import logout
 
 def home(request):
 	
 	profiles = GroupLeader.objects.filter(pcr_approved=True)
-	headers = ['Name', 'College','Phone','No. of Paid Participants',  'Code', 'View Participants']
+	headings = ['Name', 'College','Phone','No. of Paid Participants',  'Code', 'View Participants']
 	rows = []
 	urls = []
 	for profile in profiles:
@@ -24,10 +25,10 @@ def home(request):
 			 if t.payment > 0:
 				no_paid += t.participant_set.all().count()
 		data = (profile.name, profile.college, str(profile.phone), no_paid, str(profile.barcode).upper())
-		rows.append({'data':data, 'links':[{'title':'View Participants', 'link':'#'}]})
+		rows.append({'data':data, 'link':[{'title':'View Participants', 'link':'#'}]})
 	t1 = {
-		'table_title' : 'Barcodes',
-		'headers':headers,
+		'title' : 'Barcodes',
+		'headings':headings,
 		'rows':rows,
 	}
 	return render(request, 'regsoft/tables.html', {'tables':[t1]})
@@ -64,11 +65,19 @@ def gen_barcode(g_l):
 
 @staff_member_required
 def recnacc_home(request):
+	if request.method == 'POST':
+		try:
+			barcode = request.POST['barcode']
+			g_l = GroupLeader.objects.get(barcode=barcode)
+		except:
+			return redirect(request.META.get('HTTP_REFERER'))
+		return redirect('regosft:recnacc-college', kwargs={'gl_id':g_l.id})
+
 	g_ls = GroupLeader.objects.filter(pcr_approved=True)
 	rows = [{'data':[g_l.college, count_players(g_l)], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls if count_players(g_l)!=0]
 	headings = ['College', 'No. of Participants', 'Allot']
 	tables = [{'title':'Select College to allot rooms', 'rows':rows, 'headings':headings}]
-	return render(request,'regsoft/tables.html', {'tables':tables})
+	return render(request,'regsoft/recnacc_home.html', {'tables':tables})
 
 
 @staff_member_required
@@ -83,10 +92,10 @@ def recnacc_college(request, gl_id):
 @staff_member_required
 def recnacc_team(request, tc_id):
 	tc = TeamCaptain.objects.get(id=tc_id)
-	rooms = [{'room':room.room, 'id':room.id, 'vacancy':room.vacancy} for room in Room.objects.all()]
+	rooms = [{'room':room.room + ' - ' + room.bhavan.name + ' - ' + room.vacancy, 'id':room.id,} for room in Room.objects.all()]
 	parts1 = Participant.objects.filter(captain=tc, acco=True)
 	parts2 = Participant.objects.filter(captain=tc, acco=False)
-	return render(request, 'regsoft/allot.html', {'allotted':parts1, 'Unallotted':parts2, 'rooms':rooms})
+	return render(request, 'regsoft/allot.html', {'allotted':parts1, 'unallotted':parts2, 'rooms':rooms})
 
 
 
@@ -103,9 +112,9 @@ def recnacc_change(request):
 	if request.POST:
 		data = request.POST
 		
-		if 'allocate' in data['submit']:
+		if 'allocate' in data['action']:
 			try:
-				parts_id = dict(data)['allocate']
+				parts_id = dict(data)['data']
 				room_id = data['room']
 				room = Room.objects.get(id=room_id)
 				if len(parts_id) > room.vacancy:
@@ -123,17 +132,12 @@ def recnacc_change(request):
 				part = Participant.objects.get(id=part_id)
 				part.acco = True
 				part.save()
-				# rows.append({'data':[tc.name, tc.gender, tc.g_l.college, tc.phone, room.room, room.bhavan.name], 'link':[]})
-			# headings = ['Name', 'Gender', 'College', 'Phone', 'Room', 'Bhavan']
-			# title = 'Teams alloted Room just now'
-			# tables = [{'title':title, 'headings':headings, 'rows':rows}]
-			# return render(request, 'regsoft/tables.html', {'tables':tables})
 			gl_id = tc.g_l.id
 		
 
-		if 'deallocate' in data['submit']:
+		if 'deallocate' in data['action']:
 			try:
-				parts_id = dict(data)['deallocate']
+				parts_id = dict(data)['data']
 			except:
 				return redirect(request.META.get('HTTP_REFERER'))
 			tc = Participant.objects.get(id=parts_id[0]).captain
@@ -149,12 +153,6 @@ def recnacc_change(request):
 				tc.save()
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
 
-
-	# rows1 = [{'tc':tc, 'event':tc.event.name}  for tc in TeamCaptain.objects.filter(g_l=g_l, if_payment=True, firewallz_passed=True, room=None)]
-	# rows2 = [{'tc':tc, 'event':tc.event.name}  for tc in TeamCaptain.objects.filter(g_l=g_l, if_payment=True, firewallz_passed=True).exclude(room=None)]
-
-	# rooms = Room.objects.exclude(vacancy=0)
-	# return render(request, 'regsoft/allot_room.html', {'allocate':rows1, 'deallocate':rows2, 'rooms':rooms})
 
 @staff_member_required
 def all_bhavans(request):
@@ -278,21 +276,22 @@ def firewallzo_home(request):
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
 		parts = Participant.objects.filter(captain__g_l=g_l)
+		print parts
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
+		print confirmed
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
-		
+		print unconfirmed
 		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed})
-
 	events = Event.objects.all()
 	total = Participant.objects.all().count()
 	passed = Participant.objects.filter(firewallz_passed=True).count()
@@ -458,7 +457,8 @@ def get_barcode(request):
 		bc = gen_barcode(g_l)
 
 	return redirect('regsoft:firewallz-home')
+
 @staff_member_required
 def user_logout(request):
 	logout(request)
-	return HttpResponseRedirect('/')
+	return redirect('regsoft:index')

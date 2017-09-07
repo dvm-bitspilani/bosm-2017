@@ -1,0 +1,119 @@
+{% block body %}
+
+{% if unalloted %}
+<form action="{% url 'regsoft:change' %}" method="post">
+    <select name="room" id="room">
+        <option disabled selected>Select a Room to Allot</option>
+        {% for r in room %}
+        <li><option value="{{r.id}}">{{r.room}}</option></li>
+        {% endfor %}
+    </select>
+    <div class="card">
+        <div class="header">
+            <h2>
+                Participants
+            </h2>
+        </div>
+        <div class="body">
+    	{% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Gender</th>
+                            <th>Event</th>
+                            <th>College</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Gender</th>
+                            <th>Event</th>
+                            <th>College</th>
+                            <th>Select</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                    	{% for i in unalloted %}
+                        <tr>
+                            <td>{{i.name}}</td>
+                            <td>{{i.captain.gender}}</td>
+                            <td>{{i.captain.event.name}}</td>
+                            <td>{{i.captain.g_l.college}}</td>
+                            <td>
+                                <input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
+                                <label for="{{i.id}}"></label>
+    						</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type="hidden" value="allocate" name="action">
+                <button type="submit" class="btn btn-default waves-effect">Allocate</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+
+
+{% if alloted %}
+<div class="card">
+    <div class="header">
+        <h2>
+            Already Alloted Participants
+        </h2>
+    </div>
+	<div class="body">
+	<form action="{% url 'regsoft:firewallz_swap' %}" method="post">
+	{% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Gender</th>
+                        <th>Event</th>
+                        <th>College</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Gender</th>
+                        <th>Event</th>
+                        <th>College</th>
+                        <th>Select</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for i in unalloted %}
+                    <tr>
+                        <td>{{i.name}}</td>
+                        <td>{{i.captain.gender}}</td>
+                        <td>{{i.captain.event.name}}</td>
+                        <td>{{i.captain.g_l.college}}</td>
+                        <td>
+                            <input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
+                            <label for="{{i.id}}"></label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="hidden" value="deallocate" name="action">
+            <button type="submit" class="btn btn-default waves-effect">Deallocate</button>
+        </div>
+	</form>
+    </div>
+</div>
+{% endif %}
+
+
+
+{% endblock %}

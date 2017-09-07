@@ -39,7 +39,7 @@ class TeamCaptainSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = TeamCaptain
-		fields = ('name', 'email', 'phone', 'gender', 'total_players','event', 'g_l')
+		fields = ('name', 'email', 'phone', 'gender', 'total_players','event', 'g_l', 'id')
 
 		'''
 	def create(self, validated_data):

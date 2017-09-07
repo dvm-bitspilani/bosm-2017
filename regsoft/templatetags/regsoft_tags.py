@@ -29,3 +29,6 @@ def navbar_color(name):
 		return 'orange'
 	else:
 		return 'black'
+@register.inclusion_tag('regsoft/tables.html')
+def show_tables(tables):
+	return {'tables':tables}

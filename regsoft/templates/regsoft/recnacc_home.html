@@ -1,7 +1,22 @@
-﻿{% extends 'regsoft/base.html' %}
-{% load static %}
-
+{% extends "regsoft/base.html" %}
+{% load regsoft_tags %}
 {% block body %}
+<div class="form-group">
+<div class="form-line">
+<form action="{% url 'regsoft:recnacc-home' %}" method="post">
+{% csrf_token %}
+<fieldset>
+<legend>Search College</legend>
+<input type="text" name="barcode" class="form-control" placeholder="Enter Barcode" style="padding-left: 1vw;">
+<br>
+<button  type="submit" class="btn bg-red btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
+</fieldset>
+</form>
+</div>
+</div>
+
+
+
 
 {% for table in tables %}
 
@@ -51,4 +66,7 @@
     </div>
 
 {% endfor %}
+
+
+
 {% endblock %}

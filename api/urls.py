@@ -17,5 +17,6 @@ urlpatterns = [
     url(r'^api_token_refresh', refresh_jwt_token),
     url(r'^api_test', views.api_test),
     url(r'^get_id', views.get_id),
+    url(r'^sport_test/(?P<e_id>\d+)', views.test_sport),
     url(r'^logout$', views.user_logout, name='logout'),
 ]
