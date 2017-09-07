@@ -219,7 +219,10 @@ def test_sport(request, e_id):
 	except:
 		return Response({'message':'Event does not exist'})
 	if event.min_limit == 1 and event.max_limit == 1:
-		return Response({'message':'Success'})
+		# gl = GroupLeader.objects.get(user=request.user)
+		captains = TeamCaptain.objects.filter(g_l=g_l, event=Event.objects.get(id=e_id))
+		captain_serializer = TeamCaptainSerializer(captains, many=True)
+		return Response({'message':'Single Event', 'players':captain_serializer.data})
 	try:
 		Participation.objects.get(g_l=g_l, event = event)
 		try:
