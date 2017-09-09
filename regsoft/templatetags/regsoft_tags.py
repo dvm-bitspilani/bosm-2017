@@ -21,14 +21,14 @@ def show_tags():
 @register.simple_tag
 def navbar_color(name):
 	username = name
-	if 'firewallz' in username:
+	if 'firewallz' == username:
 		return 'cyan'
-	if 'controlz' in username:
+	if 'controlz' == username:
 		return 'light-green'
-	if 'recnacc' in username:
+	if 'recnacc' == username:
 		return 'orange'
 	else:
-		return 'black'
+		return 'blue'
 @register.inclusion_tag('regsoft/tables.html')
 def show_tables(tables):
 	return {'tables':tables}

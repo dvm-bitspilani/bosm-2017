@@ -1,0 +1,96 @@
+{% extends "regsoft/base.html" %}
+{% block body %}
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="card">
+    <div class="body">
+        <div class="row clearfix">
+            <div class="col-md-3">
+                <p>
+                    <b>View Participants according to Events</b>
+                </p>
+                <form action="" method="post">
+                {% csrf_token %}
+                    <select class="form-control show-tick" name="id" data-live-search="true">
+                    {% for event in events %}
+                        <option value="{{event.id}}">{{event.name}}</option>        
+                    {% endfor %}
+                    </select>
+                    <br><br>
+                <button  type="submit" name="event" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>                
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</div>
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="card">
+    <div class="body">
+        <div class="row clearfix">
+            <div class="col-md-3">
+                <p>
+                    <b>View Participants according to Colleges</b>
+                </p>
+                <form action="" method="post">
+                {% csrf_token %}
+                    <select class="form-control show-tick" name="id" data-live-search="true">
+                    {% for gl in gls %}
+                        <option value="{{gl.id}}">{{gl.college}}</option>        
+                    {% endfor %}
+                    </select><br><br>
+                <button  type="submit" name="college" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>                
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</div>
+
+{% for table in tables %}
+<div class="card">
+    <div class="header">
+        <h2>
+            {{table.title}}
+        </h2>
+    </div>
+	<div class="body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                <thead>
+                    <tr>
+                        {% for heading in table.headings %}
+                            <th>{{heading}}</th>
+                        {% endfor %}
+                   </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        {% for heading in table.headings %}
+                            <th>{{heading}}</th>
+                        {% endfor %}
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for row in table.rows %}
+                    <tr>
+                        {% for data in row.data %}
+                            <td>{{data}}</td>
+                        {% endfor %}
+                        {% for link in row.link %}
+                            <td><a href="{{link.url}}">{{link.title}}</a></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

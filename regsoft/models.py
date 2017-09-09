@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 from registrations.models import *
 from django.db import models
 
+from datetime import datetime
+
 class Bhavan(models.Model):
 
 	name = models.CharField(max_length=30)
@@ -22,8 +24,9 @@ class Room(models.Model):
 
 class Bill(models.Model):
 
-	captain = models.ForeignKey('registrations.TeamCaptain', on_delete=models.CASCADE)
+	g_leader = models.ForeignKey('registrations.GroupLeader', on_delete=models.CASCADE, null=True)
 	amount = models.IntegerField()
+	time_paid = models.DateTimeField(auto_now=True)
 	two_thousands = models.IntegerField(null=True, blank=True, default=0)
 	five_hundreds = models.IntegerField(null=True, blank=True, default=0)
 	hundreds = models.IntegerField(null=True, blank=True, default=0)
@@ -34,4 +37,4 @@ class Bill(models.Model):
 	draft_amount = models.IntegerField(null=True, blank=True, default=0)
 
 	def __unicode__(self):
-		return str(self.captain.g_l.college) + ' - ' + str(self.captain.name) + ' - ' + str(self.captain.event.name) + ' - ' + str(self.amount)
+		return str(self.g_leader.college) + ' - ' + str(self.g_leader.name) + ' - ' + str(self.name) + ' - ' + str(self.amount)

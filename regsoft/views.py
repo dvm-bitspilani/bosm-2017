@@ -71,7 +71,7 @@ def recnacc_home(request):
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
-		return redirect('regosft:recnacc-college', kwargs={'gl_id':g_l.id})
+		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id}))
 
 	g_ls = GroupLeader.objects.filter(pcr_approved=True)
 	rows = [{'data':[g_l.college, count_players(g_l)], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls if count_players(g_l)!=0]
@@ -83,24 +83,24 @@ def recnacc_home(request):
 @staff_member_required
 def recnacc_college(request, gl_id):
 	g_l = GroupLeader.objects.get(id=gl_id)
-	rows = [{'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id})}]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, g_l=g_l, if_payment=True)]
+	rows = [{'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id})}]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, g_l=g_l)]
 	headings = ['Team Captain', 'Event', 'College', 'No. of Players', 'Select']
-	tables = [{'title':'Select Team', 'rows':rows, 'headings':headings}]
+	tables = [{'title':'Select Team for '+g_l.college, 'rows':rows, 'headings':headings}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
 def recnacc_team(request, tc_id):
 	tc = TeamCaptain.objects.get(id=tc_id)
-	rooms = [{'room':room.room + ' - ' + room.bhavan.name + ' - ' + room.vacancy, 'id':room.id,} for room in Room.objects.all()]
+	rooms = Room.objects.all()
 	parts1 = Participant.objects.filter(captain=tc, acco=True)
 	parts2 = Participant.objects.filter(captain=tc, acco=False)
-	return render(request, 'regsoft/allot.html', {'allotted':parts1, 'unallotted':parts2, 'rooms':rooms})
+	return render(request, 'regsoft/allot.html', {'alloted':parts1, 'unalloted':parts2, 'rooms':rooms, 'tc':tc})
 
 
 
 def count_players(g_l):
-	tcs = TeamCaptain.objects.filter(g_l=g_l, if_payment=True, firewallz_passed=True)
+	tcs = TeamCaptain.objects.filter(g_l=g_l, firewallz_passed=True)
 	sum=0
 	for tc in tcs:
 		sum+=tc.total_players
@@ -108,11 +108,9 @@ def count_players(g_l):
 
 @staff_member_required
 def recnacc_change(request):
-	
 	if request.POST:
 		data = request.POST
-		
-		if 'allocate' in data['action']:
+		if 'allocate' == data['action']:
 			try:
 				parts_id = dict(data)['data']
 				room_id = data['room']
@@ -125,19 +123,23 @@ def recnacc_change(request):
 			rows = []
 			tc = Participant.objects.get(id=parts_id[0]).captain
 			tc.room =room
+			tc.acco = True
 			tc.save()
 			room.vacancy -= len(parts_id)
 			room.save()
 			for part_id in parts_id:
 				part = Participant.objects.get(id=part_id)
 				part.acco = True
+				part.room = room
 				part.save()
 			gl_id = tc.g_l.id
 		
 
-		if 'deallocate' in data['action']:
+		if 'deallocate' == data['action']:
+			print data
 			try:
 				parts_id = dict(data)['data']
+				print parts_id
 			except:
 				return redirect(request.META.get('HTTP_REFERER'))
 			tc = Participant.objects.get(id=parts_id[0]).captain
@@ -145,35 +147,54 @@ def recnacc_change(request):
 			for part_id in parts_id:
 				part = Participant.objects.get(id=part_id)
 				part.acco = False
+				part.room = None
 				part.save()
-				room.vacancy -= 1
+				room.vacancy += 1
 				room.save()
 			if all((not part.acco for part in Participant.objects.filter(captain=tc))):
 				tc.room = None
 				tc.save()
+			gl_id = tc.g_l.id
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
 
 
 @staff_member_required
 def all_bhavans(request):
-	rows =[{'data':[room.room, room.bhavan.name, room.vacancy], 'link':[] } for room in Room.objects.all()]
-	headings = ['Room', 'Bhavan', 'Vacancy']
+	rows =[{'data':[bhavan.name, reduce(lambda x,y:x+y.vacancy, bhavan.room_set.all(), 0),], 'link':[{'title':'Details', 'url':reverse('regsoft:bhavan_details', kwargs={'b_id':bhavan.id})},] } for bhavan in Bhavan.objects.all()]
+	headings = ['Bhavan', 'Vacancy', 'Room-wise details']
 	tables = [{'title':'All Bhavans', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
+
+@staff_member_required
+def bhavan_details(request, b_id):
+	bhavan = Bhavan.objects.get(id=b_id)
+	rows = [{'data':[room.room, room.vacancy], 'link':[]} for room in bhavan.room_set.all()]
+	headings = ['Room', 'Vacancy']
+	tables = [{'title': 'Details for ' + bhavan.name + ' bhavan', 'headings':headings, 'rows':rows}]
+	return render(request, 'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
 def college_vs_bhavan(request):
-	rows = list(set([{'data':[tc.g_l.college, tc.room.bhavan.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, if_payment=True, acco=True)]))
-	headings = ['College', 'Bhavan']
+	rows = list([{'data':[tc.g_l.college, tc.room.bhavan.name, tc.name, tc.event.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, acco=True)])
+	print rows
+	headings = ['College', 'Bhavan', 'Name', 'Event']
 	tables = [{'title':'Bhavans vs College', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
 
 @staff_member_required
 def firewallz_approved(request):
-	rows = [[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco ] for tc in TeamCaptain.objects.filter(firewallz_passed=True, if_payment=True, acco=True) for part in Participant.objects.filter(captain=tc)]
-	headings = ['Participant', 'College', 'Gender', 'Group Leader', 'Event', 'Alloted']
+	keys=[]
+	for tc in TeamCaptain.objects.filter(firewallz_passed=True):
+		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, part.room], 'link':[]}] for part in tc.participant_set.all())
+	
+	rows = []
+	for key in keys:
+		for l in key:
+			rows.append(l)
+
+	headings = ['Participant', 'College', 'Gender', 'Group Leader', 'Event', 'Alloted', 'Room']
 	tables = [{'title':'Firewallz Approved Participants', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
@@ -185,44 +206,79 @@ def firewallz_approved(request):
 def controlz_home(request):
 	if request.method == 'POST':
 		try:
-			barcode = request.POST['code']
-			g_leader = GroupLeader.objects.get(id=barcode[::2])
+			barcode = request.POST['barcode']
+			g_leader = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
 
 		c_rows = []
 		u_rows = []
+		c_count = 0
+		u_count = 0
 		for tc in TeamCaptain.objects.filter(g_l=g_leader):
 			if tc.firewallz_passed == True:
-				c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.paid], 'links':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Teamm List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
+				try:
+					room = tc.room.room
+					bhavan = tc.room.bhavan.name
+				except:
+					room = 'None'
+					bhavan = 'None'
+				if tc.if_payment:
+					amount_left = tc.event.price - tc.payment
+					c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
 
-				if not tc.paid:
-					c_rows[1]['links'].append({'title':'Make payment', 'url':reverse('regsoft:payment', kwargs={'tc_id':tc.id})})
+					if not tc.payment == tc.event.price:
+						c_rows[c_count]['link'].append({'title':'Make payment', 'url':reverse('regsoft:create_bill', kwargs={'tc_id':tc.id})})
+					else:
+						c_rows[c_count]['link'].append({'title':'Already paid/Print Bill', 'url':reverse('regsoft:print_bill', kwargs={'tc_id':tc.id})})
 				else:
-					c_rows[1]['links'].append({'title':'Already paid', 'url':'#'})
+					amount_left = 0
+					c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
+					c_rows[c_count]['link'].append({'title':'Extra Event', 'url':'#'})
+				
+				c_count += 1
 
 			else:
 				u_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players)],})
+				u_count += 1
 
 		confirmed = {
-			'title':'Participants confirmed by Firewallz',
-			'headings':['Name', 'Event', 'Total Players', 'Paid', 'Edit details', 'Team List', 'Payment'],
-			'rows':c_rows
+			'title':'Teams confirmed by Firewallz from ' + g_leader.college,
+			'headings':['Name', 'Event', 'Total Players', 'Amount Paid','Amount left','Room','Bhavan', 'Edit details', 'Team List', 'Payment Options'],
+			'rows':c_rows 
 		}
+		print confirmed
 		unconfirmed = {
-			'title':'Participants not confirmed by Firewallz',
+			'title':'Participants not confirmed by Firewallz from ' + g_leader.college,
 			'headings':['Name', 'Event', 'Total Players'],
 			'rows':u_rows
 		}
+		print unconfirmed
 
 		context = {
 			'tables':[confirmed, unconfirmed]
 		}
 
-		return render(request,'regsoft/tables.html', context)
+		return render(request, 'regsoft/controlz_home.html', context)
+	
+	return render(request, 'regsoft/controlz_home.html')
 
-	else:
-		return render(request, 'regsoft/firewallz_home.html')
+@staff_member_required
+def show_team_list(request, tc_id):
+	captain = TeamCaptain.objects.get(id=tc_id)
+	rows = []
+	for p in Participant.objects.filter(captain=captain, firewallz_passed=True):
+		try:
+			room = p.room.room
+			bhavan = p.room.bhavan.name
+		except:
+			room = 'None'
+			bhavan = 'None'
+		rows.append({'data':[p.name, p.captain.event.name, p.captain.g_l.college,room, bhavan,], 'link':[]})
+	headings = ['Name', 'Event', 'College', 'Room', 'Bhavan']
+	tables = [{'title':'Firewallz confirmed details for '+captain.event.name + ' from ' + captain.g_l.college, 'rows':rows, 'headings':headings}]
+	return render(request,'regsoft/tables.html', {'tables':tables})
+
 
 @staff_member_required
 def view_captain(request, tc_id):
@@ -302,7 +358,7 @@ def firewallz_swap(request):
 	try:
 		data = request.POST
 	except:
-		return render(request.META.get('HTTP_REFERER'))
+		return redirect(request.META.get('HTTP_REFERER'))
 
 	if 'confirm' in data['action']:
 		part_ids = dict(data)['data']
@@ -326,13 +382,14 @@ def firewallz_swap(request):
 			tc.save()
 		return redirect('regsoft:firewallz-home')
 			
-	return render(request.META.get('HTTP_REFERER'))
+	return redirect(request.META.get('HTTP_REFERER'))
 
 	
 
 
 @staff_member_required
 def get_details(request):
+	context = {}
 	if request.method == 'POST':
 		if 'event' in request.POST:
 			event = Event.objects.get(id=request.POST['id'])
@@ -343,13 +400,13 @@ def get_details(request):
 
 			rows = []
 			for participant in participant_list:
-				rows.append((str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.g_l.college).title(), participant.captain.paid))
+				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.g_l.college).title(), participant.captain.paid], 'link':[]})
 
 			headings = ['Name', 'Captain', 'College', 'Payment']
 			title = 'Participant list for ' + event.name
-
+			print rows
 		elif 'college' in request.POST:
-			g_leader = GroupLeader.objects.get(college=request.POST['college'])
+			g_leader = GroupLeader.objects.get(id=request.POST['id'])
 			captain_list = TeamCaptain.objects.filter(g_l=g_leader)
 			participant_list = []
 			for captain in captain_list:
@@ -357,7 +414,7 @@ def get_details(request):
 
 			rows = []
 			for participant in participant_list:
-				rows.append((str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.event.name).title(), participant.captain.paid))
+				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.event.name).title(), participant.captain.payment], 'link':[]})
 
 			headings = ['Name', 'Captain', 'Event', 'Payment']
 			title = 'Participant list for ' + request.POST['college']
@@ -371,38 +428,69 @@ def get_details(request):
 		context = {
 			'tables':[table,]
 		}
-	
-	return render(request, 'regsoft/controlz-details.html', context)
+	events = Event.objects.all()
+	gls = GroupLeader.objects.all()
+	context['events'] = events
+	context['gls'] = gls
+	return render(request, 'regsoft/controlz_details.html', context)
 
 ####################    BILLINGS      #########################
 
 @staff_member_required
-def view_captains_controlz(request, gl_id):
-	g_leader = GroupLeader.objects.get(id=gl_id)
+def view_captain_controlz(request, gl_id):
+	try:
+		g_leader = GroupLeader.objects.get(id=gl_id)
+	except:
+		return render(request, 'pcradmin/message', {'message':'Invalid group leader'})
 	c_rows = []
-	paid_captains = TeamCaptain.objects.filter(g_l=g_leader, paid=True)
-	for captain in paid_captains:
-		c_rows.append({'data':[str(captain.name).title(), str(g_leader.name).title(), str(g_leader.college).title(), captain.total_players, str(captain.gender).title(), str(captain.event.name).title()], 'links':[{'title':'Print Receipt', 'url':reverse('regsoft:print_bill', kwargs={'tc_id':captain.id})}]})
 	u_rows = []
-	unpaid_captains = TeamCaptain.objects.filter(g_l=g_leader, paid=False)
-	for captain in paid_captains:
-		u_rows.append({'data':[str(captain.name).title(), str(g_leader.name).title(), str(g_leader.college).title(), captain.total_players, str(captain.gender).title(), str(captain.event.name).title()], 'links':[{'title':'Create Bill', 'url':reverse('regsoft:create_bill', kwargs={'tc_id':captain.id})}]})
+	c_count = 0
+	u_count = 0
+	for tc in TeamCaptain.objects.filter(g_l=g_leader):
+		if tc.firewallz_passed == True:
+			try:
+				room = tc.room.room
+				bhavan = tc.room.bhavan.name
+			except:
+				room = 'None'
+				bhavan = 'None'
+			if tc.if_payment:
+				amount_left = tc.event.price - tc.payment
+				c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
+
+				if not tc.payment == tc.event.price:
+					c_rows[c_count]['link'].append({'title':'Make payment', 'url':reverse('regsoft:create_bill', kwargs={'tc_id':tc.id})})
+				else:
+					c_rows[c_count]['link'].append({'title':'Already paid/Print Bill', 'url':reverse('regsoft:print_bill', kwargs={'tc_id':tc.id})})
+			else:
+				amount_left = 0
+				c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
+				c_rows[c_count]['link'].append({'title':'Extra Event', 'url':'#'})
+				
+			c_count += 1
+
+		else:
+			u_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players)],})
+			u_count += 1
 
 	confirmed = {
-		'title':'Paid teams from ' + g_leader.college,
-		'headings' : ['Captain Name', 'Group Leader', 'College', 'Total Players', 'Gender', 'Event', 'Print Receipt'],
-		'rows':c_rows,
+		'title':'Teams confirmed by Firewallz from ' + g_leader.college,
+		'headings':['Name', 'Event', 'Total Players', 'Amount Paid','Amount left','Room','Bhavan', 'Edit details', 'Team List', 'Payment Options'],
+		'rows':c_rows 
 	}
+		# print confirmed
 	unconfirmed = {
-		'title':'Unpaid teams from ' + g_leader.college,
-		'headings' : ['Captain Name', 'Group Leader', 'College', 'Total Players', 'Gender', 'Event', 'Create Bill'],
-		'rows':u_rows,
-	}
+		'title':'Participants not confirmed by Firewallz from ' + g_leader.college,
+		'headings':['Name', 'Event', 'Total Players'],
+		'rows':u_rows
+		}
+	# print unconfirmed
 
 	context = {
-		'tables':[confirmed, unconfirmed],
+		'tables':[confirmed, unconfirmed]
 	}
-	return render(request, 'regsoft/tables.html', context)
+
+	return render(request, 'regsoft/controlz_home.html', context)
 
 @staff_member_required
 def create_bill(request, tc_id):
@@ -419,27 +507,27 @@ def create_bill(request, tc_id):
 		amount_dict = {'twothousands':2000, 'fivehundreds':500, 'hundreds':100, 'fifties':50, 'twenties':20, 'tens':10}
 		bill.amount = 0
 		for key,value in amount_dict.iteritems():
-			bill.amount += data[key]*value
-		
-		if bill.amount == 0:
-			try:
-				bill.draft_number = data['draft_number']
-			except:
-				pass
-			bill.draft_amount = data['draft_amount']
+			bill.amount += int(data[key])*int(value)
+		try:
+			bill.draft_number = data['draft_number']
+		except:
+			pass
+		bill.draft_amount = data['draft_amount']
 		
 		if not (bill.amount == 0 and bill.draft_amount == 0):
 			bill.captain = captain
 			bill.save()
 			captain.paid = True
+			captain.payment = captain.payment + int(bill.amount) + int(bill.draft_amount)
 			captain.save()
 
-			return redirect(reverse('regsoft:view_captains_controlz', kwargs={'gl_id':captain.g_l.id}))
+			return redirect(reverse('regsoft:view_captain_controlz', kwargs={'gl_id':captain.g_l.id}))
 
 		else:
 			return redirect(reverse('regsoft:create_bill', kwargs={'tc_id':tc_id}))
-		
-	return render(request, 'regsoft/create_bill.html')
+
+	amount = captain.event.price - captain.payment	
+	return render(request, 'regsoft/create_bill.html', {'captain':captain, 'amount':amount})
 
 @staff_member_required
 def print_bill(request, tc_id):
@@ -447,7 +535,17 @@ def print_bill(request, tc_id):
 	time_stamp = datetime.now()
 	captain = TeamCaptain.objects.get(id=tc_id)
 	g_leader = captain.g_l
-	return render(request, 'regsoft/receipt.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp})
+	for part in captain.participant_set.all():
+		part.controlz = True
+		part.save()
+	bill = Bill.objects.get(captain=captain)
+	try:
+		draft = bill.draft_number
+	except:
+		draft = ''
+	payment_methods = [{'method':'Cash', 'amount':bill.amount}, {'method':'Draft #'+draft, 'amount':bill.draft_amount}]	
+	total = int(bill.amount) + int(bill.draft_amount)
+	return render(request, 'regsoft/print_bill.html', {'captain':captain, 'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':total})
 
 
 @staff_member_required

@@ -8,7 +8,7 @@
 <legend>View Participants</legend>
 <input type="text" name="barcode" class="form-control" placeholder="Enter Barcode" style="padding-left: 1vw;">
 <br>
-<button  type="submit" class="btn bg-red btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
+<button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
 </fieldset>
 </form>
 </div>
@@ -20,7 +20,7 @@
 <div class="card">
     <div class="header">
         <h2>
-            UnConfirmed Participants
+            Unconfirmed Participants
         </h2>
     </div>
 	<div class="body">
@@ -68,8 +68,8 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <input type="hidden" value="comfirm" name="action">
-            <button type="submit" class="btn btn-default waves-effect">Confirm</button>
+            <input type="hidden" value="confirm" name="action">
+            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Confirm</button>
         </div>
 	</form>
     </div>
@@ -77,7 +77,6 @@
 {% endif %}
 
 
-{{unconfirmed}}
 
 {% if confirmed %}
 <div class="card">
@@ -127,8 +126,8 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <input type="hidden" value="uncomfirm" name="action">
-            <button type="submit" class="btn btn-default waves-effect">Unconfirm</button>
+            <input type="hidden" value="unconfirm" name="action">
+            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Unconfirm</button>
         </div>
 	</form>
     </div>

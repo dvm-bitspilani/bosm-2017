@@ -1,0 +1,60 @@
+{% extends "regsoft/base.html" %}
+{% block body %}
+<div class="form-group">
+<div class="form-line">
+<form action="" method="post">
+{% csrf_token %}
+<fieldset>
+<legend>View Participants</legend>
+<input type="text" name="barcode" class="form-control" placeholder="Enter Barcode" style="padding-left: 1vw;">
+<br>
+<button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
+</fieldset>
+</form>
+</div>
+</div>
+
+{% for table in tables %}
+<div class="card">
+    <div class="header">
+        <h2>
+            {{table.title}}
+        </h2>
+    </div>
+	<div class="body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                <thead>
+                    <tr>
+                        {% for heading in table.headings %}
+                            <th>{{heading}}</th>
+                        {% endfor %}
+                   </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        {% for heading in table.headings %}
+                            <th>{{heading}}</th>
+                        {% endfor %}
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for row in table.rows %}
+                    <tr>
+                        {% for data in row.data %}
+                            <td>{{data}}</td>
+                        {% endfor %}
+                        {% for link in row.link %}
+                            <td><a href="{{link.url}}">{{link.title}}</a></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

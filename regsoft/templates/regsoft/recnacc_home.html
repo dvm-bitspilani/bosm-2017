@@ -9,7 +9,7 @@
 <legend>Search College</legend>
 <input type="text" name="barcode" class="form-control" placeholder="Enter Barcode" style="padding-left: 1vw;">
 <br>
-<button  type="submit" class="btn bg-red btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
+<button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">search</i></button>
 </fieldset>
 </form>
 </div>
@@ -53,7 +53,7 @@
                                     <td>{{data}}</td>
                                     {% endfor %}
                                     {% for link in row.link %}
-                                    <td><a href="{{link.link}}">{{link.title}}</a></td>
+                                    <td><a href="{{link.url}}">{{link.title}}</a></td>
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}

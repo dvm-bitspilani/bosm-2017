@@ -1,13 +1,56 @@
+{% extends 'regsoft/base.html' %}
 {% block body %}
 
 {% if unalloted %}
 <form action="{% url 'regsoft:change' %}" method="post">
-    <select name="room" id="room">
+        <div class="card">
+        <div class="header">
+            <h2>
+                Select a Room for {{tc.name}} participating in {{tc.event.name}} from {{tc.g_l.college}}
+            </h2>
+        </div>
+    <div class="body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+            <thead>
+                    <tr>
+                        <th>Bhavan</th>
+                        <th>Room</th>
+                        <th>Vacancy</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Bhavan</th>
+                        <th>Room</th>
+                        <th>Vacancy</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                {% for r in rooms %}
+                    <tr>
+                        <td>{{r.bhavan}}</td>
+                        <td>{{r.room}}</td>
+                        <td>{{r.vacancy}}</td>
+                        <td>
+                            <input name="room" type="radio" id="{{r.id}}" value="{{r.id}}"/>
+                            <label for="{{r.id}}"></label>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+    {% comment %} <select name="room" id="room">
         <option disabled selected>Select a Room to Allot</option>
-        {% for r in room %}
+        {% for r in rooms %}
         <li><option value="{{r.id}}">{{r.room}}</option></li>
         {% endfor %}
-    </select>
+    </select> {% endcomment %}
+    </table>
+        </div>
+    </div>
+        </div>
     <div class="card">
         <div class="header">
             <h2>
@@ -52,7 +95,7 @@
                     </tbody>
                 </table>
                 <input type="hidden" value="allocate" name="action">
-                <button type="submit" class="btn btn-default waves-effect">Allocate</button>
+                <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Allocate</button>
             </div>
         </div>
     </div>
@@ -69,7 +112,7 @@
         </h2>
     </div>
 	<div class="body">
-	<form action="{% url 'regsoft:firewallz_swap' %}" method="post">
+	<form action="{% url 'regsoft:change' %}" method="POST">
 	{% csrf_token %}
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable js-exportable">
@@ -79,6 +122,8 @@
                         <th>Gender</th>
                         <th>Event</th>
                         <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
                         <th>Select</th>
                     </tr>
                 </thead>
@@ -88,16 +133,20 @@
                         <th>Gender</th>
                         <th>Event</th>
                         <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
                         <th>Select</th>
                     </tr>
                 </tfoot>
                 <tbody>
-                    {% for i in unalloted %}
+                    {% for i in alloted %}
                     <tr>
                         <td>{{i.name}}</td>
                         <td>{{i.captain.gender}}</td>
                         <td>{{i.captain.event.name}}</td>
                         <td>{{i.captain.g_l.college}}</td>
+                        <td>{{i.room.room}}</td>
+                        <td>{{i.room.bhavan.name}}</td>
                         <td>
                             <input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
                             <label for="{{i.id}}"></label>
@@ -107,7 +156,7 @@
                 </tbody>
             </table>
             <input type="hidden" value="deallocate" name="action">
-            <button type="submit" class="btn btn-default waves-effect">Deallocate</button>
+            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Deallocate</button>
         </div>
 	</form>
     </div>

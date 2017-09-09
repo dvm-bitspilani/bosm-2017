@@ -16,7 +16,8 @@
     <link href="{% static 'regsoft/plugins/node-waves/waves.css' %}" rel="stylesheet" />
 
     <link href="{% static 'regsoft/plugins/animate-css/animate.css' %}" rel="stylesheet" />
-
+    <link href="{% static 'regsoft/plugins/bootstrap-select/css/bootstrap-select.css' %}" rel="stylesheet" />
+    
     <!-- <link href="{% static 'regsoft/plugins/morrisjs/morris.css' %}" rel="stylesheet" /> -->
     <link href="{% static 'regsoft/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css' %}" rel="stylesheet">
 
@@ -119,7 +120,7 @@
                                 <a href="{% url 'regsoft:recnacc-home' %}">RecN Acc Home</a>
                             </li>
                             <li>
-                                <a href="p{% url 'regsoft:college_vs_bhavan' %}">College Vs Bhavan</a>
+                                <a href="{% url 'regsoft:college_vs_bhavan' %}">College Vs Bhavan</a>
                             </li>
                             <li>
                                 <a href="{% url 'regsoft:all_bhavans' %}">All Bhavans</a>
@@ -136,19 +137,10 @@
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a href="pages/charts/morris.html">Morris</a>
+                                <a href="{% url 'regsoft:controlz-home' %}">Home</a>
                             </li>
                             <li>
-                                <a href="pages/charts/flot.html">Flot</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/chartjs.html">ChartJS</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/sparkline.html">Sparkline</a>
-                            </li>
-                            <li>
-                                <a href="pages/charts/jquery-knob.html">Jquery Knob</a>
+                                <a href="{% url 'regsoft:get_details' %}">Event Details</a>
                             </li>
                         </ul>
                     </li>
@@ -245,26 +237,8 @@
     <script src="{% static 'regsoft/plugins/node-waves/waves.js' %}"></script>
 
 
-   
-    <!-- Jquery CountTo Plugin Js -->
     <script src="{% static 'regsoft/plugins/jquery-countto/jquery.countTo.js' %}"></script>
-    <!-- <script src="{% static 'regsoft/plugins/raphael/raphael.min.js' %}"></script> -->
-    <!-- <script src="{% static 'regsoft/plugins/morrisjs/morris.js' %}"></script> -->
-
-    <!-- ChartJs -->
-    <!-- <script src="{% static 'regsoft/plugins/chartjs/Chart.bundle.js' %}"></script> -->
-
-    <!-- Flot Charts Plugin Js -->
-    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.js' %}"></script> -->
-    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.resize.js' %}"></script> -->
-    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.pie.js' %}"></script> -->
-    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.categories.js' %}"></script> -->
-    <!-- <script src="{% static 'regsoft/plugins/flot-charts/jquery.flot.time.js' %}"></script> -->
-
-    <!-- Sparkline Chart Plugin Js -->
-    <!-- <script src="{% static 'regsoft/plugins/jquery-sparkline/jquery.sparkline.js' %}"></script> -->
-
-    <!-- Custom Js -->
+    
  
     <script src="{% static 'regsoft/js/pages/index.js' %}"></script>
 

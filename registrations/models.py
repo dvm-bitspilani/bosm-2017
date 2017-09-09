@@ -63,6 +63,8 @@ class TeamCaptain(models.Model):
 	payment = models.IntegerField(default=0)
 	is_extra = models.BooleanField(default=False)
 	extra_id = models.IntegerField(default=0)
+	barcode = models.CharField(max_length=50, null=True)
+
 
 	def __unicode__(self):
 
@@ -80,6 +82,9 @@ class Participant(models.Model):
 	acco = models.BooleanField('passed recnacc', default=False)
 	room = models.ForeignKey(Room, null=True, blank=True)
 	controlz = models.BooleanField('controlz passed', default=False)
+	barcode = models.CharField(max_length=50, null=True)
+	bill = models.ForeignKey(Bill ,null=True, on_delete=None)
+
 	def __unicode__(self):
 
 		return self.name
@@ -94,8 +99,3 @@ class Transport(models.Model):
 	def __unicode__(self):
 
 		return str(self.g_l.name)
-
-# class Coach(models.Model):
-
-# 	name = models.CharField(max_length=100)
-# 	captain = models.OneToOneField(TeamCaptain, on_delete=models.CASCADE)
