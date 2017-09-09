@@ -384,9 +384,6 @@ def firewallz_swap(request):
 			
 	return redirect(request.META.get('HTTP_REFERER'))
 
-	
-
-
 @staff_member_required
 def get_details(request):
 	context = {}
