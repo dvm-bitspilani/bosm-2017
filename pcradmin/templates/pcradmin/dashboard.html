@@ -42,12 +42,18 @@
             <td><a href="{% url 'pcradmin:get_list' %}" id="download-button" class="btn-large waves-effect waves-light pink">View</a></td>
           </tr>
           <tr>
+            <td>Change Payment Status</td>
+            <td><a href="{% url 'pcradmin:change_paid' %}" id="download-button" class="btn-large waves-effect waves-light pink">Payment</a></td>
+          </tr>
+          <tr>
+            <td>Edit Details</td>
+            <td><a href="{% url 'pcradmin:edit-show_gl' %}" id="download-button" class="btn-large waves-effect waves-light pink">Edit</a></td>
+          </tr>
+          <tr>
             <td>Send Final Email</td>
             <td><a href="{% url 'pcradmin:final_confirmation' %}" id="download-button" class="btn-large waves-effect waves-light pink">Final Confirmation</a></td>
           </tr>
-          <tr>
-            <td>Change Payment Status</td>
-            <td><a href="{% url 'pcradmin:change_paid' %}" id="download-button" class="btn-large waves-effect waves-light pink">Payment</a></td>
+
           </tbody>
       </table>
       </div>

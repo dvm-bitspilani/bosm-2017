@@ -110,7 +110,7 @@ def status_change(request):
 
 					for gl_id in group_leaders:
 						gl = GroupLeader.objects.get(id=gl_id)
-						gl.pcr_approved = False
+						gl.pcr_approved = True
 						user = gl.user
 						user.is_active = False
 						gl.save()
@@ -841,3 +841,27 @@ def change_paid_college(request, gl_id):
 		for i in p:
 			final_paid.append(i)
 	return render(request, 'pcradmin/change_paid.html', {'paid':final_paid, 'gl':gl})
+
+@staff_member_required
+def edit(request, gl_id=None):
+	if gl_id == None:
+		gls = GroupLeader.objects.filter(pcr_approved=True)
+		return render(request, 'pcradmin/edit-show_gl.html', {'groupleaders':gls})
+	else:
+		g_l = GroupLeader.objects.get(id=gl_id)
+		rows = [{'name':part.name, 'event':tc.event.name, 'captain':captain.name, 'id':part.id} for tc in TeamCaptain.objects.filter(g_l=g_l) for part in tc.participant_set.all()]
+		return render(request, 'pcradmin/edit-show_participants.html', {'rows':rows, 'gl':g_l})
+
+@staff_member_required
+def edit_participant(request, part_id):
+	part = Participant.objects.get(id=part_id)
+	if request.method=='POST':
+		try:
+			name = request.POST['name']
+		except:
+			return redirect(request.META.get('HTTP_REFERER'))
+		part.name=name
+		part.save()
+		edit(request, gl_id=part.captain.g_l.id)
+		return redirect(reverse('pcradmin:edit-show_participants', kwargs={'gl_id':part.captain.g_l.id}))
+	return render(request, 'pcradmin/edit.html',{'part':part, 'event':part.captain.event.name, 'college':part.captain.g_l.name} )

@@ -1,0 +1,38 @@
+{% extends "pcradmin/base.html" %}
+{% block body %}
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center pink-text">Select the Participant to edit</h2>
+      <br>
+      <div class="center-align">
+        <table class="centered">
+                <thead>
+                    <tr>
+                        <th>Participant Name</th>
+                        <th>Event</th>
+                        <th>Team Captain</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{row.name}}</td>
+                        <td>{{row.event}}</td>
+                        <td>{{row.captain}}</td>
+                        <td>
+                            <a href="{% url 'pcradmin:edit_participant' row.id %}" class="btn-large waves-effect waves-light pink">Select</a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            <br>
+            
+        </div>
+    </div>
+</div>
+{% endblock body %}
