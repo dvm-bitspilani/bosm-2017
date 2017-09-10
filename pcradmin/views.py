@@ -895,6 +895,5 @@ def edit_participant(request, part_id):
 			return redirect(request.META.get('HTTP_REFERER'))
 		part.name=name
 		part.save()
-		edit(request, gl_id=part.captain.g_l.id)
 		return redirect(reverse('pcradmin:edit-show_participants', kwargs={'gl_id':part.captain.g_l.id}))
 	return render(request, 'pcradmin/edit.html',{'part':part, 'event':part.captain.event.name, 'college':part.captain.g_l.name} )

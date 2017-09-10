@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+	<title>BOSM' 17 Registeration</title>
+	<link rel="stylesheet" href="{% static 'registrations/css/materialize.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'registrations/css/style.css' %}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script src="{% static 'registrations/js/materialize.min.js' %}"></script>
+	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+</head>
+<body style="background-color:#D9E5D6;overflow-y:scroll">
+<div class="container">
+	<div class="row" style="margin-top:5%;margin-bottom:50px;">>
+		<div class="col s12 m8 l8 offset-m2 offset-l2" style="padding-top:5%;">
+			<div class="row form2" >
+				<div class="section no-pad-bot" id="index-banner">
+                    <div class="container"> 
+                      <h2 class="header center white-text">Change Participant detail of {{college}} in {{event}}</h2>
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <div class="input-field col s6">
+                                    <input value="{{part.name}}" id="name" type="text" name="name">
+                                    <label class="active" for="name">Participant Name</label>
+                                </div>
+                                <button class="waves-effect waves-light btn blue" type="submit" name="submit">Change</button>
+                            </form>
+                            <br>
+                    </div>
+                </div>    
+            </div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

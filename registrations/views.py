@@ -332,13 +332,11 @@ def register_captain(request, event_id):
 		event = Event.objects.get(id=event_id)
 		try:
 			if event.max_limit != 1:
-				print 'hello'
 				tc = TeamCaptain.objects.get(g_l=g_l, event=event)
-				print 'hello'
+				print 'Hi'
 				data = {'tc':tc.name,'event':event.name,
-				 'participants':[part.name for part in Participant.objects.filter(captain=tc)],
-				  'url':reverse('registrations:add_extra_templ',
-				 kwargs={'tc_id':tc.id})}
+				 'participants': tc.participant_set.all(),
+				  'url':reverse('registrations:add_extra_templ', kwargs={'tc_id':tc.id})}
 				return render(request, 'registrations/participants.html', data)
 		except Exception, e:
 			pass
@@ -380,6 +378,25 @@ def add_extra_event(request, tc_id):
 		players = [{'name':part.name, 'id':part.id} for part in participants]
 	data = {'participants':players, 'events':event_set}
 	return JsonResponse(data)
+
+@login_required
+def participant_edit(request, p_id):
+
+	g_leader = GroupLeader.objects.get(user=request.user)
+	part = Participant.objects.get(id=p_id)
+	if part.captain.g_l == g_leader:
+		if request.method == 'POST':
+			try:
+				name = request.POST['name']
+			except:
+				return redirect(request.META.get('HTTP_REFERER'))
+			part.name=name
+			part.save()
+			return redirect(reverse('registrations:register_captain', kwargs={'event_id':part.captain.event.id}))
+		
+		return render(request, 'registrations/edit.html',{'part':part, 'event':part.captain.event.name, 'college':part.captain.g_l.name} )
+	else:
+		return render(request, 'pcradmin/message', {'message':'Invalid access.'})
 
 @login_required
 def transport(request):
