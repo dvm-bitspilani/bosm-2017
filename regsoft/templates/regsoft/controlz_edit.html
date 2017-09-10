@@ -1,0 +1,44 @@
+{% extends 'regsoft/base.html' %}
+
+{% block body %}
+
+<div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Edit Participant for {{college}} for {{event}}
+                    </h2>
+                </div>
+
+<div class="body">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <label for="name">Name of the Participant</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="text" id="name" class="form-control" placeholder="Name of the participant" name="name" value="{{name}}">
+                </div>
+            </div>
+            <label for="Captain">Team Captain</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="text" id="Captain" class="form-control" placeholder="Captain" name="name" value="{{captain}}" disabled="">
+                </div>
+            </div>
+            <label for="gl">Group Leader</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="text" id="gl" class="form-control" placeholder="Group Leader" name="name" value="{{g_l}}" disabled="">
+                </div>
+            </div>
+            
+            <br>
+            <button type="submit" class="btn btn-primary m-t-15 waves-effect">Edit</button>
+        </form>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}

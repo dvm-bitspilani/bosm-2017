@@ -1,0 +1,57 @@
+{% extends 'regsoft/base.html' %}
+{% load static %}
+
+{% block body %}
+
+{% for table in tables %}
+
+<div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        {{table.title}}
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="table-responsive">
+                        
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                            <thead>
+                                <tr>
+                                    {% for heading in table.headings %}
+                                    <th>{{heading}}</th>
+                                    {% endfor %}
+                            </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    {% for heading in table.headings %}
+                                    <th>{{heading}}</th>
+                                    {% endfor %}    
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for row in table.rows %}
+                                <tr>
+                                    {% for data in row.data %}
+                                    <td>{{data}}</td>
+                                    {% endfor %}
+                                    {% for link in row.link %}
+                                    <td><a href="{{link.url}}">{{link.title}}</a></td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <a href="{% url 'regsoft:print_bill' bill.id %}" class="btn-success m-l-20 bg-cyan btn-lg waves-effect">Print Bill</a>
+                <a href="{% url 'regsoft:delete_bill' bill.id %}" class="btn-danger  m-l-20 bg-pink btn-lg waves-effect">Delete Bill</a>                
+                <br><br>
+            </div>
+        </div>
+    </div>
+
+{% endfor %}
+{% endblock %}
