@@ -849,7 +849,7 @@ def edit(request, gl_id=None):
 		return render(request, 'pcradmin/edit-show_gl.html', {'groupleaders':gls})
 	else:
 		g_l = GroupLeader.objects.get(id=gl_id)
-		rows = [{'name':part.name, 'event':tc.event.name, 'captain':captain.name, 'id':part.id} for tc in TeamCaptain.objects.filter(g_l=g_l) for part in tc.participant_set.all()]
+		rows = [{'name':part.name, 'event':part.captain.event.name, 'captain':part.captain.name, 'id':part.id} for tc in TeamCaptain.objects.filter(g_l=g_l) for part in tc.participant_set.all()]
 		return render(request, 'pcradmin/edit-show_participants.html', {'rows':rows, 'gl':g_l})
 
 @staff_member_required
