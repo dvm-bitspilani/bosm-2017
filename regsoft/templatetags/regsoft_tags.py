@@ -32,3 +32,10 @@ def navbar_color(name):
 @register.inclusion_tag('regsoft/tables.html')
 def show_tables(tables):
 	return {'tables':tables}
+
+@register.simple_tag
+def get_amount(participant):
+	if (participant.captain.if_payment and participant.captain.payment > 0) or not participant.captain.if_payment:
+		return '700'
+	else:
+		return '1000'

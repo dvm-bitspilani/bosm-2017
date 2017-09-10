@@ -1,19 +1,81 @@
 {% extends 'regsoft/base.html' %}
+{% load static %}
 
 {% block body %}
 
+
+<form method="POST" action="{% url 'regsoft:create_bill' g_leader.id %}">
+        {% csrf_token %}
 <div class="row clearfix">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
                 <div class="header">
                     <h2>
-                        Create Bill for {{captain.name}} from {{captain.g_l.college}} for {{captain.event.name}} of(tentative) {{amount}}
+                        Participants from {{g_leader.college}} under {{g_leader.name}}
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="table-responsive">
+                        
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for part in participant_list %}
+                                <tr>
+                                    <td>{{part.name}}</td>
+                                    <td>{{part.captain.event.name}}</td>
+                                    <td>{{part.captain.name}}</td>
+                                    <td class="chk">
+                                        <input type="checkbox" name="data" id="{{part.id}}" value="{{part.id}}">
+                                        <label for="{{part.id}}"></label>
+                                    </td>
+                                    <td>
+                                        {% if part.captain.if_payment and part.captain.payment > 0 %}
+                                        700
+                                        {% elif not part.captain.if_payment %}
+                                        700
+                                        {% else %}
+                                        1000
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Create Bill for {{g_leader.name}} from {{g_leader.college}} of Rs. <span id="amount">0</span>
                     </h2>
                 </div>
 
 <div class="body">
-        <form method="POST" action="{% url 'regsoft:create_bill' captain.id %}">
-            {% csrf_token %}
+        
             <label for="twothousands">No of two thousand notes</label>
             <div class="form-group">
                 <div class="form-line">
