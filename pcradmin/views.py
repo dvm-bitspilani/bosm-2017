@@ -345,53 +345,86 @@ def final_list_download(request):
 @staff_member_required
 def final_confirmation(request):
 	g_leaders = GroupLeader.objects.filter(pcr_approved=True)
-	return render(request, 'pcradmin/final_confirm.html', {'g_leaders':g_leaders})
+	return render(request, 'pcradmin/final_confirm_gl.html', {'g_leaders':g_leaders})
+
 
 @staff_member_required
-def final_confirmation_email(request, gl_id):
+def final_confirmation_email(request, tc_id):
 	
-	g_l = get_object_or_404(GroupLeader, id=gl_id)
-	if request.method == 'POST':
+	tc = get_object_or_404(TeamCaptain, id=tc_id)
+	
+	body = '''<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<pre>
+Greetings!
+This is the final confirmation mail sent out only to the Group Leaders to your college.
+<b>Attached in the PDF are the list of participants</b> permitted to participate this BOSM.
 
-		sub = request.POST['sub']
-		body = request.POST['body']
-		send_to = request.POST['to']
-		sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
-		from_email = Email("no-reply@bits-bosm.org")
-		to_email = Email(send_to)
-		subject = sub
-		content = Content("text/html", "We welcome you on behalf to BOSM '17 at BITS, Pilani. PFA the list of participating colleges.")
+The <b>confirmed participants are required to pay an additional fee of Rs1000</b> (300 as a security caution deposite) upon arriving on campus.
 
-		import base64
+<b>The cofirmed participants are required to bring along their college ID cards and College Bonafides/Fee Payment Reciepts when they come on campus.</b>
 
-		with open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb") as xl_file:
-			encoded_string = base64.b64encode(xl_file.read())
+This BOSM, we are providing the option of prepaid cab and bus travel from select locations in Delhi, Jaipur and Loharu. Participants opting for the service will be dropped off directly at the campus, ensuring a hassle free experience. Limited seats available.
 
-		attachment = Attachment()
-		attachment.content = encoded_string
-		attachment.filename = "gleaders.xlsx"
+If you wish to avail travel, please fill the following form: <a href="https://goo.gl/forms/bu63y1JLxEiKErFq1">https://goo.gl/forms/bu63y1JLxEiKErFq1</a>
+ 
+<b>Terms and conditions:</b>
+	<ul>
+	<li>Cabs and Buses are available only on a first come first serve basis. Filling up this form <b>DOES NOT CONFIRM booking</b>.</li>
+	<li>All bookings shall be <b>confirmed only after online payment.</b> Payment link will be sent via mail to the respective Group Leaders.</li>
+	<li>Rates mentioned in the attached "Rate Sheet" are tentative. The organizers reserve all rights to change the rates if required, without prior notification.</li>
+	<li>Toll tax and parking charges (if any) shall be borne by the passengers.</li>
+	<li>The type of vehicle allotted is solely at the discretion of the organizers.</li>
+	<ul>
+For queries related to travel, contact:
+Sirish: +91 7989537370
+Gautham: +91 9444637124
+
+ 
+Regards,
+Ashay Anurag
+CoSSAcn (Head)
+Dept. of Publications  Correspondence, BOSM 2017
+BITS Pilani
++91-9929022741
+</pre>
+</body>
+</html>'''
+	sub = 'BOSM 2017'
+	send_to = tc.email
+	send_to = request.POST['to']
+	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+	from_email = Email("no-reply@bits-bosm.org")
+	to_email = Email(send_to)
+	subject = sub
+	content = Content("text/html", body)
+
+	import base64
+
+	with open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb") as xl_file:
+		encoded_string = base64.b64encode(xl_file.read())
+
+	attachment = Attachment()
+	attachment.content = encoded_string
+	attachment.filename = "gleaders.xlsx"
 
 
-		
-		try:
-			mail = Mail(from_email, subject, to_email, content)
-			mail.add_attachment(attachment)
-			response = sg.client.mail.send.post(request_body=mail.get())
+	
+	try:
+		mail = Mail(from_email, subject, to_email, content)
+		mail.add_attachment(attachment)
+		response = sg.client.mail.send.post(request_body=mail.get())
 
-		except:
-			return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+	except:
+		return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
-		return render(request, "pcradmin/message.html", {'message':'Email sent to ' + send_to})
+	return render(request, "pcradmin/message.html", {'message':'Email sent to ' + send_to})
 
-	else:
-
-		context = {
-		'g_l':g_l,
-		'to' : g_l.email,
-		'subject' : "BOSM 2017",
-		"body" : 'This is the final confirmation email. PFA the list of all participating group leaders for BOSM \'17.'
-		}
-		return render(request, 'pcradmin/final_confirmation_email.html', context)
+	
 
 
 
