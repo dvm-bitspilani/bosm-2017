@@ -25,8 +25,10 @@ urlpatterns = [
 	
 	########## Controlz #############
 	url(r'^controlz/$', views.controlz_home, name='controlz-home'),
-	url(r'^controlz/team_list/(?P<tc_id>\d+)/$', views.show_team_list, name='show_team_list'),
-	url(r'^controlz/view_captain/(?P<tc_id>\d+)/$', views.view_captain, name='view_captain'),
+	url(r'^controlz/edit/(?P<part_id>\d+)/$', views.controlz_edit, name='controlz_edit'),
+	url(r'^controlz/add/(?P<gl_id>\d+)/$', views.controlz_add, name='controlz_add'),
+	url(r'^controlz/delete/$', views.controlz_delete, name='controlz_delete'),
+
 	url(r'^controlz/create_bill/(?P<tc_id>\d+)/$', views.create_bill, name='create_bill'),
 	url(r'^controlz/print_bill/(?P<tc_id>\d+)/$', views.print_bill, name='print_bill'),
 	url(r'^controlz/view_captain_controlz/(?P<gl_id>\d+)/$', views.view_captain_controlz, name='view_captain_controlz'),

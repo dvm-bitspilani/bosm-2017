@@ -201,126 +201,109 @@ def firewallz_approved(request):
 
 ##################################################   CONTROLZ ######################################################
 
-
 @staff_member_required
 def controlz_home(request):
 	if request.method == 'POST':
+		
 		try:
 			barcode = request.POST['barcode']
 			g_leader = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
+		rows = [{'id':part.id, 'name':part.name, 'event':part.captain.event.name, 'captain':part.captain.name, 'link':reverse('regsoft:controlz_edit', kwargs={'part_id':part.id}), 'college':g_leader.college} for part in Participants.objects.filter(captain__g_l=g_leader, firewallz_passed=True)]
+		headings = ['Name', 'Event', 'Captain', 'College', 'Edit', 'Select']
+		table = {'title':'Participants for ' + g_leader.college, 'rows':rows, 'headings':headings}
+		return render(request, 'regsoft/controlz_home.html', {'table':table, 'gl_id':g_leader.id})
 
-		c_rows = []
-		u_rows = []
-		c_count = 0
-		u_count = 0
-		for tc in TeamCaptain.objects.filter(g_l=g_leader):
-			if tc.firewallz_passed == True:
-				try:
-					room = tc.room.room
-					bhavan = tc.room.bhavan.name
-				except:
-					room = 'None'
-					bhavan = 'None'
-				if tc.if_payment:
-					amount_left = tc.event.price - tc.payment
-					c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
+	return render(request, 'regsoft/controlz_home.html', 
+		{'group_leaders':GroupLeader.objects.filter(pcr_approved=True)})
 
-					if not tc.payment == tc.event.price:
-						c_rows[c_count]['link'].append({'title':'Make payment', 'url':reverse('regsoft:create_bill', kwargs={'tc_id':tc.id})})
-					else:
-						c_rows[c_count]['link'].append({'title':'Already paid/Print Bill', 'url':reverse('regsoft:print_bill', kwargs={'tc_id':tc.id})})
-				else:
-					amount_left = 0
-					c_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players), tc.payment,amount_left, room, bhavan], 'link':[{'title':'Edit details', 'url':reverse('regsoft:view_captain', kwargs={'tc_id':tc.id}), }, {'title':'Show Team List','url':reverse('regsoft:show_team_list', kwargs={'tc_id':tc.id})}]})
-					c_rows[c_count]['link'].append({'title':'Extra Event', 'url':'#'})
-				
-				c_count += 1
-
-			else:
-				u_rows.append({'data':[str(tc.name.title()), str(tc.event.name.title()), str(tc.total_players)],})
-				u_count += 1
-
-		confirmed = {
-			'title':'Teams confirmed by Firewallz from ' + g_leader.college,
-			'headings':['Name', 'Event', 'Total Players', 'Amount Paid','Amount left','Room','Bhavan', 'Edit details', 'Team List', 'Payment Options'],
-			'rows':c_rows 
-		}
-		print confirmed
-		unconfirmed = {
-			'title':'Participants not confirmed by Firewallz from ' + g_leader.college,
-			'headings':['Name', 'Event', 'Total Players'],
-			'rows':u_rows
-		}
-		print unconfirmed
-
-		context = {
-			'tables':[confirmed, unconfirmed]
-		}
-
-		return render(request, 'regsoft/controlz_home.html', context)
-	
-	return render(request, 'regsoft/controlz_home.html')
 
 @staff_member_required
-def show_team_list(request, tc_id):
-	captain = TeamCaptain.objects.get(id=tc_id)
-	rows = []
-	for p in Participant.objects.filter(captain=captain, firewallz_passed=True):
+def controlz_edit(request, part_id):
+	part = Participant.objects.get(id=part_id)
+	if request.method=='POST':
 		try:
-			room = p.room.room
-			bhavan = p.room.bhavan.name
+			name = request.POST['name']
 		except:
-			room = 'None'
-			bhavan = 'None'
-		rows.append({'data':[p.name, p.captain.event.name, p.captain.g_l.college,room, bhavan,], 'link':[]})
-	headings = ['Name', 'Event', 'College', 'Room', 'Bhavan']
-	tables = [{'title':'Firewallz confirmed details for '+captain.event.name + ' from ' + captain.g_l.college, 'rows':rows, 'headings':headings}]
-	return render(request,'regsoft/tables.html', {'tables':tables})
+			return redirect(request.META.get('HTTP_REFERER'))
+		part.name = name
+		part.save()
+		request.method = 'POST'
+		request.POST['barcode'] = g_l.barcode
+		controlz_home(request)
+
+		
+	tc = part.captain
+	g_l = tc.g_l
+	return render(request, 'regsoft/controlz_edit.html', 
+		{'name':part.name, 'college':g_l.college, 'captain':tc.name, 'g_l':g_l.name, 'event':tc.event})
 
 
 @staff_member_required
-def view_captain(request, tc_id):
-
-	captain = get_object_or_404(TeamCaptain, id=tc_id)
-	##### DELETE/ADD PARTICIPANT #####
+def controlz_add(request, gl_id):
+	g_l = GroupLeader.objects.get(id=gl_id)
 	if request.method == 'POST':
-		task = request.POST['task']
-		if 'delete' == task:
-			participant_list = request.POST.getlist('remove')
-			for p in participant_list:
-				Participant.objects.remove(p)
-
-		elif 'add' == task:
-			new_list = request.POST.getlist('increase')
-			if captain.total_players + new_list.count() > captain.event.max_limit:
-				return render(request, 'registrations/message.html', {'message':'Error hai bro!'})
-			
+		try:
+			event = Event.objects.get(id=request.POST['event'])
+			name = request.POST['name']
+			gender = request.POST['gender']
+		except:
+			return redirect(request.META.get('HTTP_REFERER'))
+		p, created = Participation.objects.get_or_create(g_l=g_l, event=event, confirmed=True)
+		if created:
+			if event.max_limit == 1:
+				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, firewallz_passed=True, gender=gender)
+				Participant.objects.create(name=name, captain=tc, firewallz_passed=True)
 			else:
-				for part in new_list:
-					Participant.objects.create(name=part, captain=captain)
-					Participant.save()
+				return redirect(request.META.get('HTTP_REFERER'))
+		else:
+			if event.max_limit == 1:
+				try:
+					tc1 = TeamCaptain.objects.filter(event=event, g_l=g_l)[0]
+					tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, firewallz_passed=True, gender=gender, email=tc1.email, phone=tc1.phone)
+				except:
+					tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, firewallz_passed=True, gender=gender)
 
-		elif 'change' == task:
-			data = request.POST.pop(0)
-			for key,value in data:
-				participant = Participant.objects.get(id=key)
-				participant.name = value
-				participant.save()
+				part = Participant.objects.create(name=name, captain=tc, firewallz_passed=True)
+			else:
+				try:
+					tc1 = TeamCaptain.objects.filter(event=event, g_l=g_l)[0]
+					if not(event.min_limit <= tc1.total_players < event.max_limit):
+						raise ValueError
+				except:
+					return redirect(request.META.get('HTTP_REFERER'))
 
-	participant_list = Participant.objects.filter(captain=captain)
-	rows = []
-	for p in participant_list:
-		rows.append({'data':[str(p.name).title(), p.firewallz_passed, ]})
-	tables = {
-		'headings':['Participant Name', 'Firewallz Approved', 'Delete Participant'],
-		'rows':rows,
-		'title':'Edit Participants for ' + captain.event.name + ' ' + captain.g_l.college
-	}
+				part = Participant.objects.create(captain=tc1, name=name)
+				tc1.total_players+=1
+				tc1.save()
 
-	return render(request, 'regsoft/tables.html', {'tables':[tables]})
+		# request.POST['barcode'] = g_l.barcode
+		return redirect(reverse('regsoft:home'))
 
+	events = Event.objects.all()
+	return render(request,  'regsoft/controlz_add.html',{'events':events})
+
+@staff_member_required
+def controlz_delete(request):
+	try:
+		gl_id = request.POST['gl_id']
+		g_l = GroupLeader.objects.get(id=gl_id)
+		parts_id = dict(request.POST)['data']
+	except:
+		return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
+	for part_id in parts_id:
+		part in Participant.objects.get(id=part_id)
+		tc = part.captain
+		if tc.participant_set.all().count() == 1:
+			tc.delete()
+		else:
+			part.delete()
+			tc.total_players-=1
+			tc.save()
+	request.method = 'POST'
+	request.POST['barcode'] = g_l.barcode
+	return redirect('regosft:controlz_home')
 
 
 @staff_member_required

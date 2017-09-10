@@ -14,13 +14,14 @@
 </div>
 </div>
 
-{% for table in tables %}
+
 <div class="card">
     <div class="header">
         <h2>
             {{table.title}}
         </h2>
     </div>
+    <button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick="location.href='{% url 'regsoft:controlz_add' gl_id %}'"><i class="material-icons">add</i></button>
 	<div class="body">
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable js-exportable">
@@ -39,22 +40,30 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                    {% for row in table.rows %}
+                <form action="{% url 'regsoft:controlz_delete' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="gl_id" value="{{gl_id}}">
+                    {% for row in table.rows %} 
                     <tr>
-                        {% for data in row.data %}
-                            <td>{{data}}</td>
-                        {% endfor %}
-                        {% for link in row.link %}
-                            <td><a href="{{link.url}}">{{link.title}}</a></td>
-                        {% endfor %}
+                        <td>{{row.name}}</td>
+                        <td>{{row.event}}</td>
+                        <td>{{row.captain}}</td>
+                        <td>{{row.college}}</td>
+                        <td><a href="{{row.link}}">Edit</a></td>
+                        <td>
+                            <input type="checkbox" name="data" value="row.id" id="{{row.id}}">
+                            <label for="{{row.id}}"></label>
+                        </td>
                     </tr>
                     {% endfor %}
+                     <button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">delete</i></button>
+                </form>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-{% endfor %}
+
 
 
 {% endblock %}
