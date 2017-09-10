@@ -144,6 +144,26 @@
                 </td>
             </tr>
             {% endfor %}
+            {% if coaches_list %}
+                <tr class="heading">
+                        <td>
+                            Coach
+                        </td>
+                        <td>
+                            Event
+                        </td>
+                </tr>
+                {% for coach in coaches_list %}
+                <tr class="item">
+                    <td>
+                        {{coach.name}}
+                    </td>
+                    <td>
+                        {{coach.event}}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
             <tr class="heading">
                 <td>
                     Participant

@@ -571,7 +571,13 @@ def print_bill(request, b_id):
 	g_leader = bill.g_leader
 	part_list = bill.participant_set.all()
 	jsonDec = json.decoder.JSONDecoder()
-	coaches_list = jsonDec.decode(bill.coaches_list)
+	coach_list = jsonDec.decode(bill.coaches_list)
+	coaches_list = []
+	for captain in g_leader.teamcaptain_set.all():
+		for coach in coach_list:
+			if captain.coach == coach:
+				coaches_list.append({'name':coach, 'event':captain.event})
+
 	try:
 		draft = bill.draft_number
 	except:

@@ -37,6 +37,6 @@ urlpatterns = [
     url(r'^change_paid_college/(?P<gl_id>\d+)/$', views.change_paid_college, name='change_paid_college'),
     url(r'^edit/$', views.edit, name='edit-show_gl'),
     url(r'^edit/(?P<gl_id>\d+)/$', views.edit, name='edit-show_participants'),
-    url(r'^edit_participant/(?P<part_id>)/$', views.edit_participant, name='edit_participant'),
+    url(r'^edit_participant/(?P<part_id>\d+)/$', views.edit_participant, name='edit_participant'),
 
 ]
