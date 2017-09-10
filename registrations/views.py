@@ -390,6 +390,12 @@ def participant_edit(request, p_id):
 				name = request.POST['name']
 			except:
 				return redirect(request.META.get('HTTP_REFERER'))
+			
+			if part.name == part.captain.name:
+				captain = part.captain
+				captain.name = name
+				captain.save()
+
 			part.name=name
 			part.save()
 			return redirect(reverse('registrations:register_captain', kwargs={'event_id':part.captain.event.id}))
