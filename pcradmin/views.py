@@ -22,7 +22,8 @@ from sendgrid.helpers.mail import *
 from registrations.sg_config import *
 import xlsxwriter
 from time import gmtime, strftime
-
+from reportlab.pdfgen import canvas
+from PyPDF2 import PdfFileWriter, PdfFileReader
 try:
 	import cStringIO as StringIO
 except ImportError:
@@ -349,9 +350,9 @@ def final_confirmation(request):
 
 
 @staff_member_required
-def final_confirmation_email(request, tc_id):
+def final_confirmation_email(request, gl_id):
 	
-	tc = get_object_or_404(TeamCaptain, id=tc_id)
+	gl = get_object_or_404(GroupLeader, id=gl_id)
 	
 	body = '''<!DOCTYPE html>
 <html>
@@ -395,13 +396,48 @@ BITS Pilani
 </body>
 </html>'''
 	sub = 'BOSM 2017'
-	send_to = tc.email
-	send_to = request.POST['to']
+	send_to = gl.email
 	sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
 	from_email = Email("no-reply@bits-bosm.org")
 	to_email = Email(send_to)
 	subject = sub
 	content = Content("text/html", body)
+	tcs = [i for i in TeamCaptain.objects.filter(g_l=gl) if i.payment>0]
+	parts = [p for tc in tcs for p in Participant.objects.filter(captain=tc)]
+	from reportlab.lib import colors
+	from reportlab.lib.units import inch
+	from reportlab.lib.pagesizes import letter
+	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
+
+	doc_name = '/home/dvm/bosm/public_html/bosm2017/table.pdf'
+	doc = SimpleDocTemplate(doc_name, pagesize=letter)
+	table_with_style = Table(data, [3 * inch, 1.5 * inch, inch])
+
+	table_with_style.setStyle(TableStyle([
+	    ('FONT', (0, 0), (-1, -1), 'Helvetica'),
+	    ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
+	    ('FONTSIZE', (0, 0), (-1, -1), 8),
+	    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+	    ('BOX', (0, 0), (-1, 0), 0.25, colors.green),
+	    ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+	]))
+
+	
+	doc.build([Spacer(1, 0.5 * inch),table_with_style])
+
+	watermark_name = '/home/dvm/bosm/public_html/bosm2017/Confirmed.pdf'
+	watermark = PdfFileReader(open(watermark_name, "rb"))
+	output_file = PdfFileWriter()
+	input_file = PdfFileReader(open(doc_name, "rb"))
+	page_count = input_file.getNumPages()
+
+	for page_number in range(page_count):
+	    input_page = input_file.getPage(page_number)
+    	input_page.mergePage(watermark.getPage(0))
+	    output_file.addPage(input_page)
+
+	with open("document-output.pdf", "wb") as outputStream:
+    	output_file.write(outputStream)
 
 	import base64
 
