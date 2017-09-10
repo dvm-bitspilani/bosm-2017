@@ -403,6 +403,19 @@ BITS Pilani
 	subject = sub
 	content = Content("text/html", body)
 	tcs = [i for i in TeamCaptain.objects.filter(g_l=gl) if i.payment>0]
+	tcs = []
+	for captain in TeamCaptain.objects.filter(g_l=gl):
+		if captain.if_payment:
+			if captain.payment>0:
+				captain.final_pcr = True
+				captain.save()
+				tcs.append(captain)
+		else:
+			if captain.paid:
+				captain.final_pcr = True
+				captain.save()
+				tcs.append(captain)
+
 	parts = [p for tc in tcs for p in Participant.objects.filter(captain=tc)]
 	from reportlab.lib import colors
 	from reportlab.lib.units import inch
