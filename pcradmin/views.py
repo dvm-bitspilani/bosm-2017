@@ -432,12 +432,12 @@ BITS Pilani
 	page_count = input_file.getNumPages()
 
 	for page_number in range(page_count):
-	    input_page = input_file.getPage(page_number)
-    	input_page.mergePage(watermark.getPage(0))
-	    output_file.addPage(input_page)
+		input_page = input_file.getPage(page_number)
+		input_page.mergePage(watermark.getPage(0))
+		output_file.addPage(input_page)
 
 	with open("document-output.pdf", "wb") as outputStream:
-    	output_file.write(outputStream)
+		output_file.write(outputStream)
 
 	import base64
 
