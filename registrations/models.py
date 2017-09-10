@@ -65,6 +65,7 @@ class TeamCaptain(models.Model):
 	extra_id = models.IntegerField(default=0)
 	barcode = models.CharField(max_length=50, null=True)
 	pcr_final = models.BooleanField(default=False)
+	coach_paid = models.BooleanField(default=False)
 
 	def __unicode__(self):
 

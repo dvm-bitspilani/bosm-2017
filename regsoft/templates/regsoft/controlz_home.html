@@ -14,16 +14,21 @@
 </div>
 </div>
 
-
+{% if table %} 
 <div class="card">
     <div class="header">
         <h2>
             {{table.title}}
         </h2>
     </div>
-    <button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick="location.href='{% url 'regsoft:controlz_add' gl_id %}'"><i class="material-icons">add</i></button>
 	<div class="body">
-        <div class="table-responsive">
+        <button class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick='window.location.assign("{% url 'regsoft:controlz_add' gl_id %}")'><i class="material-icons">add</i></button>
+            <form action="{% url 'regsoft:controlz_delete' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="gl_id" value="{{gl_id}}">
+            <br>
+            <br>
+            <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable js-exportable">
                 <thead>
                     <tr>
@@ -40,9 +45,6 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                <form action="{% url 'regsoft:controlz_delete' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="gl_id" value="{{gl_id}}">
                     {% for row in table.rows %} 
                     <tr>
                         <td>{{row.name}}</td>
@@ -51,19 +53,80 @@
                         <td>{{row.college}}</td>
                         <td><a href="{{row.link}}">Edit</a></td>
                         <td>
-                            <input type="checkbox" name="data" value="row.id" id="{{row.id}}">
+                            <input type="checkbox" name="data" value="{{row.id}}" id="{{row.id}}">
                             <label for="{{row.id}}"></label>
                         </td>
                     </tr>
                     {% endfor %}
-                     <button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">delete</i></button>
-                </form>
+                
                 </tbody>
             </table>
         </div>
+        <button  type="submit" class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float"><i class="material-icons">delete</i></button>
+        </form>
     </div>
+
 </div>
 
+
+{% else %}
+
+
+
+<div class="card">
+        <div class="header">
+            <h2>
+                Select a Group Leader to edit
+            </h2>
+        </div>
+        <div class="body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                    <thead>
+                        <tr>
+                            
+                            <th>Group Leader</th>
+                            <th>College</th>
+                            <th>Phone</th>
+                            <th>Edit</th>
+                            <th>Generate RecNAcc List</th>
+                       </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Group Leader</th>
+                            <th>College</th>
+                            <th>Phone</th>
+                            <th>Edit</th>
+                            <th>Generate RecNAcc List</th>
+                       </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for gl in group_leaders %} 
+                        
+                        <tr>
+                            <td>{{gl.name}}</td>
+                            <td>{{gl.college}}</td>
+                            <td>{{gl.phone}}</td>
+                            <form action="" method="post">
+                            {% csrf_token %}
+                            <td><input type="hidden" name='barcode' value="{{gl.barcode}}">
+                            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Select</button></td>
+                            </form>
+                            <td>
+                               <a href="{% url 'regsoft:recnacc_list' gl.id %}">Generate List</a> 
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+
+
+{% endif %}
 
 
 {% endblock %}

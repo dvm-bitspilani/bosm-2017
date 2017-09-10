@@ -35,6 +35,13 @@ class Bill(models.Model):
 	tens = models.IntegerField(null=True, blank=True, default=0)
 	draft_number = models.CharField(max_length=100, null=True, blank=True, default=None)
 	draft_amount = models.IntegerField(null=True, blank=True, default=0)
+	two_thousands_returned = models.IntegerField(null=True, blank=True, default=0)
+	five_hundreds_returned = models.IntegerField(null=True, blank=True, default=0)
+	hundreds_returned = models.IntegerField(null=True, blank=True, default=0)
+	fifties_returned = models.IntegerField(null=True, blank=True, default=0)
+	twenties_returned = models.IntegerField(null=True, blank=True, default=0)
+	tens_returned = models.IntegerField(null=True, blank=True, default=0)
+	coaches_list = models.CharField(max_length=200, null=True, blank=True)
 
 	def __unicode__(self):
-		return str(self.g_leader.college) + ' - ' + str(self.g_leader.name) + ' - ' + str(self.name) + ' - ' + str(self.amount)
+		return str(self.g_leader.college) + ' - ' + str(self.g_leader.name) + ' - ' + str(self.amount)

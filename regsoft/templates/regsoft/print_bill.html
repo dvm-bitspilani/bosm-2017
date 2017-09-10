@@ -97,7 +97,7 @@
                             </td>
                             
                             <td>
-                                Invoice #: {{bill.id}}<br>
+                                Invoice #: {{number}}<br>
                                 Created: {{time}} | Paid on : {{bill.time_paid}}
                             </td>
                         </tr>
@@ -115,9 +115,9 @@
                             </td>
                             
                             <td>
-                                {{captain.name}}<br>
-                                {{captain.g_l.college}}<br>
-                                {{captain.email}}
+                                {{g_leader.name}}<br>
+                                {{g_leader.college}}<br>
+                                {{g_leader.email}}
                             </td>
                         </tr>
                     </table>
@@ -144,26 +144,44 @@
                 </td>
             </tr>
             {% endfor %}
+            {% if coaches_list %}
+                <tr class="heading">
+                        <td>
+                            Coach
+                        </td>
+                        <td>
+                            Event
+                        </td>
+                </tr>
+                {% for coach in coaches_list %}
+                <tr class="item">
+                    <td>
+                        {{coach.name}}
+                    </td>
+                    <td>
+                        {{coach.event}}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
             <tr class="heading">
+                <td>
+                    Participant
+                </td>
                 <td>
                     Event
                 </td>
-                
-                <td>
-                    Price
-                </td>
             </tr>
-            
+            {% for part in part_list %}
             <tr class="item">
                 <td>
-                    {{captain.event.name}}
+                    {{part.name}}
                 </td>
-                
                 <td>
-                    {{captain.event.price}}
+                    {{part.captain.event.name}}
                 </td>
             </tr>
-            
+            {% endfor %}
             <tr class="total">
                 <td></td>
                 
@@ -184,7 +202,7 @@
                                 </td>
                                 
                                 <td>
-                                    Invoice #: {{bill.id}}<br>
+                                    Invoice #: {{number}}<br>
                                     Created: {{time}} | Paid on : {{bill.time_paid}}
                                 </td>
                             </tr>
@@ -202,9 +220,9 @@
                                 </td>
                                 
                                 <td>
-                                    {{captain.name}}<br>
-                                    {{captain.g_l.college}}<br>
-                                    {{captain.email}}
+                                    {{g_leader.name}}<br>
+                                    {{g_leader.college}}<br>
+                                    {{g_leader.email}}
                                 </td>
                             </tr>
                         </table>
@@ -233,29 +251,27 @@
                 {% endfor %}
                 <tr class="heading">
                     <td>
+                        Participant
+                    </td>
+                    <td>
                         Event
                     </td>
-                    
-                    <td>
-                        Price
-                    </td>
                 </tr>
-                
+                {% for part in part_list %}
                 <tr class="item">
                     <td>
-                        {{captain.event.name}}
+                        {{part.name}}
                     </td>
-                    
                     <td>
-                        {{captain.event.price}}
+                        {{part.captain.event.name}}
                     </td>
                 </tr>
-                
+                {% endfor %}
                 <tr class="total">
                     <td></td>
                     
                     <td>
-                       Total : {{total}}
+                      Total : {{total}}
                     </td>
                 </tr>
             </table>

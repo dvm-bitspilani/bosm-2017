@@ -1,19 +1,134 @@
 {% extends 'regsoft/base.html' %}
+{% load static %}
 
 {% block body %}
 
+
+<form method="POST" action="{% url 'regsoft:create_bill' g_leader.id %}">
+        {% csrf_token %}
+        
 <div class="row clearfix">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
                 <div class="header">
                     <h2>
-                        Create Bill for {{captain.name}} from {{captain.g_l.college}} for {{captain.event.name}} of(tentative) {{amount}}
+                        Participants from {{g_leader.college}} under {{g_leader.name}}
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="table-responsive">
+                        
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for part in participant_list %}
+                                <tr>
+                                    <td>{{part.name}}</td>
+                                    <td>{{part.captain.event.name}}</td>
+                                    <td>{{part.captain.name}}</td>
+                                    <td class="chk">
+                                        <input type="checkbox" name="data" id="{{part.id}}" value="{{part.id}}">
+                                        <label for="{{part.id}}"></label>
+                                    </td>
+                                    <td>
+                                        {% if part.captain.if_payment and part.captain.payment > 0 %}
+                                        700
+                                        {% elif not part.captain.if_payment %}
+                                        700
+                                        {% else %}
+                                        1000
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Coaches from {{g_leader.college}} under {{g_leader.name}}
+                    </h2>
+                </div>
+                <div class="body">
+                    <div class="table-responsive">
+                        
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Event</th>
+                                    <th>Captain</th>
+                                    <th>Select</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for captain in coaches %}
+                                <tr>
+                                    <td>{{captain.coach}}</td>
+                                    <td>{{captain.event.name}}</td>
+                                    <td>{{captain.name}}</td>
+                                    <td class="chk">
+                                        <input type="checkbox" name="coach_data" id="{{captain.id}}" value="{{captain.id}}">
+                                        <label for="{{captain.id}}"></label>
+                                    </td>
+                                    <td>
+                                        1000
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        Create Bill for {{g_leader.name}} from {{g_leader.college}} of Rs. <span id="amount">0</span>
                     </h2>
                 </div>
 
 <div class="body">
-        <form method="POST" action="{% url 'regsoft:create_bill' captain.id %}">
-            {% csrf_token %}
+        
             <label for="twothousands">No of two thousand notes</label>
             <div class="form-group">
                 <div class="form-line">
@@ -63,6 +178,43 @@
                 </div>
             </div>
             <br>
+            <br><br>
+            <label for="twothousandsreturned">No of two thousand notes returned</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="number" id="twothousandsreturned" class="form-control" placeholder="No of two thousand notes returned" name="twothousandsreturned" value=0>
+                </div>
+            </div>
+            <label for="fivehundredsreturned">No of five hundred notes</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="number" id="fivehundredsreturned" class="form-control" placeholder="No of five hundred notes returned" name="fivehundredsreturned" value="0">
+                </div>
+            </div>
+            <label for="hundredsreturned">No of one hundred notes</label>
+            <div class="form-group">
+                    <div class="form-line">
+                        <input type="number" id="hundredsreturned" class="form-control" placeholder="No of one hundred notes returned" name="hundredsreturned" value="0">
+                    </div>
+            </div>
+            <label for="fiftiesreturned">No of fifty notes</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="number" id="fiftiesreturned" name="fiftiesreturned" class="form-control" placeholder="No of fifty notes returned" value="0">
+                </div>
+            </div>
+            <label for="twentiesreturned">No of twenty notes</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="number" id="twentiesreturned" name="twentiesreturned" class="form-control" placeholder="No of twenty notes returned" value="0">
+                </div>
+            </div>
+            <label for="tensreturned">No of ten notes</label>
+            <div class="form-group">
+                <div class="form-line">
+                    <input type="number" id="tensreturned" name="tensreturned" class="form-control" placeholder="No of ten notes returned" value="0">
+                </div>
+            </div>
             <button type="submit" class="btn btn-primary m-t-15 waves-effect">Create Bill</button>
         </form>
 </div>
