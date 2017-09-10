@@ -5,7 +5,7 @@
       <br><br>
       <h2 class="header center pink-text">Click <a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_list_download' %}">here</a> before sending final confirmation E-mails.</h2>
       <br><br>
-      <h2 class="header center pink-text">List of approved Team Captains</h2>
+      <h2 class="header center pink-text">List of approved Group Leaders</h2>
       <div class="center-align">
         <table class="centered">
                 <thead>
@@ -16,11 +16,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for tc in tcs %}
+                    {% for g_l in g_leaders %}
                     <tr>
-                        <td>{{tc.name}}</td>
-                        <td>{{tc.college}}</td>
-                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirm_email' tc.id %}">Send Email</a></td>
+                        <td>{{g_l.name}}</td>
+                        <td>{{g_l.college}}</td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirm' g_l.id %}">Send Mail</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
