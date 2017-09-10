@@ -110,6 +110,7 @@ def count_players(g_l):
 @staff_member_required
 def recnacc_change(request):
 	if request.POST:
+		from datetime import datetime
 		data = request.POST
 		if 'allocate' == data['action']:
 			try:
@@ -132,6 +133,7 @@ def recnacc_change(request):
 				part = Participant.objects.get(id=part_id)
 				part.acco = True
 				part.room = room
+				part.recnacc_time = datetime.now()
 				part.save()
 			gl_id = tc.g_l.id
 		
@@ -188,14 +190,14 @@ def college_vs_bhavan(request):
 def firewallz_approved(request):
 	keys=[]
 	for tc in TeamCaptain.objects.filter(firewallz_passed=True):
-		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, part.room], 'link':[]}] for part in tc.participant_set.all())
+		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, part.room.room, part.room.bhavan], 'link':[]}] for part in tc.participant_set.all())
 	
 	rows = []
 	for key in keys:
 		for l in key:
 			rows.append(l)
 
-	headings = ['Participant', 'College', 'Gender', 'Group Leader', 'Event', 'Alloted', 'Room']
+	headings = ['Participant', 'College', 'Gender', 'Group Leader', 'Event', 'Alloted', 'Room', 'Bhavan']
 	tables = [{'title':'Firewallz Approved Participants', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
@@ -297,6 +299,34 @@ def controlz_delete(request):
 	print 'done'
 	return redirect('regosft:controlz_home')
 
+@staff_member_required
+def recnacc_list(request, gl_id):
+	g_leader = get_object_or_404(GroupLeader, id=gl_id)
+	participant_list = []
+	for captain in g_leader.teamcaptain_set.filter(firewallz_passed=True):
+		participant_list += captain.participant_set.filter(firewallz_passed=True)
+	
+	participant_list.sort(key=lambda x: x.recnacc_time, reverse=True)
+
+	return render(request, 'regsoft/recnacc_list.html', {'participant_list':participant_list})
+
+@staff_member_required
+def generate_recnacc_list(request):
+	if request.method == 'POST':
+		
+		data = request.POST
+		id_list = data.getlist('data')
+		c_rows = []
+		for p_id in id_list:
+			part = Participant.objects.get(id=p_id)
+			c_rows.append({'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.room.room, part.room.bhavan, '300'], 'link':[]})
+
+		table = {
+			'title':'Participant list for RecNAcc',
+			'headings':['Name', 'College', 'Gender', 'GroupLeader', 'Event', 'Room','Bhavan', 'Caution Deposit'],
+			'rows': [c_rows, ]
+		}
+		return render(request, 'regsoft/tables.html', {'tables':[table,]})
 
 @staff_member_required
 def firewallzo_home(request):
@@ -498,7 +528,10 @@ def create_bill(request, gl_id):
 		for key,value in return_dict.iteritems():
 			bill.amount -= int(data[key])*int(value)
 		
-		coach_list = [captain.coach for captain in captain_list]
+		for captain in captain_list:
+			coach_list.append(captain.coach)
+			captain.coach_paid = True
+			captain.save()
 		bill.coaches_list = json.dumps(coach_list)
 
 		try:
@@ -525,7 +558,7 @@ def create_bill(request, gl_id):
 	coaches_list = []
 	for captain in g_leader.teamcaptain_set.all():
 		participant_list += captain.participant_set.filter(firewallz_passed=True, controlz=False)
-		if captain.coach:
+		if captain.coach and captain.coach_paid==False:
 			coaches_list.append(captain)
 	
 	return render(request, 'regsoft/create_bill.html', {'g_leader':g_leader, 'participant_list':participant_list, 'coaches':coaches_list})

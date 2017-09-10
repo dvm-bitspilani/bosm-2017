@@ -88,7 +88,8 @@
                             <th>Group Leader</th>
                             <th>College</th>
                             <th>Phone</th>
-                            <th>Select</th>
+                            <th>Edit</th>
+                            <th>Generate RecNAcc List</th>
                        </tr>
                     </thead>
                     <tfoot>
@@ -96,8 +97,9 @@
                             <th>Group Leader</th>
                             <th>College</th>
                             <th>Phone</th>
-                            <th>Select</th>
-                        </tr>
+                            <th>Edit</th>
+                            <th>Generate RecNAcc List</th>
+                       </tr>
                     </tfoot>
                     <tbody>
                         {% for gl in group_leaders %} 
@@ -109,8 +111,11 @@
                             <form action="" method="post">
                             {% csrf_token %}
                             <td><input type="hidden" name='barcode' value="{{gl.barcode}}">
-                            <button type="submit">Select</button></td>
+                            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Select</button></td>
                             </form>
+                            <td>
+                               <a href="{% url 'regsoft:recnacc_list' gl.id %}">Generate List</a> 
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
