@@ -409,8 +409,8 @@ BITS Pilani
 	from reportlab.lib.units import inch
 	from reportlab.lib.pagesizes import letter
 	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
-	# _dir = '/home/dvm/bosm/public_html/bosm2017/'
-	_dir = '/home/auto-reload/Desktop/'
+	_dir = '/root/live/bosm/backend/resources/bosm2017'
+	# _dir = '/home/auto-reload/dDesktop/'
 	doc_name = _dir + 'table.pdf'
 	doc = SimpleDocTemplate(doc_name, pagesize=letter)
 	table_with_style = Table(parts, [3 * inch, 1.5 * inch, inch])
