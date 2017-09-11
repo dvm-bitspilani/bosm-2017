@@ -402,8 +402,8 @@ BITS Pilani
 	to_email = Email(send_to)
 	subject = sub
 	content = Content("text/html", body)
-	tcs = [i for i in TeamCaptain.objects.filter(g_l=gl) if i.payment>0]
-	parts = ['Participant', "Sport"]
+	tcs = [i for i in TeamCaptain.objects.filter(g_l=gl) if i.payment>0 or i.if_payment]
+	parts = [['Participant', "Sport"],]
 	parts += [[p.name,tc.event.name] for tc in tcs for p in Participant.objects.filter(captain=tc)]
 	from reportlab.lib import colors
 	from reportlab.lib.units import inch

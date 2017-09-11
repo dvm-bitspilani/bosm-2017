@@ -232,6 +232,10 @@ def controlz_edit(request, part_id):
 			name = request.POST['name']
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
+		if part.name == part.captain.name:
+			captain = part.captain
+			captain.name = name
+			captain.save()
 		part.name = name
 		part.save()
 		request.method = 'POST'
