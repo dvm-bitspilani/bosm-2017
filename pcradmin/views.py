@@ -403,15 +403,16 @@ BITS Pilani
 	subject = sub
 	content = Content("text/html", body)
 	tcs = [i for i in TeamCaptain.objects.filter(g_l=gl) if i.payment>0]
-	parts = [p for tc in tcs for p in Participant.objects.filter(captain=tc)]
+	parts = ['Participant', "Sport"]
+	parts += [[p.name,tc.event.name] for tc in tcs for p in Participant.objects.filter(captain=tc)]
 	from reportlab.lib import colors
 	from reportlab.lib.units import inch
 	from reportlab.lib.pagesizes import letter
 	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
-
-	doc_name = '/home/dvm/bosm/public_html/bosm2017/table.pdf'
+	_dir = '/home/dvm/bosm/public_html/bosm2017/'
+	doc_name = _dir + 'table.pdf'
 	doc = SimpleDocTemplate(doc_name, pagesize=letter)
-	table_with_style = Table(data, [3 * inch, 1.5 * inch, inch])
+	table_with_style = Table(parts, [3 * inch, 1.5 * inch, inch])
 
 	table_with_style.setStyle(TableStyle([
 	    ('FONT', (0, 0), (-1, -1), 'Helvetica'),
@@ -425,36 +426,42 @@ BITS Pilani
 	
 	doc.build([Spacer(1, 0.5 * inch),table_with_style])
 
-	watermark_name = '/home/dvm/bosm/public_html/bosm2017/Confirmed.pdf'
-	watermark = PdfFileReader(open(watermark_name, "rb"))
+	watermark_name = _dir + 'Confirmed.pdf'
 	output_file = PdfFileWriter()
 	input_file = PdfFileReader(open(doc_name, "rb"))
 	page_count = input_file.getNumPages()
 
 	for page_number in range(page_count):
-		input_page = input_file.getPage(page_number)
-		input_page.mergePage(watermark.getPage(0))
+		watermark = PdfFileReader(open(watermark_name, "rb"))
+		input_page = watermark.getPage(0)
+		input_page.mergePage(input_file.getPage(0))
 		output_file.addPage(input_page)
-
-	with open("document-output.pdf", "wb") as outputStream:
+	output_name = _dir +'document-output.pdf'
+	with open(output_name, "wb") as outputStream:
 		output_file.write(outputStream)
 
 	import base64
 
-	with open(os.path.join(BASE_DIR, "workbooks/final_list.xlsx"), "rb") as xl_file:
-		encoded_string = base64.b64encode(xl_file.read())
-
-	attachment = Attachment()
-	attachment.content = encoded_string
-	attachment.filename = "gleaders.xlsx"
-
+	with open(output_name, "rb") as output_pdf:
+		encoded_string1 = base64.b64encode(output_pdf.read())
+	with open(_dir+'rates.pdf') as rates_pdf:
+		encoded_string2 = base64.b64encode(rates_pdf.read())
+	attachment1 = Attachment()
+	attachment1.content = encoded_string1
+	attachment1.filename = "confirmed Participants.pdf"
+	attachment2 = Attachment()
+	attachment2.content = encoded_string2
+	attachment2.filename = "Rate Sheet.pdf"
 
 	
 	try:
 		mail = Mail(from_email, subject, to_email, content)
-		mail.add_attachment(attachment)
+		mail.add_attachment(attachment1)
+		mail.add_attachment(attachment2)
 		response = sg.client.mail.send.post(request_body=mail.get())
-
+		for tc in tcs:
+			tc.pcr_final=True
+			tc.save()
 	except:
 		return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
