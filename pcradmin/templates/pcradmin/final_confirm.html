@@ -3,7 +3,7 @@
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-      <h2 class="header center pink-text">Click <a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_list_download' %}">here</a> before sending final confirmation E-mails.</h2>
+     
       <br><br>
       <h2 class="header center pink-text">List of approved Group Leaders</h2>
       <div class="center-align">
@@ -20,7 +20,7 @@
                     <tr>
                         <td>{{g_l.name}}</td>
                         <td>{{g_l.college}}</td>
-                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirm' g_l.id %}">Send Mail</a></td>
+                        <td><a class="waves-effect waves-light btn pink" href="{% url 'pcradmin:final_confirmation_email' g_l.id %}">Send Final Mail</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

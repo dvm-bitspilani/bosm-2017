@@ -12,6 +12,9 @@ urlpatterns = [
 
 	url(r'^firewallz/$', views.firewallzo_home, name='firewallz-home'),
 	url(r'^firewallz/swap/$', views.firewallz_swap, name='firewallz_swap'),
+	url(r'^firewallz/edit/(?P<part_id>\d+)/$', views.firewallz_edit, name='firewallz_edit'),
+	url(r'^firewallz/add/(?P<gl_id>\d+)/$', views.firewallz_add, name='firewallz_add'),
+	url(r'^firewallz/delete/$', views.firewallz_delete, name='firewallz_delete'),
 
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),

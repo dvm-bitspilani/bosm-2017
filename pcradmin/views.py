@@ -346,7 +346,7 @@ def final_list_download(request):
 @staff_member_required
 def final_confirmation(request):
 	g_leaders = GroupLeader.objects.filter(pcr_approved=True)
-	return render(request, 'pcradmin/final_confirm_gl.html', {'g_leaders':g_leaders})
+	return render(request, 'pcradmin/final_confirm.html', {'g_leaders':g_leaders})
 
 
 @staff_member_required
@@ -409,9 +409,17 @@ BITS Pilani
 	from reportlab.lib.units import inch
 	from reportlab.lib.pagesizes import letter
 	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
-	_dir = '/home/dvm/bosm/public_html/bosm2017/'
-	doc_name = _dir + 'table.pdf'
-	doc = SimpleDocTemplate(doc_name, pagesize=letter)
+	try:
+		_dir = '/root/live/bosm/backend/resources/bosm2017'
+		# _dir = '/home/auto-reload/dDesktop/'
+		doc_name = _dir + 'table.pdf'
+		doc = SimpleDocTemplate(doc_name, pagesize=letter)
+	except:
+		_dir = '/home/auto-reload/Downloads'
+	# _dir = '/home/auto-reload/dDesktop/'
+		doc_name = _dir + 'table.pdf'
+		doc = SimpleDocTemplate(doc_name, pagesize=letter)
+	
 	table_with_style = Table(parts, [3 * inch, 1.5 * inch, inch])
 
 	table_with_style.setStyle(TableStyle([
