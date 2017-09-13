@@ -410,12 +410,12 @@ BITS Pilani
 	from reportlab.lib.pagesizes import letter
 	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
 	try:
-		_dir = '/root/live/bosm/backend/resources/bosm2017'
-		# _dir = '/home/auto-reload/dDesktop/'
+		_dir = '/root/live/bosm/backend/resources/bosm2017/'
+		# _dir = '/home/auto-reload/Desktop/'
 		doc_name = _dir + 'table.pdf'
 		doc = SimpleDocTemplate(doc_name, pagesize=letter)
 	except:
-		_dir = '/home/auto-reload/Downloads'
+		_dir = '/home/auto-reload/Downloads/'
 	# _dir = '/home/auto-reload/dDesktop/'
 		doc_name = _dir + 'table.pdf'
 		doc = SimpleDocTemplate(doc_name, pagesize=letter)
@@ -462,14 +462,14 @@ BITS Pilani
 	attachment2.filename = "Rate Sheet.pdf"
 
 	
+	for tc in tcs:
+		tc.pcr_final=True
+		tc.save()
 	try:
 		mail = Mail(from_email, subject, to_email, content)
 		mail.add_attachment(attachment1)
 		mail.add_attachment(attachment2)
 		response = sg.client.mail.send.post(request_body=mail.get())
-		for tc in tcs:
-			tc.pcr_final=True
-			tc.save()
 	except:
 		return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
