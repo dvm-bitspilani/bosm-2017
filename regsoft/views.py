@@ -55,10 +55,10 @@ def gen_barcode(g_l):
 		g_l.save()
 	print 'encoded: ', encoded
 	try:
-		image='/home/dvm/bosm/public_html/bosm2017/barcodes/%04s.gif' % int(gl_id)
+		image='/root/live/bosm/backend/resources/bosm2017/barcodes/%04s.gif' % int(gl_id)
 		barg.code128_image(encoded).save(image)
 	except:
-		image = '/home/tushar/barcodes/%04d.gif' % int(gl_id)
+		image = '/home/auto-reload/Desktop/barcodes/%04d.gif' % int(gl_id)
 		barg.code128_image(encoded).save(image)
 	return encoded
 
@@ -80,23 +80,20 @@ def firewallzo_home(request):
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
-		parts = []
-		parts += [participant for participant in captain.participant_set.all() for captain in g_l.teamcaptain_set.filter(pcr_final=True)]
-		print parts
+		parts_id = [participant.id for captain in g_l.teamcaptain_set.filter(pcr_final=True) for participant in captain.participant_set.all()]
+		parts = Participant.objects.filter(pk__in=parts_id)
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
-		print confirmed
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
-		print unconfirmed
 		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed})
 	events = Event.objects.all()
 	total = Participant.objects.all().count()
@@ -243,10 +240,10 @@ def count_players(g_l):
 def recnacc_college(request, gl_id):
 	g_l = GroupLeader.objects.get(id=gl_id)
 	rows = []
-	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True):
+	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False):
 		if tc.participant_set.filter(firewallz_passed=True):
-			rows.append({'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id}),}]})
-	headings = ['Team Captain', 'Event', 'College', 'No. of Players', 'Select']
+			rows.append({'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players, tc.participant_set.filter(firewallz_passed=True).count(),tc.participant_set.filter(acco=True).count(), ], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id}),}]})
+	headings = ['Team Captain', 'Event', 'College', 'No. of Players','Firewallz Passed','Alloted', 'Select']
 	tables = [{'title':'Select Team for '+g_l.college, 'rows':rows, 'headings':headings}]
 	return render(request,'regsoft/tables.html', {'tables':tables,})
 
@@ -276,6 +273,7 @@ def recnacc_change(request):
 			rows = []
 			room.vacancy -= len(parts_id)
 			room.save()
+			gl_id=0
 			for part_id in parts_id:
 				part = Participant.objects.get(id=part_id)
 				part.acco = True
@@ -287,7 +285,7 @@ def recnacc_change(request):
 					tc.room =room
 					tc.acco = True
 					tc.save()
-			gl_id = tc.g_l.id
+					gl_id = tc.g_l.id
 		
 
 		if 'deallocate' == data['action']:
@@ -340,8 +338,9 @@ def college_vs_bhavan(request):
 def firewallz_approved(request):
 	keys=[]
 	for tc in TeamCaptain.objects.filter(pcr_final=True):
-		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, part.room.room, part.room.bhavan], 'link':[]}] for part in tc.participant_set.all(firewallz_passed=True))
-	
+		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, part.room.room, part.room.bhavan], 'link':[]}] for part in tc.participant_set.filter(firewallz_passed=True) if part.acco)
+		keys += list([{'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.acco, '-', '-'], 'link':[]}] for part in tc.participant_set.filter(firewallz_passed=True) if not part.acco)
+		
 	rows = []
 	for key in keys:
 		for l in key:
