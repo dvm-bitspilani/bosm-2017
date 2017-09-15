@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from registrations import views
+from regsoft import views
 
 class RegsoftMiddleware(object):
 
