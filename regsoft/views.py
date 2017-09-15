@@ -265,8 +265,7 @@ def recnacc_change(request):
 				parts_id = dict(data)['data']
 				room_id = data['room']
 				room = Room.objects.get(id=room_id)
-				if len(parts_id) > room.vacancy:
-					raise KeyError
+				
 			except:
 				return redirect(request.META.get('HTTP_REFERER'))
 				
@@ -328,9 +327,9 @@ def bhavan_details(request, b_id):
 
 @staff_member_required
 def college_vs_bhavan(request):
-	rows = list([{'data':[tc.g_l.college, tc.room.bhavan.name, tc.name, tc.event.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, acco=True, pcr_final=True)])
+	rows = list([{'data':[tc.g_l.college, tc.room.bhavan.name,tc.room.room, tc.name, tc.event.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, acco=True, pcr_final=True)])
 	print rows
-	headings = ['College', 'Bhavan', 'Name', 'Event']
+	headings = ['College', 'Bhavan','Room', 'Name', 'Event']
 	tables = [{'title':'Bhavans vs College', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
@@ -453,7 +452,7 @@ def recnacc_list(request, gl_id):
 	g_leader = get_object_or_404(GroupLeader, id=gl_id)
 	participant_list = []
 	for captain in g_leader.teamcaptain_set.filter(firewallz_passed=True, pcr_final=True):
-		participant_list += captain.participant_set.filter(firewallz_passed=True)
+		participant_list += captain.participant_set.filter(firewallz_passed=True, acco=True)
 	
 	participant_list.sort(key=lambda x: x.recnacc_time, reverse=True)
 
@@ -466,14 +465,16 @@ def generate_recnacc_list(request):
 		data = request.POST
 		id_list = data.getlist('data')
 		c_rows = []
+		# value = 300
 		for p_id in id_list:
 			part = Participant.objects.get(id=p_id)
-			c_rows.append({'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.room.room, part.room.bhavan, '300'], 'link':[]})
-
+			c_rows.append({'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.room.room, part.room.bhavan, 300], 'link':[]})
+		amount = len(id_list)*300
+		c_rows.append({'data':['Total', '','','','','','',amount]})
 		table = {
 			'title':'Participant list for RecNAcc',
 			'headings':['Name', 'College', 'Gender', 'GroupLeader', 'Event', 'Room','Bhavan', 'Caution Deposit'],
-			'rows': [c_rows, ]
+			'rows': c_rows
 		}
 		return render(request, 'regsoft/tables.html', {'tables':[table,]})
 
@@ -490,9 +491,15 @@ def get_details(request):
 
 			rows = []
 			for participant in participant_list:
-				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.g_l.college).title(), participant.captain.payment], 'link':[]})
+				try:
+					room = participant.room.room
+					bhavan = participant.room.bhavan.name
+				except:
+					room = 'None'
+					bhavan = 'None'
+				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.g_l.college).title(),room, bhavan], 'link':[]})
 
-			headings = ['Name', 'Captain', 'College', 'Payment']
+			headings = ['Name', 'Captain', 'College', 'Room', 'Bhavan']
 			title = 'Participant list for ' + event.name
 			print rows
 		elif 'college' in request.POST:
@@ -504,9 +511,15 @@ def get_details(request):
 
 			rows = []
 			for participant in participant_list:
-				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.event.name).title(), participant.captain.payment], 'link':[]})
+				try:
+					room = participant.room.room
+					bhavan = participant.room.bhavan.name
+				except:
+					room = 'None'
+					bhavan = 'None'
+				rows.append({'data':[str(participant.name).title(), str(participant.captain.name).title(), str(participant.captain.event.name).title(),  room, bhavan], 'link':[]})
 
-			headings = ['Name', 'Captain', 'Event', 'Payment']
+			headings = ['Name', 'Captain', 'Event', 'Room', 'Bhavan']
 			title = 'Participant list for ' + request.POST['college']
 
 		table = {
@@ -591,7 +604,8 @@ def create_bill(request, gl_id):
 	if request.method == 'POST':
 		data = request.POST
 		id_list = data.getlist('data')
-		captain_list = [TeamCaptain.objects.get(id=tc_id) for tc_id in data.getlist('coaches_data')]
+		print data.getlist('coach_data')
+		captain_list = [TeamCaptain.objects.get(id=tc_id) for tc_id in data.getlist('coach_data')]
 		bill = Bill()
 		bill.two_thousands = data['twothousands']
 		bill.five_hundreds = data['fivehundreds']
@@ -612,7 +626,7 @@ def create_bill(request, gl_id):
 			bill.amount += int(data[key])*int(value)
 		for key,value in return_dict.iteritems():
 			bill.amount -= int(data[key])*int(value)
-		
+		coach_list = []
 		for captain in captain_list:
 			coach_list.append(captain.coach)
 			captain.coach_paid = True
@@ -624,7 +638,8 @@ def create_bill(request, gl_id):
 		except:
 			pass
 		bill.draft_amount = data['draft_amount']
-		
+		print bill.draft_amount
+		bill.amount += int(bill.draft_amount)
 		if not (bill.amount == 0 and bill.draft_amount == 0):
 			bill.g_leader = g_leader
 			bill.save()
@@ -651,10 +666,10 @@ def create_bill(request, gl_id):
 @staff_member_required
 def view_bills(request, gl_id):
 	g_leader = GroupLeader.objects.get(id=gl_id)
-	c_rows = [{'data':[bill.participant_set.count(), bill.time_paid, bill.amount], 'link':[{'title':'View details', 'url':reverse('regsoft:bill_details',kwargs={'b_id':bill.id})}]} for bill in Bill.objects.filter(g_leader = g_leader)]
+	c_rows = [{'data':[bill.participant_set.count(), bill.time_paid, bill.amount-bill.draft_amount, bill.draft_amount, bill.draft_number], 'link':[{'title':'View details', 'url':reverse('regsoft:bill_details',kwargs={'b_id':bill.id})}]} for bill in Bill.objects.filter(g_leader = g_leader)]
 	bill_table = {
 		'title':"Bills created under " + g_leader.name,
-		'headings':['Participants', 'Time paid', 'Amount', 'View Details'],
+		'headings':['Participants', 'Time paid',  'Cash paid', 'Draft Amount', 'Draft Number', 'View Details'],
 		'rows':c_rows,
 	}
 
@@ -663,10 +678,10 @@ def view_bills(request, gl_id):
 @staff_member_required
 def bill_details(request, b_id):
 	bill = get_object_or_404(Bill, id=b_id)
-	c_rows = [{'data':[part.name, part.captain.name, part.captain.event.name, bill.time_paid], 'link':[]} for part in bill.participant_set.all()]
+	c_rows = [{'data':[part.name, part.captain.name, part.captain.event.name, bill.time_paid,], 'link':[]} for part in bill.participant_set.all()]
 	table = {
-		'title' : 'Participant details for the bill under ' + bill.g_leader.name + ' from ' + bill.g_leader.college,
-		'headings' : ['Name', 'Captain', 'Event', 'Time created'],
+		'title' : 'Participant details for the bill under ' + bill.g_leader.name + ' from ' + bill.g_leader.college+'. Cash amount = Rs ' + str(bill.amount-bill.draft_amount) + '. Draft Amount = Rs ' + str(bill.draft_amount),
+		'headings' : ['Name', 'Captain', 'Event', 'Time created',],
 		'rows':c_rows,
 	}
 	return render(request, 'regsoft/bill_details.html', {'tables':[table, ], 'bill':bill})
@@ -675,9 +690,19 @@ def bill_details(request, b_id):
 def delete_bill(request, b_id):
 	bill = get_object_or_404(Bill, id=b_id)
 	gl_id = bill.g_leader.id
+	g_leader = bill.g_leader
 	for part in bill.participant_set.all():
 		part.controlz = False
 		part.save()
+	
+	jsonDec = json.decoder.JSONDecoder()
+	coach_list = jsonDec.decode(bill.coaches_list)
+	for captain in g_leader.teamcaptain_set.all():
+		for coach in coach_list:
+			if captain.coach == coach:
+				captain.coach_paid = False
+				captain.save()
+
 	bill.delete()
 	return redirect(reverse('regsoft:view_bills', kwargs={'gl_id':gl_id}))
 
@@ -700,10 +725,10 @@ def print_bill(request, b_id):
 		draft = bill.draft_number
 	except:
 		draft = ''
-	payment_methods = [{'method':'Cash', 'amount':bill.amount}, {'method':'Draft #'+draft, 'amount':bill.draft_amount}]	
-	total = int(bill.amount) + int(bill.draft_amount)
+	payment_methods = [{'method':'Cash', 'amount':bill.amount-bill.draft_amount}, {'method':'Draft #'+draft, 'amount':bill.draft_amount}]
+
 	number = Bill.objects.all().count()
-	return render(request, 'regsoft/print_bill.html', {'part_list':part_list, 'coaches_list':coaches_list ,'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':total, 'number':number})
+	return render(request, 'regsoft/print_bill.html', {'part_list':part_list, 'coaches_list':coaches_list ,'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':bill.amount, 'number':number})
 
 
 @staff_member_required

@@ -6,7 +6,7 @@ app_name = 'regsoft'
 urlpatterns = [
 	
 	url(r'^$', views.index, name='index'),
-	url(r'^test/$', views.home, name='home'),	
+	# url(r'^test/$', views.home, name='home'),	
 	url(r'^get_barcode/$', views.get_barcode, name='get_barcode'),
 	########## Firewallz #############
 

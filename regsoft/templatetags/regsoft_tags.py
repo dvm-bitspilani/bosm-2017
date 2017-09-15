@@ -24,9 +24,9 @@ def navbar_color(name):
 	if 'firewallz' == username:
 		return 'cyan'
 	if 'controlz' == username:
-		return 'light-green'
-	if 'recnacc' == username:
 		return 'orange'
+	if 'recnacc' == username:
+		return 'light-green'
 	else:
 		return 'blue'
 @register.inclusion_tag('regsoft/tables.html')
