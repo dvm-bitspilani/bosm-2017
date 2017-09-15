@@ -15,7 +15,10 @@
 </div>
 
 
-
+{% if confirmed or unconfirmed %}
+<button class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick='window.location.assign("{% url 'regsoft:firewallz_add' gl_id %}")'><i class="material-icons">add</i></button><br>
+<br>
+{% endif %}
 {% if unconfirmed %}
 <div class="card">
     <div class="header">
@@ -35,6 +38,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Edit</th>
                         <th>Select</th>
                     </tr>
                 </thead>
@@ -45,6 +49,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Edit</th>
                         <th>Select</th>
                     </tr>
                 </tfoot>
@@ -56,6 +61,7 @@
                         <td>{{i.event}}</td>
                         <td>{{i.captain}}</td>
                         <td>{{i.pcr}}</td>
+                        <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>
                         {% if i.pcr %}
                         	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
@@ -97,6 +103,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Edit</th>
                         <th>Select</th>
                     </tr>
                 </thead>
@@ -107,6 +114,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Edit</th>
                         <th>Select</th>
                     </tr>
                 </tfoot>
@@ -118,6 +126,7 @@
                         <td>{{i.event}}</td>
                         <td>{{i.captain}}</td>
                         <td>{{i.pcr}}</td>
+                        <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>
                         	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
                         	<label for="{{i.id}}"></label>
@@ -134,6 +143,54 @@
 </div>
 {% endif %}
 
+{% if group_leaders %}
+    <div class="card">
+        <div class="header">
+            <h2>
+                Select a Group Leader
+            </h2>
+        </div>
+        <div class="body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                    <thead>
+                        <tr>
+                            
+                            <th>Group Leader</th>
+                            <th>College</th>
+                            <th>Phone</th>
+                            <th>Edit</th>
+                       </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Group Leader</th>
+                            <th>College</th>
+                            <th>Phone</th>
+                            <th>Edit</th>
+                       </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for gl in group_leaders %} 
+                        
+                        <tr>
+                            <td>{{gl.name}}</td>
+                            <td>{{gl.college}}</td>
+                            <td>{{gl.phone}}</td>
+                            <form action="" method="post">
+                            {% csrf_token %}
+                            <td><input type="hidden" name='barcode' value="{{gl.barcode}}">
+                            <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Select</button></td>
+                            </form>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
+{% endif %}
 
 {% endblock %}
