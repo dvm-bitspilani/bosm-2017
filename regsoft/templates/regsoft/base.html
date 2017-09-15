@@ -79,7 +79,7 @@
                     <div class="btn-group user-helper-dropdown">
                         <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
                         <ul class="dropdown-menu pull-right">
-                            <li><a href="javascript:void(0);"><i class="material-icons">person</i>Contacts</a></li>
+                            <li><a href="{% url 'regsoft:contacts' %}"><i class="material-icons">person</i>Contacts</a></li>
                             <li role="seperator" class="divider"></li>
                             <li><a href="{% url 'regsoft:user-logout' %}"><i class="material-icons">input</i>Sign Out</a></li>
                         </ul>
@@ -151,7 +151,7 @@
                     
                     <li class="header">LABELS</li>
                     <li>
-                        <a href="javascript:void(0);">
+                        <a href="{% url 'regsoft:contacts' %}">
                             <i class="material-icons col-amber">donut_large</i>
                             <span>Contacts</span>
                         </a>
