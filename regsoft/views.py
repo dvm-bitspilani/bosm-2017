@@ -35,11 +35,10 @@ def home(request):
 	return render(request, 'regsoft/tables.html', {'tables':[t1]})
 
 @staff_member_required
-def index(request):
+def index(request, message=None):
 	g_ls = GroupLeader.objects.filter(pcr_approved=True)
 	return render(request, 'regsoft/index.html', {'groupleaders':g_ls})
 
-# @staff_member_required
 def gen_barcode(g_l):
 	try:
 		gl_id = g_l.id
@@ -94,11 +93,11 @@ def firewallzo_home(request):
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
-		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed})
-	events = Event.objects.all()
-	total = Participant.objects.all().count()
-	passed = Participant.objects.filter(firewallz_passed=True).count()
-	return render(request, 'regsoft/firewallzo_home.html', {'events':events, 'total':total, 'passed':passed})
+		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'gl_id':g_l.id})
+
+
+
+	return render(request, 'regsoft/firewallzo_home.html', {'group_leaders':GroupLeader.objects.filter(pcr_approved=True)})
 
 @staff_member_required
 def firewallz_swap(request):
@@ -152,7 +151,7 @@ def firewallz_edit(request, part_id):
 		part.save()
 		request.method = 'POST'
 
-		return redirect(reverse('regsoft:firewallz_home'))
+		return redirect(reverse('regsoft:firewallz-home'))
 		
 	return render(request, 'regsoft/controlz_edit.html', 
 		{'name':part.name, 'college':g_l.college, 'captain':tc.name, 'g_l':g_l.name, 'event':tc.event})
@@ -189,7 +188,7 @@ def firewallz_add(request, gl_id):
 			tc1.save()
 
 		# request.POST['barcode'] = g_l.barcode
-		return redirect(reverse('regosft:firewallz_home'))
+		return redirect(reverse('regsoft:firewallz-home'))
 	events = [part.event for part in Participation.objects.filter(g_l=g_l, confirmed=True)]
 	return render(request,  'regsoft/controlz_add.html',{'events':events})
 
@@ -210,7 +209,7 @@ def firewallz_delete(request):
 			part.delete()
 			tc.total_players-=1
 			tc.save()
-	return redirect('regosft:firewallz_home')
+	return redirect('regosft:firewallz-home')
 ###################################################### RECNACC #############################################
 
 @staff_member_required
@@ -321,8 +320,8 @@ def all_bhavans(request):
 @staff_member_required
 def bhavan_details(request, b_id):
 	bhavan = Bhavan.objects.get(id=b_id)
-	rows = [{'data':[room.room, room.vacancy], 'link':[]} for room in bhavan.room_set.all()]
-	headings = ['Room', 'Vacancy']
+	rows = [{'data':[room.room, room.vacancy, room.capacity], 'link':[]} for room in bhavan.room_set.all()]
+	headings = ['Room', 'Vacancy', 'Capacity']
 	tables = [{'title': 'Details for ' + bhavan.name + ' bhavan', 'headings':headings, 'rows':rows}]
 	return render(request, 'regsoft/tables.html', {'tables':tables})
 
