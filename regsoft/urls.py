@@ -48,6 +48,7 @@ urlpatterns = [
 
 	########## FirewallzI #############
 	#url(r'^firewallzi/$', views.firewallzi_home, name='firewallzi-home')
+	url(r'^contacts/$', views.contacts, name='contacts'),
 	url(r'^logout/$', views.user_logout, name='user-logout'),
 
 ]

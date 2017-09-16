@@ -762,6 +762,9 @@ def print_bill(request, b_id):
 	number = Bill.objects.all().count()
 	return render(request, 'regsoft/print_bill.html', {'part_list':part_list, 'coaches_list':coaches_list ,'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':bill.amount, 'number':number})
 
+@staff_member_required
+def contacts(request):
+	return render(request, 'regsoft/contact.html')
 
 @staff_member_required
 def user_logout(request):
