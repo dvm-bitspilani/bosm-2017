@@ -415,6 +415,7 @@ BITS Pilani
 		# _dir = '/home/auto-reload/Desktop/'
 		doc_name = _dir + 'table.pdf'
 		doc = SimpleDocTemplate(doc_name, pagesize=letter)
+	
 	except:
 		_dir = '/home/auto-reload/Downloads/'
 	# _dir = '/home/auto-reload/dDesktop/'
@@ -468,7 +469,7 @@ BITS Pilani
 	for tc in tcs:
 		tc.pcr_final=True
 		tc.save()
-	# try:
+	try:
 		mail = Mail(from_email, subject, to_email, content)
 		mail.add_attachment(attachment1)
 		mail.add_attachment(attachment2)
