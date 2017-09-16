@@ -15,6 +15,7 @@ urlpatterns = [
 	url(r'^firewallz/edit/(?P<part_id>\d+)/$', views.firewallz_edit, name='firewallz_edit'),
 	url(r'^firewallz/add/(?P<gl_id>\d+)/$', views.firewallz_add, name='firewallz_add'),
 	url(r'^firewallz/delete/$', views.firewallz_delete, name='firewallz_delete'),
+	url(r'^firewallz/edit_tc/(?P<tc_id>\d+)/$', views.firewallz_edit_tc, name='firewallz_edit_tc'),
 
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
@@ -43,6 +44,7 @@ urlpatterns = [
 	url(r'^controlz/add/(?P<gl_id>\d+)/$', views.controlz_add, name='controlz_add'),
 	url(r'^controlz/delete/$', views.controlz_delete, name='controlz_delete'),
 	url(r'^controlz/event_details/$', views.get_details, name='get_details'),
+	url(r'^controlz/edit_tc/(?P<tc_id>\d+)/$', views.controlz_edit_tc, name='controlz_edit_tc'),
 
 	########## FirewallzI #############
 	#url(r'^firewallzi/$', views.firewallzi_home, name='firewallzi-home')

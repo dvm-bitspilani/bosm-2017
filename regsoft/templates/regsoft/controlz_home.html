@@ -49,7 +49,7 @@
                     <tr>
                         <td>{{row.name}}</td>
                         <td>{{row.event}}</td>
-                        <td>{{row.captain}}</td>
+                        <td><a href="{% url 'regsoft:controlz_edit_tc' row.captain_id %}">{{row.captain}}</a></td>
                         <td>{{row.college}}</td>
                         <td><a href="{{row.link}}">Edit</a></td>
                         <td>
