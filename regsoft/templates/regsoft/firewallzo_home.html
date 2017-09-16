@@ -59,7 +59,7 @@
                         <td>{{i.name}}</td>
                         <td>{{i.college}}</td>
                         <td>{{i.event}}</td>
-                        <td>{{i.captain}}</td>
+                        <td><a href="{% url 'regsoft:firewallz_edit_tc' i.captain_id %}">{{i.captain}}</a></td>
                         <td>{{i.pcr}}</td>
                         <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>
@@ -124,7 +124,7 @@
                         <td>{{i.name}}</td>
                         <td>{{i.college}}</td>
                         <td>{{i.event}}</td>
-                        <td>{{i.captain}}</td>
+                        <td><a href="{% url 'regsoft:firewallz_edit_tc' i.captain_id %}">{{i.captain}}</a></td>
                         <td>{{i.pcr}}</td>
                         <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>

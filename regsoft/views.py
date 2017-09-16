@@ -86,13 +86,15 @@ def firewallzo_home(request):
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
-			'id':part.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
+			'id':part.id,
+			'captain_id':part.captain.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
 			'event': part.captain.event.name,
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
-			'id':part.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
+			'id':part.id,
+			'captain_id':part.captain.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
 		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'gl_id':g_l.id})
 
 
@@ -210,6 +212,23 @@ def firewallz_delete(request):
 			tc.total_players-=1
 			tc.save()
 	return redirect('regosft:firewallz-home')
+
+@staff_member_required
+def firewallz_edit_tc(request, tc_id):
+	tc = TeamCaptain.objects.get(id=tc_id)
+	if request.method == 'POST':
+		name = request.POST['name']
+		phone = request.POST['phone']
+		tc.name = name
+		tc.phone = phone
+		tc.save()
+		return redirect('regsoft:firewallz-home')
+	return render(request, 'regsoft/firewallz_edit_tc.html', {'tc':tc, 'event':tc.event, 'g_l':tc.g_l})
+
+
+
+
+
 ###################################################### RECNACC #############################################
 
 @staff_member_required
@@ -359,7 +378,7 @@ def controlz_home(request):
 			g_leader = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return render(request, 'registrations/message.html', {'message':'Group Leader with the given barcode does not exist.'})
-		rows = [{'id':part.id, 'name':part.name, 'event':part.captain.event.name, 'captain':part.captain.name, 'link':reverse('regsoft:controlz_edit', kwargs={'part_id':part.id}), 'college':g_leader.college} for part in Participant.objects.filter(captain__g_l=g_leader, firewallz_passed=True)]
+		rows = [{'id':part.id, 'name':part.name, 'event':part.captain.event.name, 'captain_id':part.captain.id, 'captain':part.captain.name, 'link':reverse('regsoft:controlz_edit', kwargs={'part_id':part.id}), 'college':g_leader.college} for part in Participant.objects.filter(captain__g_l=g_leader, firewallz_passed=True)]
 		headings = ['Name', 'Event', 'Captain', 'College', 'Edit', 'Select']
 		table = {'title':'Participants for ' + g_leader.college, 'rows':rows, 'headings':headings}
 		return render(request, 'regsoft/controlz_home.html', {'table':table, 'gl_id':g_leader.id})
@@ -445,6 +464,20 @@ def controlz_delete(request):
 			tc.total_players-=1
 			tc.save()
 	return redirect('regosft:controlz_home')
+
+
+@staff_member_required
+def controlz_edit_tc(request, tc_id):
+	tc = TeamCaptain.objects.get(id=tc_id)
+	if request.method == 'POST':
+		name = request.POST['name']
+		phone = request.POST['phone']
+		tc.name = name
+		tc.phone = phone
+		tc.save()
+		return redirect('regsoft:controlz-home')
+	return render(request, 'regsoft/firewallz_edit_tc.html', {'tc':tc, 'event':tc.event, 'g_l':tc.g_l})
+
 
 @staff_member_required
 def recnacc_list(request, gl_id):
