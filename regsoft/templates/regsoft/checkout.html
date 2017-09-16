@@ -1,0 +1,72 @@
+{% extends 'regsoft/base.html' %}
+{% block body %}
+
+<form action="{% url 'regsoft:recnacc_checkout_id' g_l.id %}" method="post">
+    {% csrf_token %}
+        <div class="card">
+        <div class="header">
+            <h2>
+                Select participants to check out
+            </h2>
+        </div>
+    <div class="body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+            <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                {% for part in part_list %}
+                    <tr>
+                        <td>{{part.name}}</td>
+                        <td>{{part.captain.g_l.college}}</td>
+                        <td>{{part.room.room}}</td>
+                        <td>{{part.room.bhavan}}</td>
+                        <td>
+                            <input name="part_list" type="checkbox" id="{{part.id}}" value="{{part.id}}"/>
+                            <label for="{{part.id}}"></label>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+        </table>
+        </div>
+        </div>
+    </div>
+    <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="header">
+                        <h2>
+                            Enter the amount retained
+                        </h2>
+                    </div>
+    
+    <div class="body">
+            
+                <label for="retained">Amount retained: </label>
+                <div class="form-group">
+                    <div class="form-line">
+                        <input type="number" id="retained" class="form-control" placeholder="Amount retained" name="retained" value=0>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary m-t-15 waves-effect">Checkout</button>
+</form>
+
+
+{% endblock %}

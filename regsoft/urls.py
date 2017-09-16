@@ -20,14 +20,13 @@ urlpatterns = [
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
 	url(r'^recnacc/college/(?P<gl_id>\d+)/$', views.recnacc_college, name='recnacc-college'),
-	url(r'^recnacc/team/(?P<tc_id>\d+)/$', views.recnacc_team, name='recnacc-team'),
 	url(r'^recnacc/change/$',views.recnacc_change, name='change'),
 	url(r'^recnacc/college_vs_bhavan/$', views.college_vs_bhavan, name='college_vs_bhavan'),
 	url(r'^recnacc/all_bhavans/$', views.all_bhavans, name='all_bhavans'),
 	url(r'^recnacc/bhavan_details/(?P<b_id>\d+)/$', views.bhavan_details, name='bhavan_details'),
 	url(r'^recnacc/firewallz_approved/$', views.firewallz_approved, name='firewallz_approved'),
-	url(r'^recnacc/checkout/$', views.checkout, name="recnacc_checkout"),
-	url(r'^recnacc/checkout/(?P<gl_id>\d+)/$', views.checkout, name="recnacc_checkout_id"),
+	url(r'^recnacc/checkout/$', views.recnacc_checkout, name="recnacc_checkout"),
+	url(r'^recnacc/checkout/(?P<gl_id>\d+)/$', views.recnacc_checkout_id, name="recnacc_checkout_id"),
 	
 	########## Controlz #############
 	url(r'^controlz/$', views.controlz_home, name='controlz-home'),

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>BOSM '17 Receipt for {{g_leader.name}} from {{g_leader.college}}</title>
+    <title>BOSM '17 Checkput Invoice for {{g_l.college}}</title>
     
     <style>
     .invoice-box{
@@ -97,8 +97,7 @@
                             </td>
                             
                             <td>
-                                Invoice #: {{number}}<br>
-                                Created: {{time}} | Paid on : {{bill.time_paid}}
+                                Checkout time: {{time}}
                             </td>
                         </tr>
                     </table>
@@ -115,55 +114,14 @@
                             </td>
                             
                             <td>
-                                {{g_leader.name}}<br>
-                                {{g_leader.college}}<br>
-                                {{g_leader.email}}
+                                {{g_l.name}}<br>
+                                {{g_l.college}}<br>
+                                {{g_l.email}}
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
-            
-            <tr class="heading">
-                <td>
-                    Payment Method
-                </td>
-                
-                <td>
-                    Amount
-                </td>
-            </tr>
-            {% for method in payment_methods %}
-            <tr class="details">
-                <td>
-                    {{method.method}}
-                </td>
-                
-                <td>
-                    {{method.amount}}
-                </td>
-            </tr>
-            {% endfor %}
-            {% if coaches_list %}
-                <tr class="heading">
-                        <td>
-                            Coach
-                        </td>
-                        <td>
-                            Event
-                        </td>
-                </tr>
-                {% for coach in coaches_list %}
-                <tr class="item">
-                    <td>
-                        {{coach.name}}
-                    </td>
-                    <td>
-                        {{coach.event}}
-                    </td>
-                </tr>
-                {% endfor %}
-            {% endif %}
             <tr class="heading">
                 <td>
                     Participant
@@ -183,11 +141,12 @@
             </tr>
             {% endfor %}
             <tr class="total">
-                <td></td>
-                
-                <td>
-                  Total : {{total}}
-                </td>
+                <td>Amount Retained</td>
+                <td>{{retained}}</td>
+            </tr>
+            <tr class="total">
+                    <td>Amount Returned</td>
+                    <td>{{returned}}</td>
             </tr>
         </table>
     </div>
@@ -202,8 +161,7 @@
                                 </td>
                                 
                                 <td>
-                                    Invoice #: {{number}}<br>
-                                    Created: {{time}} | Paid on : {{bill.time_paid}}
+                                    Checkout time: {{time}}
                                 </td>
                             </tr>
                         </table>
@@ -220,35 +178,14 @@
                                 </td>
                                 
                                 <td>
-                                    {{g_leader.name}}<br>
-                                    {{g_leader.college}}<br>
-                                    {{g_leader.email}}
+                                    {{g_l.name}}<br>
+                                    {{g_l.college}}<br>
+                                    {{g_l.email}}
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr>
-                
-                <tr class="heading">
-                    <td>
-                        Payment Method
-                    </td>
-                    
-                    <td>
-                        Amount
-                    </td>
-                </tr>
-                {% for method in payment_methods %}
-                <tr class="details">
-                    <td>
-                        {{method.method}}
-                    </td>
-                    
-                    <td>
-                        {{method.amount}}
-                    </td>
-                </tr>
-                {% endfor %}
                 <tr class="heading">
                     <td>
                         Participant
@@ -268,13 +205,15 @@
                 </tr>
                 {% endfor %}
                 <tr class="total">
-                    <td></td>
-                    
-                    <td>
-                      Total : {{total}}
-                    </td>
+                    <td>Amount Retained</td>
+                    <td>{{retained}}</td>
+                </tr>
+                <tr class="total">
+                        <td>Amount Returned</td>
+                        <td>{{returned}}</td>
                 </tr>
             </table>
         </div>
+<a href="{% url 'regsoft:recnacc-home' %}">Home</a>
 </body>
 </html>

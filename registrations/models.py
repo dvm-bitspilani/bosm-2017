@@ -86,6 +86,7 @@ class Participant(models.Model):
 	barcode = models.CharField(max_length=50, null=True)
 	bill = models.ForeignKey(Bill ,null=True, on_delete=None)
 	recnacc_time = models.DateTimeField(null=True, auto_now=False)
+	checkout = models.BooleanField(default=False)
 
 	def __unicode__(self):
 

@@ -79,7 +79,7 @@ def firewallzo_home(request):
 			g_l = GroupLeader.objects.get(barcode=barcode)
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
-		parts_id = [participant.id for captain in g_l.teamcaptain_set.filter(pcr_final=True) for participant in captain.participant_set.all()]
+		parts_id = [participant.id for captain in g_l.teamcaptain_set.filter(pcr_final=True, is_extra=False) for participant in captain.participant_set.all()]
 		parts = Participant.objects.filter(pk__in=parts_id)
 		confirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
@@ -107,9 +107,10 @@ def firewallz_swap(request):
 		data = request.POST
 	except:
 		return redirect(request.META.get('HTTP_REFERER'))
-
-	if 'confirm' in data['action']:
+	print data
+	if 'confirm' == data['action']:
 		part_ids = dict(data)['data']
+		print part_ids
 		for part_id in part_ids:
 			part = Participant.objects.get(id=part_id)
 			part.firewallz_passed=True
@@ -120,8 +121,9 @@ def firewallz_swap(request):
 				captain.firewallz_passed = True
 				captain.save()
 		return redirect('regsoft:firewallz-home')
-	elif 'unconfirm' in data['action']:
+	elif 'unconfirm' == data['action']:
 		part_ids = dict(data)['data']
+		print part_ids
 		for part_id in part_ids:
 			part = Participant.objects.get(id=part_id)
 			part.firewallz_passed=False
@@ -248,30 +250,30 @@ def recnacc_home(request):
 	return render(request,'regsoft/recnacc_home.html', {'tables':tables})
 
 def count_players(g_l):
-	tcs = TeamCaptain.objects.filter(g_l=g_l, firewallz_passed=True, pcr_final=True)
+	tcs = TeamCaptain.objects.filter(g_l=g_l,pcr_final=True, is_extra=False)
 	sum=0
 	for tc in tcs:
-		sum+=tc.total_players
+		sum+=tc.participant_set.filter(firewallz_passed=True).count()
+	return sum
+
+def count_players_accomodated(g_l):
+	tcs = TeamCaptain.objects.filter(g_l=g_l,	 pcr_final=True, is_extra=False)
+	sum=0
+	for tc in tcs:
+		sum+=tc.participant_set.filter(acco=True).count()
 	return sum
 
 @staff_member_required
 def recnacc_college(request, gl_id):
 	g_l = GroupLeader.objects.get(id=gl_id)
-	rows = []
+	rooms = Room.objects.all()
+	parts1 = []
+	parts2 = []
 	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False):
 		if tc.participant_set.filter(firewallz_passed=True):
-			rows.append({'data':[tc.name, tc.event.name, tc.g_l.college, tc.total_players, tc.participant_set.filter(firewallz_passed=True).count(),tc.participant_set.filter(acco=True).count(), ], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-team', kwargs={'tc_id':tc.id}),}]})
-	headings = ['Team Captain', 'Event', 'College', 'No. of Players','Firewallz Passed','Alloted', 'Select']
-	tables = [{'title':'Select Team for '+g_l.college, 'rows':rows, 'headings':headings}]
-	return render(request,'regsoft/tables.html', {'tables':tables,})
-
-@staff_member_required
-def recnacc_team(request, tc_id):
-	tc = TeamCaptain.objects.get(id=tc_id)
-	rooms = Room.objects.all()
-	parts1 = Participant.objects.filter(captain=tc, acco=True, firewallz_passed=True)
-	parts2 = Participant.objects.filter(captain=tc, acco=False, firewallz_passed=True)
-	return render(request, 'regsoft/allot.html', {'alloted':parts1, 'unalloted':parts2, 'rooms':rooms, 'tc':tc})
+			parts1 += Participant.objects.filter(captain=tc, acco=True, firewallz_passed=True)
+			parts2 += Participant.objects.filter(captain=tc, acco=False, firewallz_passed=True)
+	return render(request, 'regsoft/allot.html', {'alloted':parts1, 'unalloted':parts2, 'rooms':rooms,'g_l':g_l})
 
 @staff_member_required
 def recnacc_change(request):
@@ -330,19 +332,36 @@ def recnacc_change(request):
 
 
 @staff_member_required
-def checkout(request, gl_id=None):
-	if gl_id==None:
-		g_ls = GroupLeader.objects.filter(pcr_approved=True)
-		rows = [{'data':[gl.name, g_l.college, count_players(g_l)], 'link':[{'title':'Select', 'url':reverse('regsoft:recnacc_checkout_id', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls]
-		headings = ['Group Leader', 'College', 'Total Players', 'Select']
-		tables = [{'title':'Select College for Checkout', 'headings':headings, 'rows':rows}]
-	else:
-		g_l = GroupLeader.objects.get(id=gl_id)
-		if request.method == 'POST':
-			pass
-		tcs = TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False)
-		parts = [part for tc in tcs for part in tc.participant_set.filter(acco=True, firewallz_passed=True)]
-		return render(request, 'regsoft/checkout.html', {'parts':parts})
+def recnacc_checkout(request):
+	g_ls = GroupLeader.objects.filter(pcr_approved=True)
+	rows = [{'data':[g_l.name, g_l.college, count_players_accomodated(g_l)], 'link':[{'title':'Select', 'url':reverse('regsoft:recnacc_checkout_id', kwargs={'gl_id':g_l.id})},]} for g_l in g_ls]
+	headings = ['Group Leader', 'College', 'Total Players', 'Select']
+	tables = {'title':'Select College for Checkout', 'headings':headings, 'rows':rows}
+	return render(request, 'regsoft/tables.html', {'tables':[tables,]})
+
+@staff_member_required
+def recnacc_checkout_id(request,gl_id):
+	g_l = GroupLeader.objects.get(id=gl_id)
+	if request.method == 'POST':
+		from datetime import datetime
+		data = request.POST
+		part_list = data.getlist('part_list')
+
+		participant_list = Participant.objects.filter(id__in=part_list)
+		for p_id in part_list:
+			part = Participant.objects.get(id=p_id)
+			part.acco = False
+			part.room = None
+			part.checkout = True
+			part.save()
+		time = datetime.now()
+		amount_retained = int(data['retained'])
+		amount_returned = (len(part_list)*300) - amount_retained
+		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time})
+
+	teamcaptain_list = g_l.teamcaptain_set.filter(pcr_final=True)
+	part_list = Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True)
+	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l})
 
 
 @staff_member_required
