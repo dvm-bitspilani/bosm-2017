@@ -26,6 +26,8 @@ urlpatterns = [
 	url(r'^recnacc/all_bhavans/$', views.all_bhavans, name='all_bhavans'),
 	url(r'^recnacc/bhavan_details/(?P<b_id>\d+)/$', views.bhavan_details, name='bhavan_details'),
 	url(r'^recnacc/firewallz_approved/$', views.firewallz_approved, name='firewallz_approved'),
+	url(r'^recnacc/checkout/$', views.checkout, name="recnacc_checkout"),
+	url(r'^recnacc/checkout/(?P<gl_id>\d+)/$', views.checkout, name="recnacc_checkout_id"),
 	
 	########## Controlz #############
 	url(r'^controlz/$', views.controlz_home, name='controlz-home'),

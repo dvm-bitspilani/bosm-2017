@@ -313,10 +313,11 @@ def recnacc_change(request):
 			except:
 				return redirect(request.META.get('HTTP_REFERER'))
 			tc = Participant.objects.get(id=parts_id[0]).captain
-			room = tc.room
+			# room = tc.room
 			for part_id in parts_id:
 				part = Participant.objects.get(id=part_id)
 				part.acco = False
+				room = part.room
 				part.room = None
 				part.save()
 				room.vacancy += 1
@@ -326,6 +327,22 @@ def recnacc_change(request):
 				tc.save()
 			gl_id = tc.g_l.id
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
+
+
+@staff_member_required
+def checkout(request, gl_id=None):
+	if gl_id==None:
+		g_ls = GroupLeader.objects.filter(pcr_approved=True)
+		rows = [{'data':[gl.name, g_l.college, count_players(g_l)], 'link':[{'title':'Select', 'url':reverse('regsoft:recnacc_checkout_id', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls]
+		headings = ['Group Leader', 'College', 'Total Players', 'Select']
+		tables = [{'title':'Select College for Checkout', 'headings':headings, 'rows':rows}]
+	else:
+		g_l = GroupLeader.objects.get(id=gl_id)
+		if request.method == 'POST':
+			pass
+		tcs = TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False)
+		parts = [part for tc in tcs for part in tc.participant_set.filter(acco=True, firewallz_passed=True)]
+		return render(request, 'regsoft/checkout.html', {'parts':parts})
 
 
 @staff_member_required

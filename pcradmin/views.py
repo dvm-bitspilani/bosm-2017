@@ -410,7 +410,8 @@ BITS Pilani
 	from reportlab.lib.pagesizes import letter
 	from reportlab.platypus import SimpleDocTemplate, Spacer, Table, TableStyle
 	try:
-		_dir = '/root/live/bosm/backend/resources/bosm2017/'
+		# _dir = '/root/live/bosm/backend/resources/bosm2017/'
+		_dir = '/home/tushar/Downloads/'
 		# _dir = '/home/auto-reload/Desktop/'
 		doc_name = _dir + 'table.pdf'
 		doc = SimpleDocTemplate(doc_name, pagesize=letter)
@@ -440,38 +441,40 @@ BITS Pilani
 	page_count = input_file.getNumPages()
 
 	for page_number in range(page_count):
+		print page_number
 		watermark = PdfFileReader(open(watermark_name, "rb"))
 		input_page = watermark.getPage(0)
-		input_page.mergePage(input_file.getPage(0))
+		input_page.mergePage(input_file.getPage(page_number))
+		print input_page
 		output_file.addPage(input_page)
 	output_name = _dir +'document-output.pdf'
 	with open(output_name, "wb") as outputStream:
 		output_file.write(outputStream)
 
-	import base64
+	# import base64
 
-	with open(output_name, "rb") as output_pdf:
-		encoded_string1 = base64.b64encode(output_pdf.read())
-	with open(_dir+'rates.pdf') as rates_pdf:
-		encoded_string2 = base64.b64encode(rates_pdf.read())
-	attachment1 = Attachment()
-	attachment1.content = encoded_string1
-	attachment1.filename = "confirmed Participants.pdf"
-	attachment2 = Attachment()
-	attachment2.content = encoded_string2
-	attachment2.filename = "Rate Sheet.pdf"
+	# with open(output_name, "rb") as output_pdf:
+	# 	encoded_string1 = base64.b64encode(output_pdf.read())
+	# with open(_dir+'rates.pdf') as rates_pdf:
+	# 	encoded_string2 = base64.b64encode(rates_pdf.read())
+	# attachment1 = Attachment()
+	# attachment1.content = encoded_string1
+	# attachment1.filename = "confirmed Participants.pdf"
+	# attachment2 = Attachment()
+	# attachment2.content = encoded_string2
+	# attachment2.filename = "Rate Sheet.pdf"
 
 	
-	for tc in tcs:
-		tc.pcr_final=True
-		tc.save()
-	try:
-		mail = Mail(from_email, subject, to_email, content)
-		mail.add_attachment(attachment1)
-		mail.add_attachment(attachment2)
-		response = sg.client.mail.send.post(request_body=mail.get())
-	except:
-		return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
+	# for tc in tcs:
+	# 	tc.pcr_final=True
+	# 	tc.save()
+	# # try:
+	# 	mail = Mail(from_email, subject, to_email, content)
+	# 	mail.add_attachment(attachment1)
+	# 	mail.add_attachment(attachment2)
+	# 	response = sg.client.mail.send.post(request_body=mail.get())
+	# except:
+	# 	return render(request, 'pcradmin/message.html', {'message':'Email not sent'})
 
 	return render(request, "pcradmin/message.html", {'message':'Email sent to ' + send_to})
 
