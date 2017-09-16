@@ -302,7 +302,7 @@ def recnacc_change(request):
 					tc.room =room
 					tc.acco = True
 					tc.save()
-					gl_id = tc.g_l.id
+				gl_id = part.captain.g_l.id
 		
 
 		if 'deallocate' == data['action']:
