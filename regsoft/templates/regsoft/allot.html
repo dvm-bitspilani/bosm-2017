@@ -1,8 +1,9 @@
 {% extends 'regsoft/base.html' %}
 {% block body %}
 
-{% if unalloted %}
+{% if unalloted or coach_unalloted %}
 <form action="{% url 'regsoft:change' %}" method="post">
+        {% csrf_token %}
         <div class="card">
         <div class="header">
             <h2>
@@ -44,12 +45,6 @@
                     </tr>
                 {% endfor %}
                 </tbody>
-    {% comment %} <select name="room" id="room">
-        <option disabled selected>Select a Room to Allot</option>
-        {% for r in rooms %}
-        <li><option value="{{r.id}}">{{r.room}}</option></li>
-        {% endfor %}
-    </select> {% endcomment %}
     </table>
         </div>
     </div>
@@ -61,7 +56,7 @@
             </h2>
         </div>
         <div class="body">
-    	{% csrf_token %}
+    	
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover dataTable">
                     <thead>
@@ -70,6 +65,8 @@
                             <th>Gender</th>
                             <th>Event</th>
                             <th>College</th>
+                            <th>Captain</th>
+                            <th>Captain Phone</th>
                             <th>Select</th>
                         </tr>
                     </thead>
@@ -79,6 +76,8 @@
                             <th>Gender</th>
                             <th>Event</th>
                             <th>College</th>
+                            <th>Captain</th>
+                            <th>Captain Phone</th>
                             <th>Select</th>
                         </tr>
                     </tfoot>
@@ -89,14 +88,50 @@
                             <td>{{i.captain.gender}}</td>
                             <td>{{i.captain.event.name}}</td>
                             <td>{{i.captain.g_l.college}}</td>
+                            <td>{{i.captain.name}}</td>
+                            <td>{{i.captain.phone}}</td>
                             <td>
-                                <input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
-                                <label for="{{i.id}}"></label>
+                                <input type="checkbox" name="data" id="{{i.name}}" value="{{i.id}}">
+                                <label for="{{i.name}}"></label>
     						</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <h3>Coaches</h3>
+                <table class="table table-bordered table-striped table-hover dataTable">
+                    <thead>
+                        <tr>
+                            <th>Coach</th>
+                            <th>Event</th>
+                            <th>College</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Event</th>
+                            <th>College</th>
+                            <th>Select</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for i in coach_unalloted %}
+                        <tr>
+                            <td>{{i.name}}</td>
+                            <td>{{i.event.name}}</td>
+                            <td>{{i.g_l.college}}</td>
+                            <td>
+                                <input type="checkbox" name="coach_data" id="{{i.name}}" value="{{i.id}}">
+                                <label for="{{i.name}}"></label>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{% url 'regsoft:add_coach_recnacc' g_l.id %}" class="btn btn-primary btn-lg m-l-15 waves-effect">Add Coach</a>
+                <br><br>
                 <input type="hidden" value="allocate" name="action">
                 <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Allocate</button>
             </div>
@@ -107,7 +142,7 @@
 
 
 
-{% if alloted %}
+{% if alloted or coach_alloted %}
 <div class="card">
     <div class="header">
         <h2>
@@ -125,6 +160,8 @@
                         <th>Gender</th>
                         <th>Event</th>
                         <th>College</th>
+                        <th>Captain</th>
+                        <th>Captain Phone</th>
                         <th>Room</th>
                         <th>Bhavan</th>
                         <th>Select</th>
@@ -136,6 +173,8 @@
                         <th>Gender</th>
                         <th>Event</th>
                         <th>College</th>
+                        <th>Captain</th>
+                        <th>Captain Phone</th>
                         <th>Room</th>
                         <th>Bhavan</th>
                         <th>Select</th>
@@ -148,11 +187,53 @@
                         <td>{{i.captain.gender}}</td>
                         <td>{{i.captain.event.name}}</td>
                         <td>{{i.captain.g_l.college}}</td>
+                        <td>{{i.captain.name}}</td>
+                        <td>{{i.captain.phone}}</td>
                         <td>{{i.room.room}}</td>
                         <td>{{i.room.bhavan.name}}</td>
                         <td>
-                            <input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
-                            <label for="{{i.id}}"></label>
+                            <input type="checkbox" name="data" id="{{i.name}}" value="{{i.id}}">
+                            <label for="{{i.name}}"></label>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3>
+                Coaches
+            </h3>
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <thead>
+                    <tr>
+                        <th>Coach</th>
+                        <th>Event</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Event</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th>Select</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for i in coach_alloted %}
+                    <tr>
+                        <td>{{i.name}}</td>
+                        <td>{{i.event.name}}</td>
+                        <td>{{i.g_l.college}}</td>
+                        <td>{{i.room.room}}</td>
+                        <td>{{i.room.bhavan.name}}</td>
+                        <td>
+                            <input type="checkbox" name="coach_data" id="{{i.name}}" value="{{i.id}}">
+                            <label for="{{i.name}}"></label>
                         </td>
                     </tr>
                     {% endfor %}
@@ -161,6 +242,7 @@
             <input type="hidden" value="deallocate" name="action">
             <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Deallocate</button>
         </div>
+
 	</form>
     </div>
 </div>

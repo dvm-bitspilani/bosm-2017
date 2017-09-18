@@ -102,3 +102,15 @@ class Transport(models.Model):
 	def __unicode__(self):
 
 		return str(self.g_l.name)
+
+class Coach(models.Model):
+	name = models.CharField(max_length=200)
+	g_l = models.ForeignKey(GroupLeader, on_delete=models.CASCADE)
+	event = models.ForeignKey(Event, on_delete=models.CASCADE)
+	paid = models.BooleanField(default=False)
+	acco = models.BooleanField(default=False)
+	bill = models.ForeignKey(Bill, null=True, on_delete=None)
+	room = models.ForeignKey(Room, null=True, on_delete=None)
+
+	def __unicode__(self):
+		return self.name + str(self.g_l.name)

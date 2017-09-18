@@ -40,24 +40,47 @@ def index(request, message=None):
 	return render(request, 'regsoft/index.html', {'groupleaders':g_ls})
 
 def gen_barcode(g_l):
-	try:
-		gl_id = g_l.id
-		encoded = g_l.barcode
-		if encoded == '':
-			raise ValueError
+	gl_id = g_l.id
+	encoded = g_l.barcode
+	if encoded == '':
+		raise ValueError
+	if encoded is not None:
 		return encoded
-	except:
-		gl_ida = "%04d" % int(gl_id)
-		mixed = string.ascii_uppercase + string.ascii_lowercase
-		encoded = ''.join([x+mixed[randint(0,51)] for x in gl_ida])
-		g_l.barcode = encoded
-		g_l.save()
+	gl_ida = "%04d" % int(gl_id)
+	mixed = string.ascii_uppercase + string.ascii_lowercase
+	encoded = ''.join([x+mixed[randint(0,51)] for x in gl_ida])
+	g_l.barcode = encoded
+	g_l.save()
 	print 'encoded: ', encoded
 	try:
-		image='/root/live/bosm/backend/resources/bosm2017/barcodes/%04s.gif' % int(gl_id)
+		image='/root/live/bosm/backend/resources/bosm2017/barcodes/gleaders/%04s.gif' % int(gl_id)
 		barg.code128_image(encoded).save(image)
 	except:
-		image = '/home/auto-reload/Desktop/barcodes/%04d.gif' % int(gl_id)
+		image = '/home/auto-reload/Desktop/barcodes/gleaders/%04d.gif' % int(gl_id)
+		barg.code128_image(encoded).save(image)
+	return encoded
+
+def gen_barcode_participant(part):
+
+	part_id = part.id
+	print part_id
+	encoded = part.barcode
+	if encoded == '':
+		raise ValueError
+	if encoded is not None:
+		return encoded
+	part_ida = "%04d" % int(part_id)
+	mixed = string.ascii_uppercase + string.ascii_lowercase
+	encoded = ''.join([x+mixed[randint(0,51)] for x in part_ida])
+	part.barcode = encoded
+	part.save()
+
+	print 'encoded: ', encoded
+	try:
+		image='/root/live/bosm/backend/resources/bosm2017/barcodes/participants/%04s.gif' % int(part_id)
+		barg.code128_image(encoded).save(image)
+	except:
+		image = '/home/auto-reload/Desktop/barcodes/participants/%04d.gif' % int(part_id)
 		barg.code128_image(encoded).save(image)
 	return encoded
 
@@ -87,6 +110,7 @@ def firewallzo_home(request):
 			'pcr':Participation.objects.get(event=part.captain.event, g_l=part.captain.g_l).confirmed,
 			'captain':part.captain.name,
 			'id':part.id,
+			'barcode':part.barcode,
 			'captain_id':part.captain.id} for part in parts.filter(firewallz_passed=True).order_by('captain__event__name')]
 		unconfirmed = [{'name':part.name,
 			'college': part.captain.g_l.college,
@@ -114,6 +138,8 @@ def firewallz_swap(request):
 		for part_id in part_ids:
 			part = Participant.objects.get(id=part_id)
 			part.firewallz_passed=True
+			barcode = gen_barcode_participant(part)
+			print barcode
 			part.save()
 			tc = part.captain
 			if part.name == part.captain.name:
@@ -173,7 +199,11 @@ def firewallz_add(request, gl_id):
 		
 		if event.max_limit == 1:
 			try:
-				tc1 = TeamCaptain.objects.filter(event=event, g_l=g_l)[0]
+				for t in TeamCaptain.objects.filter(event=event, g_l=g_l):
+					if t.phone > 0:
+						tc1 = t
+						break
+				print tc1
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, email=tc1.email, phone=tc1.phone, pcr_final=True)
 			except:
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, pcr_final=True)
@@ -194,7 +224,7 @@ def firewallz_add(request, gl_id):
 		# request.POST['barcode'] = g_l.barcode
 		return redirect(reverse('regsoft:firewallz-home'))
 	events = [part.event for part in Participation.objects.filter(g_l=g_l, confirmed=True)]
-	return render(request,  'regsoft/controlz_add.html',{'events':events})
+	return render(request,  'regsoft/controlz_add.html',{'events':events, 'g_l':g_l})
 
 @staff_member_required
 def firewallz_delete(request):
@@ -273,7 +303,10 @@ def recnacc_college(request, gl_id):
 		if tc.participant_set.filter(firewallz_passed=True):
 			parts1 += Participant.objects.filter(captain=tc, acco=True, firewallz_passed=True)
 			parts2 += Participant.objects.filter(captain=tc, acco=False, firewallz_passed=True)
-	return render(request, 'regsoft/allot.html', {'alloted':parts1, 'unalloted':parts2, 'rooms':rooms,'g_l':g_l})
+	
+	coach1 = Coach.objects.filter(g_l=g_l, acco=True)
+	coach2 = Coach.objects.filter(g_l=g_l, acco=False)
+	return render(request, 'regsoft/allot.html', {'alloted':parts1, 'unalloted':parts2, 'rooms':rooms,'g_l':g_l, 'coach_unalloted':coach2, 'coach_alloted':coach1})
 
 @staff_member_required
 def recnacc_change(request):
@@ -305,8 +338,19 @@ def recnacc_change(request):
 					tc.acco = True
 					tc.save()
 				gl_id = part.captain.g_l.id
-		
-
+			
+			try:
+				coach_list = data.getlist('coach_data')
+				for c_id in coach_list:
+					coach = Coach.objects.get(id=c_id)
+					coach.acco = True
+					coach.room = room
+					coach.save()
+					room.vacancy -= 1
+					room.save()
+			except:
+				pass
+				
 		if 'deallocate' == data['action']:
 			print data
 			try:
@@ -327,9 +371,35 @@ def recnacc_change(request):
 			if all((not part.acco for part in Participant.objects.filter(captain=tc))):
 				tc.room = None
 				tc.save()
+			try:
+				coach_list = data.getlist('coach_data')
+				for c_id in coach_list:
+					coach = Coach.objects.get(id=c_id)
+					room = coach.room
+					coach.acco = False
+					coach.room = None
+					coach.save()
+					room.vacancy += 1
+					room.save()
+			except:
+				pass
 			gl_id = tc.g_l.id
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
 
+@staff_member_required
+def add_coach_recnacc(request, gl_id):
+	g_leader = GroupLeader.objects.get(id=gl_id)
+	if request.method == 'POST':
+		try:
+			event = Event.objects.get(id=request.POST['event'])
+			name = request.POST['name']
+		except:
+			return redirect(request.META.get('HTTP_REFERER'))
+		coach = Coach.objects.create(name=name, event=event, g_l=g_leader)
+		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
+		
+	events = [part.event for part in Participation.objects.filter(g_l=g_leader)]
+	return render(request, 'regsoft/add_coach.html', {'g_l':g_leader, 'events':events})
 
 @staff_member_required
 def recnacc_checkout(request):
@@ -519,7 +589,7 @@ def controlz_edit_tc(request, tc_id):
 def recnacc_list(request, gl_id):
 	g_leader = get_object_or_404(GroupLeader, id=gl_id)
 	participant_list = []
-	for captain in g_leader.teamcaptain_set.filter(firewallz_passed=True, pcr_final=True):
+	for captain in g_leader.teamcaptain_set.filter(pcr_final=True):
 		participant_list += captain.participant_set.filter(firewallz_passed=True, acco=True)
 	
 	participant_list.sort(key=lambda x: x.recnacc_time, reverse=True)
@@ -545,6 +615,21 @@ def generate_recnacc_list(request):
 			'rows': c_rows
 		}
 		return render(request, 'regsoft/tables.html', {'tables':[table,]})
+
+@staff_member_required
+def add_coach_controlz(request, gl_id):
+	g_leader = GroupLeader.objects.get(id=gl_id)
+	if request.method == 'POST':
+		try:
+			event = Event.objects.get(id=request.POST['event'])
+			name = request.POST['name']
+		except:
+			return redirect(request.META.get('HTTP_REFERER'))
+		coach = Coach.objects.create(name=name, event=event, g_l=g_leader)
+		return redirect(reverse('regsoft:create_bill', kwargs={'gl_id':gl_id}))
+		
+	events = [part.event for part in Participation.objects.filter(g_l=g_leader)]
+	return render(request, 'regsoft/add_captain.html', {'g_l':g_l, 'events':events})
 
 @staff_member_required
 def get_details(request):
@@ -673,7 +758,7 @@ def create_bill(request, gl_id):
 		data = request.POST
 		id_list = data.getlist('data')
 		print data.getlist('coach_data')
-		captain_list = [TeamCaptain.objects.get(id=tc_id) for tc_id in data.getlist('coach_data')]
+		coach_list = Coach.objects.filter(id__in=data.getlist('coach_data'))
 		bill = Bill()
 		bill.two_thousands = data['twothousands']
 		bill.five_hundreds = data['fivehundreds']
@@ -694,12 +779,10 @@ def create_bill(request, gl_id):
 			bill.amount += int(data[key])*int(value)
 		for key,value in return_dict.iteritems():
 			bill.amount -= int(data[key])*int(value)
-		coach_list = []
-		for captain in captain_list:
-			coach_list.append(captain.coach)
-			captain.coach_paid = True
-			captain.save()
-		bill.coaches_list = json.dumps(coach_list)
+
+		for coach in coach_list:
+			coach.paid = True
+			coach.save()
 
 		try:
 			bill.draft_number = data['draft_number']
@@ -716,6 +799,9 @@ def create_bill(request, gl_id):
 				part.bill = bill
 				part.controlz = True
 				part.save()
+			for coach in coach_list:
+				coach.bill = bill
+				coach.save()
 
 			return redirect(reverse('regsoft:view_bills', kwargs={'gl_id':g_leader.id}))
 
@@ -723,21 +809,20 @@ def create_bill(request, gl_id):
 			return redirect(reverse('regsoft:create_bill', kwargs={'gl_id':gl_id}))
 	
 	participant_list = []
-	coaches_list = []
-	for captain in g_leader.teamcaptain_set.all():
+	coaches_list = Coach.objects.filter(g_l=g_leader, paid=False)
+	for captain in g_leader.teamcaptain_set.filter(pcr_final=True):
 		participant_list += captain.participant_set.filter(firewallz_passed=True, controlz=False)
-		if captain.coach and captain.coach_paid==False:
-			coaches_list.append(captain)
+	
 	
 	return render(request, 'regsoft/create_bill.html', {'g_leader':g_leader, 'participant_list':participant_list, 'coaches':coaches_list})
 
 @staff_member_required
 def view_bills(request, gl_id):
 	g_leader = GroupLeader.objects.get(id=gl_id)
-	c_rows = [{'data':[bill.participant_set.count(), bill.time_paid, bill.amount-bill.draft_amount, bill.draft_amount, bill.draft_number], 'link':[{'title':'View details', 'url':reverse('regsoft:bill_details',kwargs={'b_id':bill.id})}]} for bill in Bill.objects.filter(g_leader = g_leader)]
+	c_rows = [{'data':[bill.participant_set.count(),bill.coach_set.count(), bill.time_paid, bill.amount-bill.draft_amount, bill.draft_amount, bill.draft_number], 'link':[{'title':'View details', 'url':reverse('regsoft:bill_details',kwargs={'b_id':bill.id})}]} for bill in Bill.objects.filter(g_leader = g_leader, is_displayed=True)]
 	bill_table = {
 		'title':"Bills created under " + g_leader.name,
-		'headings':['Participants', 'Time paid',  'Cash paid', 'Draft Amount', 'Draft Number', 'View Details'],
+		'headings':['Participants','Coaches','Time paid',  'Cash paid', 'Draft Amount', 'Draft Number', 'View Details'],
 		'rows':c_rows,
 	}
 
@@ -752,7 +837,13 @@ def bill_details(request, b_id):
 		'headings' : ['Name', 'Captain', 'Event', 'Time created',],
 		'rows':c_rows,
 	}
-	return render(request, 'regsoft/bill_details.html', {'tables':[table, ], 'bill':bill})
+	d_rows = [{'data':[coach.name, coach.event.name, bill.time_paid,], 'link':[]} for coach in bill.coach_set.all()]
+	table2 = {
+		'title':'Coach details',
+		'headings':['Name','Event','Time created'],
+		'rows':d_rows
+	}
+	return render(request, 'regsoft/bill_details.html', {'tables':[table, table2], 'bill':bill})
 
 @staff_member_required
 def delete_bill(request, b_id):
@@ -761,17 +852,16 @@ def delete_bill(request, b_id):
 	g_leader = bill.g_leader
 	for part in bill.participant_set.all():
 		part.controlz = False
+		part.bill = None
 		part.save()
 	
-	jsonDec = json.decoder.JSONDecoder()
-	coach_list = jsonDec.decode(bill.coaches_list)
-	for captain in g_leader.teamcaptain_set.all():
-		for coach in coach_list:
-			if captain.coach == coach:
-				captain.coach_paid = False
-				captain.save()
+	for coach in bill.coach_set.all():
+		coach.paid = False
+		coach.bill = None
+		coach.save()
 
-	bill.delete()
+	bill.is_displayed = False
+	bill.save()
 	return redirect(reverse('regsoft:view_bills', kwargs={'gl_id':gl_id}))
 
 @staff_member_required
@@ -781,13 +871,7 @@ def print_bill(request, b_id):
 	bill = get_object_or_404(Bill, id=b_id)
 	g_leader = bill.g_leader
 	part_list = bill.participant_set.all()
-	jsonDec = json.decoder.JSONDecoder()
-	coach_list = jsonDec.decode(bill.coaches_list)
-	coaches_list = []
-	for captain in g_leader.teamcaptain_set.all():
-		for coach in coach_list:
-			if captain.coach == coach:
-				coaches_list.append({'name':coach, 'event':captain.event})
+	coach_list = bill.coach_set.all()
 
 	try:
 		draft = bill.draft_number
@@ -796,7 +880,7 @@ def print_bill(request, b_id):
 	payment_methods = [{'method':'Cash', 'amount':bill.amount-bill.draft_amount}, {'method':'Draft #'+draft, 'amount':bill.draft_amount}]
 
 	number = Bill.objects.all().count()
-	return render(request, 'regsoft/print_bill.html', {'part_list':part_list, 'coaches_list':coaches_list ,'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':bill.amount, 'number':number})
+	return render(request, 'regsoft/print_bill.html', {'part_list':part_list, 'coaches_list':coach_list ,'g_leader':g_leader, 'time':time_stamp, 'bill':bill, 'payment_methods':payment_methods, 'total':bill.amount, 'number':number})
 
 @staff_member_required
 def contacts(request):

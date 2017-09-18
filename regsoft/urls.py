@@ -20,6 +20,7 @@ urlpatterns = [
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
 	url(r'^recnacc/college/(?P<gl_id>\d+)/$', views.recnacc_college, name='recnacc-college'),
+	url(r'^recnacc/add_coach/(?P<gl_id>\d+)/$', views.add_coach_recnacc, name='add_coach_recnacc'),
 	url(r'^recnacc/change/$',views.recnacc_change, name='change'),
 	url(r'^recnacc/college_vs_bhavan/$', views.college_vs_bhavan, name='college_vs_bhavan'),
 	url(r'^recnacc/all_bhavans/$', views.all_bhavans, name='all_bhavans'),
@@ -33,6 +34,7 @@ urlpatterns = [
 	# url(r'^controlz/team_list/(?P<tc_id>\d+)/$', views.show_team_list, name='show_team_list'),
 	# url(r'^controlz/view_captain/(?P<tc_id>\d+)/$', views.view_captain, name='view_captain'),
 	url(r'^controlz/get_captains/$', views.get_captains, name='get_captains'),
+	url(r'^controlz/add_coach/(?P<gl_id>\d+)/$', views.add_coach_controlz, name='add_coach_controlz'),
 	url(r'^controlz/create_bill/(?P<gl_id>\d+)/$', views.create_bill, name='create_bill'),
 	url(r'^controlz/recnacc_list/(?P<gl_id>\d+)/$', views.recnacc_list, name='recnacc_list'),
 	url(r'^controlz/generate_recnacc_list/$', views.generate_recnacc_list, name='generate_recnacc_list'),

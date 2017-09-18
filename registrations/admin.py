@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(GroupLeader)
 admin.site.register(TeamCaptain)
 admin.site.register(Participant)
+admin.site.register(Coach)

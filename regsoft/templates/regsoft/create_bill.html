@@ -44,8 +44,8 @@
                                     <td>{{part.captain.event.name}}</td>
                                     <td>{{part.captain.name}}</td>
                                     <td class="chk">
-                                        <input type="checkbox" name="data" id="{{part.id}}" value="{{part.id}}">
-                                        <label for="{{part.id}}"></label>
+                                        <input type="checkbox" name="data" id="{{part.name}}" value="{{part.id}}">
+                                        <label for="{{part.name}}"></label>
                                     </td>
                                     <td>
                                         {% if part.captain.if_payment and part.captain.payment > 0 %}
@@ -81,7 +81,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Event</th>
-                                    <th>Captain</th>
                                     <th>Select</th>
                                     <th>Amount</th>
                                 </tr>
@@ -90,20 +89,18 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Event</th>
-                                    <th>Captain</th>
                                     <th>Select</th>
                                     <th>Amount</th>
                                 </tr>
                             </tfoot>
                             <tbody>
-                                {% for captain in coaches %}
+                                {% for coach in coaches %}
                                 <tr>
-                                    <td>{{captain.coach}}</td>
-                                    <td>{{captain.event.name}}</td>
-                                    <td>{{captain.name}}</td>
+                                    <td>{{coach.name}}</td>
+                                    <td>{{coach.event.name}}</td>
                                     <td class="chk">
-                                        <input type="checkbox" name="coach_data" id="{{captain.id}}" value="{{captain.id}}">
-                                        <label for="{{captain.id}}"></label>
+                                        <input type="checkbox" name="coach_data" id="{{coach.name}}" value="{{coach.id}}">
+                                        <label for="{{coach.name}}"></label>
                                     </td>
                                     <td>
                                         1000
@@ -112,6 +109,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <a href="{% url 'regsoft:add_coach_controlz' g_leader.id %}" class="btn btn-primary btn-lg m-l-15 waves-effect">Add Coach</a>
                     </div>
                 </div>
             </div>
@@ -185,31 +183,31 @@
                     <input type="number" id="twothousandsreturned" class="form-control" placeholder="No of two thousand notes returned" name="twothousandsreturned" value=0>
                 </div>
             </div>
-            <label for="fivehundredsreturned">No of five hundred notes</label>
+            <label for="fivehundredsreturned">No of five hundred notes returned</label>
             <div class="form-group">
                 <div class="form-line">
                     <input type="number" id="fivehundredsreturned" class="form-control" placeholder="No of five hundred notes returned" name="fivehundredsreturned" value="0">
                 </div>
             </div>
-            <label for="hundredsreturned">No of one hundred notes</label>
+            <label for="hundredsreturned">No of one hundred notes returned</label>
             <div class="form-group">
                     <div class="form-line">
                         <input type="number" id="hundredsreturned" class="form-control" placeholder="No of one hundred notes returned" name="hundredsreturned" value="0">
                     </div>
             </div>
-            <label for="fiftiesreturned">No of fifty notes</label>
+            <label for="fiftiesreturned">No of fifty notes returned</label>
             <div class="form-group">
                 <div class="form-line">
                     <input type="number" id="fiftiesreturned" name="fiftiesreturned" class="form-control" placeholder="No of fifty notes returned" value="0">
                 </div>
             </div>
-            <label for="twentiesreturned">No of twenty notes</label>
+            <label for="twentiesreturned">No of twenty notes returned</label>
             <div class="form-group">
                 <div class="form-line">
                     <input type="number" id="twentiesreturned" name="twentiesreturned" class="form-control" placeholder="No of twenty notes returned" value="0">
                 </div>
             </div>
-            <label for="tensreturned">No of ten notes</label>
+            <label for="tensreturned">No of ten notes returned</label>
             <div class="form-group">
                 <div class="form-line">
                     <input type="number" id="tensreturned" name="tensreturned" class="form-control" placeholder="No of ten notes returned" value="0">

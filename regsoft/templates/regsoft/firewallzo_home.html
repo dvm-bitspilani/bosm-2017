@@ -75,11 +75,7 @@
                         <td>{{i.pcr}}</td>
                         <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>
-                        {% if i.pcr %}
                         	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
-                        {% else %}
-							<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}" disabled="disabled">
-						{% endif %}
                         	<label for="{{i.id}}"></label>
 						</td>
                     </tr>
@@ -127,6 +123,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Barcode</th>
                         <th>Edit</th>
                         <th>Select</th>
                     </tr>
@@ -138,6 +135,7 @@
                         <th>Event</th>
                         <th>Team Captain</th>
                         <th>Pcr Approved</th>
+                        <th>Barcode</th>
                         <th>Edit</th>
                         <th>Select</th>
                     </tr>
@@ -150,6 +148,7 @@
                         <td>{{i.event}}</td>
                         <td><a href="{% url 'regsoft:firewallz_edit_tc' i.captain_id %}">{{i.captain}}</a></td>
                         <td>{{i.pcr}}</td>
+                        <td>{{i.barcode}}</td>
                         <td><a href="{% url 'regsoft:firewallz_edit' i.id%}">Edit</a></td>
                         <td>
                         	<input type="checkbox" name="data" id="{{i.id}}" value="{{i.id}}">
