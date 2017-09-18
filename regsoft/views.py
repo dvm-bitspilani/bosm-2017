@@ -86,7 +86,7 @@ def gen_barcode_participant(part):
 
 @staff_member_required
 def get_barcode(request):
-	g_ls = GroupLeader.objects.all()
+	g_ls = GroupLeader.objects.filter(pcr_approved=True)
 	for g_l in g_ls:
 		bc = gen_barcode(g_l)
 

@@ -84,7 +84,7 @@ class Participant(models.Model):
 	room = models.ForeignKey(Room, null=True, blank=True)
 	controlz = models.BooleanField('controlz passed', default=False)
 	barcode = models.CharField(max_length=50, null=True)
-	bill = models.ForeignKey(Bill ,null=True, on_delete=None)
+	bill = models.ForeignKey(Bill ,null=True, on_delete=models.SET_NULL)
 	recnacc_time = models.DateTimeField(null=True, auto_now=False)
 	checkout = models.BooleanField(default=False)
 
@@ -109,8 +109,8 @@ class Coach(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE)
 	paid = models.BooleanField(default=False)
 	acco = models.BooleanField(default=False)
-	bill = models.ForeignKey(Bill, null=True, on_delete=None)
-	room = models.ForeignKey(Room, null=True, on_delete=None)
+	bill = models.ForeignKey(Bill, null=True, on_delete=models.SET_NULL)
+	room = models.ForeignKey(Room, null=True, on_delete=models.SET_NULL)
 
 	def __unicode__(self):
 		return self.name + str(self.g_l.name)
