@@ -16,6 +16,7 @@ urlpatterns = [
 	url(r'^firewallz/add/(?P<gl_id>\d+)/$', views.firewallz_add, name='firewallz_add'),
 	url(r'^firewallz/delete/$', views.firewallz_delete, name='firewallz_delete'),
 	url(r'^firewallz/edit_tc/(?P<tc_id>\d+)/$', views.firewallz_edit_tc, name='firewallz_edit_tc'),
+	url(r'^firewallz/add_coach/(?P<gl_id>\d+)/$', views.add_coach_recnacc, name='add_coach_firewallz'),
 
 	########## RecNAcc #############
 	url(r'^recnacc/$', views.recnacc_home, name='recnacc-home'),
@@ -25,7 +26,7 @@ urlpatterns = [
 	url(r'^recnacc/college_vs_bhavan/$', views.college_vs_bhavan, name='college_vs_bhavan'),
 	url(r'^recnacc/all_bhavans/$', views.all_bhavans, name='all_bhavans'),
 	url(r'^recnacc/bhavan_details/(?P<b_id>\d+)/$', views.bhavan_details, name='bhavan_details'),
-	url(r'^recnacc/firewallz_approved/$', views.firewallz_approved, name='firewallz_approved'),
+	url(r'^recnacc/f_approved/$', views.firewallz_approved, name='firewallz_approved'),
 	url(r'^recnacc/checkout/$', views.recnacc_checkout, name="recnacc_checkout"),
 	url(r'^recnacc/checkout/(?P<gl_id>\d+)/$', views.recnacc_checkout_id, name="recnacc_checkout_id"),
 	

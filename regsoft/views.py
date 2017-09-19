@@ -119,7 +119,8 @@ def firewallzo_home(request):
 			'captain':part.captain.name,
 			'id':part.id,
 			'captain_id':part.captain.id} for part in parts.filter(firewallz_passed=False).order_by('captain__event__name')]
-		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'gl_id':g_l.id})
+		coaches = [[coach.name, coach.event.name, coach.g_l.college] for coach in Coach.objects.filter(g_l=g_l) ]
+		return render(request, 'regsoft/firewallzo_home.html',{'confirmed':confirmed, 'unconfirmed':unconfirmed, 'gl_id':g_l.id, 'coaches':coaches})
 
 
 
@@ -396,6 +397,8 @@ def add_coach_recnacc(request, gl_id):
 		except:
 			return redirect(request.META.get('HTTP_REFERER'))
 		coach = Coach.objects.create(name=name, event=event, g_l=g_leader)
+		if request.user.username == 'firewallz':
+			return redirect(reverse('regsoft:firewallz-home'))			
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':gl_id}))
 		
 	events = [part.event for part in Participation.objects.filter(g_l=g_leader)]

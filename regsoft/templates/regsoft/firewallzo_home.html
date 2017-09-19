@@ -16,8 +16,8 @@
 
 
 {% if confirmed or unconfirmed %}
-<button class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick='window.location.assign("{% url 'regsoft:firewallz_add' gl_id %}")'><i class="material-icons">add</i></button><br>
-<br>
+<button class="btn bg-cyan btn-circle-lg waves-effect waves-circle waves-float" onclick='window.location.assign("{% url 'regsoft:firewallz_add' gl_id %}")'><i class="material-icons">add</i></button>
+<br><br>
 {% endif %}
 {% if unconfirmed %}
 <div class="card">
@@ -113,8 +113,8 @@
                         <th></th>
                         <th></th>
                         <th>
-                            <input type="checkbox" id="selectAll">
-                            <label for="selectAll"></label>
+                            <input type="checkbox" id="selectAll1">
+                            <label for="selectAll1"></label>
                         </th>
                     </tr>
                     <tr>
@@ -160,6 +160,48 @@
             </table>
             <input type="hidden" value="unconfirm" name="action">
             <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Unconfirm</button>
+        </div>
+	</form>
+    </div>
+</div>
+{% endif %}
+
+
+{% if coaches %}
+<div class="card">
+    <div class="header">
+        <h2>
+            Coaches   <a href="{% url 'regsoft:add_coach_firewallz' gl_id %}" class="btn btn-primary btn-lg m-l-15 waves-effect">Add Coach</a>
+            
+        </h2>
+    </div>
+	<div class="body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Event</th>
+                        <th>College</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Event</th>
+                        <th>College</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                	{% for coach in coaches %}
+                    <tr>
+                        {% for i in coach %}
+                        <td>{{i}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 	</form>
     </div>
