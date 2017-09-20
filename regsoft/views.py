@@ -515,7 +515,7 @@ def controlz_edit(request, part_id):
 		part.save()
 		request.method = 'POST'
 
-		return redirect('controlz_home')
+		return redirect('regsoft:controlz-home')
 		
 	return render(request, 'regsoft/controlz_edit.html', 
 		{'name':part.name, 'college':g_l.college, 'captain':tc.name, 'g_l':g_l.name, 'event':tc.event})
@@ -633,7 +633,7 @@ def add_coach_controlz(request, gl_id):
 		return redirect(reverse('regsoft:create_bill', kwargs={'gl_id':gl_id}))
 		
 	events = [part.event for part in Participation.objects.filter(g_l=g_leader)]
-	return render(request, 'regsoft/add_captain.html', {'g_l':g_l, 'events':events})
+	return render(request, 'regsoft/add_coach.html', {'g_l':g_leader, 'events':events})
 
 @staff_member_required
 def get_details(request):
