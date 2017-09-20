@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^registrations/', include('registrations.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^regsoft/', include('regsoft.urls')),
+    url(r'^app/', include('app.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

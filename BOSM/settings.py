@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'events',
     'pcradmin',
     'api',
+    'app',
     'rest_framework',
 ]
 
