@@ -275,20 +275,26 @@ def recnacc_home(request):
 		return redirect(reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id}))
 
 	g_ls = GroupLeader.objects.filter(pcr_approved=True)
-	rows = [{'data':[g_l.college, count_players(g_l)], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls if count_players(g_l)!=0]
-	headings = ['College', 'No. of Participants', 'Allot']
+	rows = [{'data':[g_l.college, count_players(g_l), if_alloted_any(g_l)], 'link':[{'title':'Allot', 'url':reverse('regsoft:recnacc-college', kwargs={'gl_id':g_l.id})}]} for g_l in g_ls if count_players(g_l)!=0]
+	headings = ['College', 'No. of Participants','Alloted', 'Allot']
 	tables = [{'title':'Select College to allot rooms', 'rows':rows, 'headings':headings}]
 	return render(request,'regsoft/recnacc_home.html', {'tables':tables})
 
+def if_alloted_any(g_l):
+	for tc in TeamCaptain.objects.filter(g_l=g_l, is_extra=False, if_payment=True):
+		for part in tc.participant_set.all():
+			if part.acco:
+				return True
+	return False
 def count_players(g_l):
-	tcs = TeamCaptain.objects.filter(g_l=g_l,pcr_final=True, is_extra=False)
+	tcs = TeamCaptain.objects.filter(g_l=g_l,pcr_final=True, is_extra=False, if_payment=True)
 	sum=0
 	for tc in tcs:
 		sum+=tc.participant_set.filter(firewallz_passed=True).count()
 	return sum
 
 def count_players_accomodated(g_l):
-	tcs = TeamCaptain.objects.filter(g_l=g_l,	 pcr_final=True, is_extra=False)
+	tcs = TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False, if_payment=True)
 	sum=0
 	for tc in tcs:
 		sum+=tc.participant_set.filter(acco=True).count()
@@ -300,7 +306,7 @@ def recnacc_college(request, gl_id):
 	rooms = Room.objects.all()
 	parts1 = []
 	parts2 = []
-	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False):
+	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False, if_payment=True):
 		if tc.participant_set.filter(firewallz_passed=True):
 			parts1 += Participant.objects.filter(captain=tc, acco=True, firewallz_passed=True)
 			parts2 += Participant.objects.filter(captain=tc, acco=False, firewallz_passed=True)
