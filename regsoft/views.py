@@ -300,7 +300,7 @@ def recnacc_college(request, gl_id):
 	rooms = Room.objects.all()
 	parts1 = []
 	parts2 = []
-	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False):
+	for tc in TeamCaptain.objects.filter(g_l=g_l, pcr_final=True, is_extra=False, if_payment=True):
 		if tc.participant_set.filter(firewallz_passed=True):
 			parts1 += Participant.objects.filter(captain=tc, acco=True, firewallz_passed=True)
 			parts2 += Participant.objects.filter(captain=tc, acco=False, firewallz_passed=True)
