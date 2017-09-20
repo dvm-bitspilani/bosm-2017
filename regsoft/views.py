@@ -919,6 +919,16 @@ def delete_bill(request, b_id):
 	return redirect(reverse('regsoft:view_bills', kwargs={'gl_id':gl_id}))
 
 @staff_member_required
+def team_captain_list(request):
+	rows = [{'data':[captain.name, captain.event.name, captain.phone, captain.email, captain.g_l.college]} for captain in TeamCaptain.objects.filter(pcr_final=True)]
+	table = {
+		'rows':rows,
+		'headings':['Name', 'Event', 'Phone', 'Email', 'College'],
+		'title':'Captains finalised by PCr',
+	}
+	return render(request, 'regsoft/tables.html', {'tables':[table]})
+
+@staff_member_required
 def print_bill(request, b_id):
 	from datetime import datetime
 	time_stamp = datetime.now()

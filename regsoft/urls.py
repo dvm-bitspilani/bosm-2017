@@ -43,6 +43,7 @@ urlpatterns = [
 	url(r'^controlz/bill_details/(?P<b_id>\d+)/$', views.bill_details, name='bill_details'),
 	url(r'^controlz/delete_bill/(?P<b_id>\d+)/$', views.delete_bill, name='delete_bill'),
 	url(r'^controlz/print_bill/(?P<b_id>\d+)/$', views.print_bill, name='print_bill'),
+	url(r'^controlz/team_captain_list/$', views.team_captain_list, name='team_captain_list'),
 	url(r'^controlz/master_bill/$', views.master_bill, name='master_bill'),
 	# url(r'^controlz/view_captain_controlz/(?P<gl_id>\d+)/$', views.view_captain_controlz, name='view_captain_controlz'),
 	url(r'^controlz/edit/(?P<part_id>\d+)/$', views.controlz_edit, name='controlz_edit'),
