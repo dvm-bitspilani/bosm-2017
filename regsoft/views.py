@@ -515,7 +515,7 @@ def controlz_edit(request, part_id):
 		part.save()
 		request.method = 'POST'
 
-		return redirect('controlz_home')
+		return redirect('regsoft:controlz-home')
 		
 	return render(request, 'regsoft/controlz_edit.html', 
 		{'name':part.name, 'college':g_l.college, 'captain':tc.name, 'g_l':g_l.name, 'event':tc.event})
@@ -633,7 +633,7 @@ def add_coach_controlz(request, gl_id):
 		return redirect(reverse('regsoft:create_bill', kwargs={'gl_id':gl_id}))
 		
 	events = [part.event for part in Participation.objects.filter(g_l=g_leader)]
-	return render(request, 'regsoft/add_captain.html', {'g_l':g_l, 'events':events})
+	return render(request, 'regsoft/add_coach.html', {'g_l':g_leader, 'events':events})
 
 @staff_member_required
 def get_details(request):
@@ -833,6 +833,56 @@ def view_bills(request, gl_id):
 	return render(request, 'regsoft/tables.html', {'tables':[bill_table]})
 
 @staff_member_required
+def master_bill(request):
+	bill_list = Bill.objects.all()
+	two_thousand = 0
+	five_hundred = 0
+	hundred = 0
+	fifty = 0
+	twenty = 0
+	ten = 0
+	returned_two_thousand = 0
+	returned_five_hundred = 0
+	returned_hundred = 0
+	returned_fifty = 0
+	returned_twenty = 0
+	returned_ten = 0
+	for bill in bill_list:
+		two_thousand += bill.two_thousands
+		five_hundred += bill.five_hundreds
+		hundred += bill.hundreds
+		fifty += bill.fifties
+		twenty += bill.twenties
+		ten += bill.tens
+		returned_two_thousand += bill.two_thousands_returned
+		returned_five_hundred += bill.five_hundreds_returned
+		returned_hundred += bill.hundreds_returned
+		returned_fifty += bill.fifties_returned
+		returned_twenty += bill.twenties_returned
+		returned_ten += bill.tens_returned
+
+	rows = [{'data':['Two Thousands', two_thousand]},
+			{'data':['Five Hundreds', five_hundred]},
+			{'data':['Hundreds', hundred]},
+			{'data':['Fifties', fifty]},
+			{'data':['Twenties', twenty]},
+			{'data':['Tens', ten]},
+			{'data':['Returned Two Thousands', returned_two_thousand]},
+			{'data':['Returned Five Hundreds', returned_five_hundred]},
+			{'data':['Returned Hundreds', returned_hundred]},
+			{'data':['Returned Fifties', returned_fifty]},
+			{'data':['Returned Twenties', returned_twenty]},
+			{'data':['Returned Tens', returned_ten]},]
+	headings = ['Denomination', 'Number of notes']
+	title = 'Notes Master List'
+	table = {
+	'rows':rows,
+	'headings':headings,
+	'title':title,
+	}
+	return render(request, 'regsoft/tables.html', {'tables':[table,]})
+
+@staff_member_required
 def bill_details(request, b_id):
 	bill = get_object_or_404(Bill, id=b_id)
 	c_rows = [{'data':[part.name, part.captain.name, part.captain.event.name, bill.time_paid,], 'link':[]} for part in bill.participant_set.all()]
@@ -876,7 +926,7 @@ def team_captain_list(request):
 		'headings':['Name', 'Event', 'Phone', 'Email', 'College'],
 		'title':'Captains finalised by PCr',
 	}
-	return render(request, 'regsoft/tables.hmtl', {'tables':[table]})
+	return render(request, 'regsoft/tables.html', {'tables':[table]})
 
 @staff_member_required
 def print_bill(request, b_id):
