@@ -454,9 +454,10 @@ def bhavan_details(request, b_id):
 
 @staff_member_required
 def college_vs_bhavan(request):
-	rows = list([{'data':[tc.g_l.college, tc.room.bhavan.name,tc.room.room, tc.name, tc.event.name], 'link':[]} for tc in TeamCaptain.objects.filter(firewallz_passed=True, acco=True, pcr_final=True)])
+	x = [[part.captain.g_l.college, part.room.bhavan.name, part.room.room, part.captain.event.name] for part in Participant.objects.filter(firewallz_passed=True, acco=True)]
+	rows = [{'data':i, 'link':[]} for i in x]
 	print rows
-	headings = ['College', 'Bhavan','Room', 'Name', 'Event']
+	headings = ['College', 'Bhavan','Room', 'Event']
 	tables = [{'title':'Bhavans vs College', 'headings':headings, 'rows':rows}]
 	return render(request,'regsoft/tables.html', {'tables':tables})
 
