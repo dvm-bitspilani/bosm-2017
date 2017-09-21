@@ -281,11 +281,14 @@ def recnacc_home(request):
 	return render(request,'regsoft/recnacc_home.html', {'tables':tables})
 
 def if_alloted_any(g_l):
+	x=0
+	y=0
 	for tc in TeamCaptain.objects.filter(g_l=g_l, is_extra=False, if_payment=True):
-		for part in tc.participant_set.all():
+		for part in tc.participant_set.filter(firewallz_passed=True):
+			y+=1
 			if part.acco:
-				return True
-	return False
+				x+=1
+	return x==y
 def count_players(g_l):
 	tcs = TeamCaptain.objects.filter(g_l=g_l,pcr_final=True, is_extra=False, if_payment=True)
 	sum=0
