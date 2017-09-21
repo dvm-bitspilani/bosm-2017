@@ -48,6 +48,40 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <h3>
+                            Coaches
+                        </h3>
+                        <table class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>College</th>    
+                                    <th>Event</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>College</th>    
+                                    <th>Event</th>
+                                    <th>Select</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for coach in coaches %}
+                                <tr>
+                                    <td>{{coach.name}}</td>
+                                    <td>{{coach.g_l.college}}</td>
+                                    <td>{{coach.event.name}}</td>
+                                    <td>                                   
+                                        <input type="checkbox" name="coach_data" id="{{coach.name}}" value="{{coach.id}}">
+                                        <label for="{{coach.name}}"></label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                         <button type="submit" class="btn btn-primary btn-lg m-l-15 waves-effect">Generate List</button>
                     </div>
                 </form>

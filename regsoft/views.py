@@ -603,8 +603,8 @@ def recnacc_list(request, gl_id):
 		participant_list += captain.participant_set.filter(firewallz_passed=True, acco=True)
 	
 	participant_list.sort(key=lambda x: x.recnacc_time, reverse=True)
-
-	return render(request, 'regsoft/recnacc_list.html', {'participant_list':participant_list})
+	coaches_list = Coach.objects.filter(g_l=g_leader, acco=True)
+	return render(request, 'regsoft/recnacc_list.html', {'participant_list':participant_list, 'coaches':coaches_list})
 
 @staff_member_required
 def generate_recnacc_list(request):
@@ -612,12 +612,17 @@ def generate_recnacc_list(request):
 		
 		data = request.POST
 		id_list = data.getlist('data')
+		cid_list = data.getlist('coach_data')
 		c_rows = []
 		# value = 300
 		for p_id in id_list:
 			part = Participant.objects.get(id=p_id)
 			c_rows.append({'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.room.room, part.room.bhavan, 300], 'link':[]})
-		amount = len(id_list)*300
+			
+		for cid in cid_list:
+			coach = Coach.objects.get(id=cid)
+			c_rows.append({'data':[coach.name, coach.g_l.college, 'N/A(Coach)', coach.g_l.name, coach.event.name,coach.room.room,coach.room.bhavan, 300 ]})
+		amount = (len(id_list)+len(cid_list))*300
 		c_rows.append({'data':['Total', '','','','','','',amount]})
 		table = {
 			'title':'Participant list for RecNAcc',
