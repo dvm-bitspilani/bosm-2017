@@ -196,6 +196,7 @@ def firewallz_add(request, gl_id):
 			name = request.POST['name']
 			gender = request.POST['gender']
 		except:
+			print 1
 			return redirect(request.META.get('HTTP_REFERER'))
 		
 		if event.max_limit == 1:
@@ -206,16 +207,20 @@ def firewallz_add(request, gl_id):
 						break
 				print tc1
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, email=tc1.email, phone=tc1.phone, pcr_final=True)
+				print 3
 			except:
+				print 2
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, pcr_final=True)
 
 			part = Participant.objects.create(name=name, captain=tc,)
+
 		else:
 			try:
 				tc1 = TeamCaptain.objects.filter(event=event, g_l=g_l)[0]
-				if not(tc1.total_players < event.max_limit):
-					raise ValueError
+				
+				print 4
 			except:
+				print 5
 				return redirect(request.META.get('HTTP_REFERER'))
 
 			part = Participant.objects.create(captain=tc1, name=name,)
@@ -223,6 +228,7 @@ def firewallz_add(request, gl_id):
 			tc1.save()
 
 		# request.POST['barcode'] = g_l.barcode
+		print 6
 		return redirect(reverse('regsoft:firewallz-home'))
 	events = [part.event for part in Participation.objects.filter(g_l=g_l, confirmed=True)]
 	return render(request,  'regsoft/controlz_add.html',{'events':events, 'g_l':g_l})
