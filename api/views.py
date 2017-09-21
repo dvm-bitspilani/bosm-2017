@@ -126,7 +126,7 @@ pcr@bits-bosm.org
 			return Response({'message':'Email sending failed.'})
 
 		message = "A confirmation link has been sent to %s. Kindly click on it to verify your email address.(Email may be present in the spams folder)." %(send_to)
-		return Response({'message':message})
+		return Response({'fragment_message':message})
 
 	else:
 		return Response({'message':get_errors(user_serializer._errors)}, status=status.HTTP_400_BAD_REQUEST)
