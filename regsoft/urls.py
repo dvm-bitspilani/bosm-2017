@@ -26,7 +26,7 @@ urlpatterns = [
 	url(r'^recnacc/college_vs_bhavan/$', views.college_vs_bhavan, name='college_vs_bhavan'),
 	url(r'^recnacc/all_bhavans/$', views.all_bhavans, name='all_bhavans'),
 	url(r'^recnacc/bhavan_details/(?P<b_id>\d+)/$', views.bhavan_details, name='bhavan_details'),
-	url(r'^recnacc/f_approved/$', views.firewallz_approved, name='firewallz_approved'),
+	url(r'^recnacc/controlz/f_approved/$', views.firewallz_approved, name='firewallz_approved'),
 	url(r'^recnacc/checkout/$', views.recnacc_checkout, name="recnacc_checkout"),
 	url(r'^recnacc/checkout/(?P<gl_id>\d+)/$', views.recnacc_checkout_id, name="recnacc_checkout_id"),
 	
