@@ -112,6 +112,7 @@ class Coach(models.Model):
 	acco = models.BooleanField(default=False)
 	bill = models.ForeignKey(Bill, null=True, on_delete=models.SET_NULL)
 	room = models.ForeignKey(Room, null=True, on_delete=models.SET_NULL)
+	checkout = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.name + str(self.g_l.name)

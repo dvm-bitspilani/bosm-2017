@@ -442,14 +442,33 @@ def recnacc_checkout_id(request,gl_id):
 			part.room = None
 			part.checkout = True
 			part.save()
+		try:
+			coach_list = data.getlist('coach_list')
+			for p_id in coach_list:
+				part = Coach.objects.get(id=p_id)
+				part.acco = False
+				part.room = None
+				part.checkout = True
+				part.save()
+		except:
+			pass
 		time = datetime.now()
 		amount_retained = int(data['retained'])
-		amount_returned = (len(part_list)*300) - amount_retained
-		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time})
+		coach_list = Coach.objects.filter(id__in=coach_list)
+		amount_returned = ((len(part_list)+len(coach_list))*300) - amount_retained
+		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time, 'coach_list':coach_list})
 
 	teamcaptain_list = g_l.teamcaptain_set.filter(pcr_final=True)
-	part_list = Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True, controlz=True)
-	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l})
+	part_list = list(Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True, controlz=True))
+	part_name = [p.name.lower() for p in part_list]
+	part_controlz = Participant.objects.filter(captain__g_l=g_l, captain__pcr_final=True, controlz=True)
+	for p in part_controlz:
+		if not p.name.lower() in part_name:
+			part_list.append(p)
+
+	coach_list = Coach.objects.filter(g_l=g_l, paid=True, acco=True)
+
+	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l, 'coach_list':coach_list})
 
 
 @staff_member_required

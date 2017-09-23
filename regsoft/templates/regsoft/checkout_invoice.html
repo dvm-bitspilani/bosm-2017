@@ -140,6 +140,24 @@
                 </td>
             </tr>
             {% endfor %}
+            <tr class="heading">
+                <td>
+                    Coach
+                </td>
+                <td>
+                    Event
+                </td>
+            </tr>
+            {% for part in coach_list %}
+            <tr class="item">
+                <td>
+                    {{part.name}}
+                </td>
+                <td>
+                    {{part.event.name}}
+                </td>
+            </tr>
+            {% endfor %}
             <tr class="total">
                 <td>Amount Retained</td>
                 <td>{{retained}}</td>
