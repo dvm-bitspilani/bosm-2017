@@ -448,7 +448,7 @@ def recnacc_checkout_id(request,gl_id):
 		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time})
 
 	teamcaptain_list = g_l.teamcaptain_set.filter(pcr_final=True)
-	part_list = Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True)
+	part_list = Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True, controlz=True)
 	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l})
 
 
