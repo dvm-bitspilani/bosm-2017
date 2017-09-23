@@ -974,3 +974,25 @@ def contacts(request):
 def user_logout(request):
 	logout(request)
 	return redirect('regsoft:index')
+
+def fuckup():
+	# Participant.objects.filter(acco=True).update(fu_controller=True)
+	g_ls = GroupLeader.objects.filter(pcr_approved=True)
+	for g_l in g_ls:
+		parts = Participant.objects.filter(acco=True, captain__g_l=g_l)
+		pl = []
+		pl_name = []
+		for p in parts:
+			if not p.name.lower() in pl_name:
+				pl.append(p)
+				pl_name.append(p.name.lower())
+
+		extra = [p.id for p in parts if not p in pl]
+		for part_id in extra:
+			part = Participant.objects.get(id=part_id)
+			part.acco = False
+			room = part.room
+			part.room = None
+			part.save()
+			room.vacancy += 1
+			room.save()
