@@ -465,6 +465,7 @@ def recnacc_checkout_id(request,gl_id):
 	for p in part_controlz:
 		if not p.name.lower() in part_name:
 			part_list.append(p)
+			part.name.append(p.name.lower())
 
 	coach_list = Coach.objects.filter(g_l=g_l, paid=True, acco=True)
 
