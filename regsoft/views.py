@@ -975,7 +975,8 @@ def user_logout(request):
 	logout(request)
 	return redirect('regsoft:index')
 
-def fuckup():
+@staff_member_required
+def fuckup(request):
 	# Participant.objects.filter(acco=True).update(fu_controller=True)
 	g_ls = GroupLeader.objects.filter(pcr_approved=True)
 	for g_l in g_ls:
@@ -996,3 +997,4 @@ def fuckup():
 			part.save()
 			room.vacancy += 1
 			room.save()
+	return HttpResponse('done')
