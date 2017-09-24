@@ -960,3 +960,12 @@ def contacts(request):
 def user_logout(request):
 	logout(request)
 	return redirect('regsoft:index')
+
+
+@staff_member_required
+def all_bills(request):
+	bills = Bill.objects.all()
+	rows = [{'data':[bill.amount, bill.g_leader.college, bill.participant_set.all().count()], 'link':[]} for bill in bills]
+	headings = ['Amount', 'College', 'No. of Participants']
+	table = {'rows':rows, 'headings':headings, 'title':'All Bills'}
+	return render(request, 'regsoft/tables.html', {'tables':[table, ]})

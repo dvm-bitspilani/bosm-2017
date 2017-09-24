@@ -51,6 +51,7 @@ urlpatterns = [
 	url(r'^controlz/delete/$', views.controlz_delete, name='controlz_delete'),
 	url(r'^controlz/event_details/$', views.get_details, name='get_details'),
 	url(r'^controlz/edit_tc/(?P<tc_id>\d+)/$', views.controlz_edit_tc, name='controlz_edit_tc'),
+	url(r'^controlz/all_bills/$',views.all_bills, name="all_bills"),
 
 	########## FirewallzI #############
 	#url(r'^firewallzi/$', views.firewallzi_home, name='firewallzi-home')
