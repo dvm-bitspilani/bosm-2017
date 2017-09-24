@@ -13,16 +13,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable">
             <thead>
-                    <tr>
-                            <th>Select All</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th>
-                                <input type="checkbox" id="selectAll">
-                                <label for="selectAll"></label>
-                            </th>
-                    </tr>
+                    
                     <tr>
                         <th>Name</th>
                         <th>College</th>
@@ -50,6 +41,42 @@
                         <td>
                             <input name="part_list" type="checkbox" id="{{part.id}}" value="{{part.id}}"/>
                             <label for="{{part.id}}"></label>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+        </table>
+        <h2>Coaches</h2>
+        <table class="table table-bordered table-striped table-hover dataTable">
+            <thead>
+                   
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Room</th>
+                        <th>Bhavan</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                {% for coach in coach_list %}
+                    <tr>
+                        <td>{{coach.name}}</td>
+                        <td>{{coach.g_l.college}}</td>
+                        <td>{{coach.room.room}}</td>
+                        <td>{{coach.room.bhavan}}</td>
+                        <td>
+                            <input name="coach_list" type="checkbox" id="{{coach.name}}" value="{{coach.id}}"/>
+                            <label for="{{coach.name}}"></label>
                         </td>
                     </tr>
                 {% endfor %}

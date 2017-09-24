@@ -196,6 +196,7 @@ def firewallz_add(request, gl_id):
 			name = request.POST['name']
 			gender = request.POST['gender']
 		except:
+			print 1
 			return redirect(request.META.get('HTTP_REFERER'))
 		
 		if event.max_limit == 1:
@@ -206,16 +207,20 @@ def firewallz_add(request, gl_id):
 						break
 				print tc1
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, email=tc1.email, phone=tc1.phone, pcr_final=True)
+				print 3
 			except:
+				print 2
 				tc = TeamCaptain.objects.create(g_l=g_l, name=name, is_single=True, event=event, gender=gender, pcr_final=True)
 
 			part = Participant.objects.create(name=name, captain=tc,)
+
 		else:
 			try:
 				tc1 = TeamCaptain.objects.filter(event=event, g_l=g_l)[0]
-				if not(tc1.total_players < event.max_limit):
-					raise ValueError
+				
+				print 4
 			except:
+				print 5
 				return redirect(request.META.get('HTTP_REFERER'))
 
 			part = Participant.objects.create(captain=tc1, name=name,)
@@ -223,6 +228,7 @@ def firewallz_add(request, gl_id):
 			tc1.save()
 
 		# request.POST['barcode'] = g_l.barcode
+		print 6
 		return redirect(reverse('regsoft:firewallz-home'))
 	events = [part.event for part in Participation.objects.filter(g_l=g_l, confirmed=True)]
 	return render(request,  'regsoft/controlz_add.html',{'events':events, 'g_l':g_l})
@@ -281,11 +287,14 @@ def recnacc_home(request):
 	return render(request,'regsoft/recnacc_home.html', {'tables':tables})
 
 def if_alloted_any(g_l):
+	x=0
+	y=0
 	for tc in TeamCaptain.objects.filter(g_l=g_l, is_extra=False, if_payment=True):
-		for part in tc.participant_set.all():
+		for part in tc.participant_set.filter(firewallz_passed=True):
+			y+=1
 			if part.acco:
-				return True
-	return False
+				x+=1
+	return x==y
 def count_players(g_l):
 	tcs = TeamCaptain.objects.filter(g_l=g_l,pcr_final=True, is_extra=False, if_payment=True)
 	sum=0
@@ -433,14 +442,34 @@ def recnacc_checkout_id(request,gl_id):
 			part.room = None
 			part.checkout = True
 			part.save()
+		try:
+			coach_list = data.getlist('coach_list')
+			for p_id in coach_list:
+				part = Coach.objects.get(id=p_id)
+				part.acco = False
+				part.room = None
+				part.checkout = True
+				part.save()
+		except:
+			pass
 		time = datetime.now()
 		amount_retained = int(data['retained'])
-		amount_returned = (len(part_list)*300) - amount_retained
-		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time})
+		coach_list = Coach.objects.filter(id__in=coach_list)
+		amount_returned = ((len(part_list)+len(coach_list))*300) - amount_retained
+		return render(request, 'regsoft/checkout_invoice.html', {'retained':amount_retained, 'returned':amount_returned, 'part_list':participant_list, 'g_l':g_l, 'time':time, 'coach_list':coach_list})
 
 	teamcaptain_list = g_l.teamcaptain_set.filter(pcr_final=True)
-	part_list = Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True)
-	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l})
+	part_list = list(Participant.objects.filter(captain__g_l=g_l, acco=True, captain__pcr_final=True, controlz=True))
+	part_name = [p.name.lower() for p in part_list]
+	part_controlz = Participant.objects.filter(captain__g_l=g_l, captain__pcr_final=True, controlz=True)
+	for p in part_controlz:
+		if not p.name.lower() in part_name:
+			part_list.append(p)
+			part_name.append(p.name.lower())
+
+	coach_list = Coach.objects.filter(g_l=g_l, paid=True, acco=True)
+
+	return render(request, 'regsoft/checkout.html', {'part_list':part_list, 'g_l':g_l, 'coach_list':coach_list})
 
 
 @staff_member_required
@@ -603,8 +632,8 @@ def recnacc_list(request, gl_id):
 		participant_list += captain.participant_set.filter(firewallz_passed=True, acco=True)
 	
 	participant_list.sort(key=lambda x: x.recnacc_time, reverse=True)
-
-	return render(request, 'regsoft/recnacc_list.html', {'participant_list':participant_list})
+	coaches_list = Coach.objects.filter(g_l=g_leader, acco=True)
+	return render(request, 'regsoft/recnacc_list.html', {'participant_list':participant_list, 'coaches':coaches_list})
 
 @staff_member_required
 def generate_recnacc_list(request):
@@ -612,12 +641,17 @@ def generate_recnacc_list(request):
 		
 		data = request.POST
 		id_list = data.getlist('data')
+		cid_list = data.getlist('coach_data')
 		c_rows = []
 		# value = 300
 		for p_id in id_list:
 			part = Participant.objects.get(id=p_id)
 			c_rows.append({'data':[part.name, part.captain.g_l.college, part.captain.gender,part.captain.g_l.name, part.captain.event.name, part.room.room, part.room.bhavan, 300], 'link':[]})
-		amount = len(id_list)*300
+			
+		for cid in cid_list:
+			coach = Coach.objects.get(id=cid)
+			c_rows.append({'data':[coach.name, coach.g_l.college, 'N/A(Coach)', coach.g_l.name, coach.event.name,coach.room.room,coach.room.bhavan, 300 ]})
+		amount = (len(id_list)+len(cid_list))*300
 		c_rows.append({'data':['Total', '','','','','','',amount]})
 		table = {
 			'title':'Participant list for RecNAcc',
@@ -961,7 +995,6 @@ def user_logout(request):
 	logout(request)
 	return redirect('regsoft:index')
 
-
 @staff_member_required
 def all_bills(request):
 	bills = Bill.objects.all()
@@ -969,3 +1002,28 @@ def all_bills(request):
 	headings = ['Amount', 'College', 'No. of Participants']
 	table = {'rows':rows, 'headings':headings, 'title':'All Bills'}
 	return render(request, 'regsoft/tables.html', {'tables':[table, ]})
+
+
+@staff_member_required
+def fuckup(request):
+	# Participant.objects.filter(acco=True).update(fu_controller=True)
+	g_ls = GroupLeader.objects.filter(pcr_approved=True)
+	for g_l in g_ls:
+		parts = Participant.objects.filter(acco=True, captain__g_l=g_l)
+		pl = []
+		pl_name = []
+		for p in parts:
+			if not p.name.lower() in pl_name:
+				pl.append(p)
+				pl_name.append(p.name.lower())
+
+		extra = [p.id for p in parts if not p in pl]
+		for part_id in extra:
+			part = Participant.objects.get(id=part_id)
+			part.acco = False
+			room = part.room
+			part.room = None
+			part.save()
+			room.vacancy += 1
+			room.save()
+	return HttpResponse('done')
