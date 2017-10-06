@@ -13,8 +13,9 @@ from random import randint
 import json
 from django.contrib.auth import logout
 
+
+## TEST COMMIT
 def home(request):
-	
 	profiles = GroupLeader.objects.filter(pcr_approved=True)
 	headings = ['Name', 'College','Phone','No. of Paid Participants',  'Code', 'View Participants']
 	rows = []
